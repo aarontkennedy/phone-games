@@ -4,6 +4,7 @@
 }
 
 .g2048-board {
+  touch-action: none; /* also set here: in landscape the .g2048 wrapper has no box */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 3%;

@@ -4,8 +4,8 @@
 
 1. **Yours alone.** No ads, accounts, nags, notifications, analytics or network calls.
 2. **Works anywhere.** Fully offline after the first visit.
-3. **One thumb, portrait.** Everything reachable and readable while holding the phone in
-   one hand.
+3. **One thumb, portrait first.** Everything reachable and readable while holding the
+   phone in one hand. Turning the phone sideways also works (see "Landscape").
 4. **Instant resume.** Every move auto-saves, so closing the app never loses a game.
 5. **Calm.** Quick, subtle motion and no flashing. Celebrate wins briefly.
 6. **One family.** Every game uses the same tokens, components and screen layout.
@@ -89,6 +89,31 @@ topbar        ‹ Games   Title                    (app shell)
   .board-frame                                   the playing surface; hosts .overlay
   .status-line                                   hint, or result (aria-live)
 ```
+
+### Landscape
+
+When a phone is turned sideways (landscape and at most 560px tall), every game screen
+switches to a side bar layout automatically:
+
+```
+| ‹ Games  Title   Rules |                    |
+| [stat] [New] [stat]    |      board         |
+| [options] [toggle]     |  (fills the        |
+| status line            |   screen height)   |
+```
+
+- **Pure CSS** in `src/style.css`. It works for any screen built from the structure
+  above, so new games get it for free. Don't add game-specific landscape rules unless a
+  game truly needs them.
+- **Everything fits on one screen.** No scrolling either way, the board fully visible,
+  every control left of the board. Touch target, cell size and text size rules still
+  apply.
+- **Gesture surfaces** set `touch-action: none` on the board itself, not only on the
+  `.screen` wrapper, because the wrapper has no box in this layout.
+- **Tested** by `e2e/landscape.spec.ts` at iPhone 13 (844x390) and iPhone SE (667x375)
+  sizes, for every game and Mines difficulty.
+- **Tablets** are taller than 560px, so they keep the portrait layout.
+- The manifest allows any orientation.
 
 Shared components live in `src/style.css` and `src/core/ui.ts`:
 

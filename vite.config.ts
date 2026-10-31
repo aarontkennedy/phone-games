@@ -16,7 +16,7 @@ export default defineConfig({
         theme_color: '#15131f',
         background_color: '#15131f',
         display: 'standalone',
-        orientation: 'portrait',
+        orientation: 'any', // landscape has its own layout (docs/DESIGN.md)
         start_url: './',
         scope: './',
         icons: [

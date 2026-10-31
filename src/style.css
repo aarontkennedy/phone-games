@@ -395,3 +395,54 @@ body {
   font-size: var(--text-sm);
   text-align: center;
 }
+
+/* --- Landscape phones: controls in a side bar on the left, board on the right ---
+   Applies to any screen built from the standard layout (docs/DESIGN.md). The game's
+   wrappers are flattened (display: contents) so the top bar, stats, controls and
+   status line stack in column 1, and the board fills the screen height in column 2. */
+@media (orientation: landscape) and (max-height: 560px) {
+  #app:has(> .game) {
+    --pad-y: var(--space-3);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: repeat(4, auto) 1fr;
+    column-gap: var(--space-5);
+    row-gap: var(--space-3);
+    height: 100dvh;
+    min-height: 0;
+    padding: calc(env(safe-area-inset-top) + var(--pad-y)) calc(env(safe-area-inset-right) + var(--space-4))
+      calc(env(safe-area-inset-bottom) + var(--pad-y)) calc(env(safe-area-inset-left) + var(--space-4));
+  }
+
+  #app:has(> .game) > .topbar {
+    grid-column: 1;
+    padding: 0;
+  }
+
+  .game,
+  .game > .screen {
+    display: contents;
+  }
+
+  .game .stats,
+  .game .controls,
+  .game .status-line {
+    grid-column: 1;
+  }
+
+  /* The side bar is ~260px on the smallest phones; keep stats on one row. */
+  .game .stat {
+    padding-inline: var(--space-2);
+  }
+
+  .game .board-frame {
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: center;
+    width: min(
+      calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 2 * var(--pad-y)),
+      60vw
+    );
+  }
+}
+
