@@ -161,6 +161,30 @@ Shared components live in `src/style.css` and `src/core/ui.ts`:
   only, so it's always optional.
 - **Sound (future):** off by default, synthesized in code.
 
+## Playing cards
+
+Every card game uses the shared card pieces, so cards look and behave the same
+everywhere.
+
+- **Model:** `src/core/cards.ts` (suits, ranks, names, decks, shuffling with an `rng`).
+- **Drawing:** `src/core/card-view.ts` and `src/core/cards.css`. `cardFace()`,
+  `cardBack()` and `cardSlot()` return HTML. Tappable cards are real `<button>`s with a
+  spoken name ("Queen of hearts"). Put the `cards` class on the game's `.screen` for the
+  card color tokens.
+- **Look:** flat, light card faces in both themes (like real cards), a 1px solid edge,
+  a solid purple back, and our own simple suit shapes. No pictures on court cards: the
+  rank letter and suit say it all.
+- **Readable:** the corner rank is `--text-md` (20px). When cards overlap, at least
+  24px of each card must show so the rank stays readable. Squeeze overlaps to fit the
+  screen, but never below that.
+- **Contrast:** card text 4.5:1 on the face. Card edges, backs and empty-pile outlines
+  3:1 against the table. Tested in `src/core/card-view.test.ts`.
+- **Tap to move:** tapping a card moves it to the best legal place. No dragging is
+  needed. If it can't move, the status line says so.
+- **Undo** wherever a game has no hidden information to protect (Solitaire).
+- **Computer players** (Hearts, Spades, Euchre, Cribbage): an **Easy / Strong**
+  segmented control, like the Mines difficulty.
+
 ## How to play
 
 Every game has a **How to play** page, written for someone who has never played it.

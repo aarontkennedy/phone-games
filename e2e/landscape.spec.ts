@@ -71,6 +71,14 @@ for (const size of SIZES) {
       });
     }
 
+    test('Solitaire: side bar on the left, cards on the right', async ({ page }) => {
+      await page.goto('./#/solitaire');
+      await expectSideBarLayout(page);
+      await page.locator('[data-draw="3"]').click();
+      await page.locator('[data-stock]').click();
+      await expectSideBarLayout(page);
+    });
+
     test('home and About still fit the width', async ({ page }) => {
       await page.goto('./');
       await expectNoHorizontalOverflow(page);

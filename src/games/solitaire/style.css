@@ -1,0 +1,65 @@
+/* Seven columns of cards; the top row lines up with them:
+   deck | turned-over cards (2 columns wide) | four foundations. */
+.sol {
+  --sol-gap: 4px;
+}
+
+.sol-board {
+  padding: var(--space-2);
+  container-type: inline-size;
+  touch-action: manipulation;
+}
+
+.sol-top,
+.sol-tableau {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--sol-gap);
+  /* Card height from the board width, for overlapping cards in a column. */
+  --card-h: calc((100cqw - 6 * var(--sol-gap)) / 7 * 1.4);
+}
+
+.sol-tableau {
+  margin-top: var(--space-3);
+  align-items: start;
+}
+
+.sol-waste {
+  grid-column: 2 / span 2;
+  position: relative;
+  height: var(--card-h);
+}
+
+/* Draw 3 fans the last three cards so you can see what's coming. */
+.sol-waste .card {
+  position: absolute;
+  top: 0;
+  left: calc(var(--i) * 25%);
+  width: calc((100% - var(--sol-gap)) / 2);
+}
+
+.sol-found .card-slot,
+.sol-stock .card-slot {
+  display: grid;
+  place-items: center;
+}
+
+.sol-found .card-slot .suit {
+  width: 55%;
+  fill: var(--card-slot);
+}
+
+.sol-col {
+  /* Face-up cards show the rank; fitColumns() can squeeze this for long columns. */
+  --peek-up: 8cqw;
+  display: flex;
+  flex-direction: column;
+}
+
+.sol-col > .card + .card {
+  margin-top: calc(var(--peek-up) - var(--card-h));
+}
+
+.sol-col > .card.back + .card {
+  margin-top: calc(3.5cqw - var(--card-h));
+}

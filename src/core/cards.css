@@ -1,0 +1,99 @@
+/* Shared playing cards. Flat: solid fills and 1px solid edges only (docs/DESIGN.md).
+   Faces stay light in both themes, like real cards. Put .cards on the game's .screen. */
+.cards {
+  --card-face: #ffffff;
+  --card-edge: #6e6690;
+  --card-red: #c62828;
+  --card-black: #1d1a2b;
+  --card-back: #5b4fd6;
+  --card-slot: #625d78;
+}
+
+@media (prefers-color-scheme: dark) {
+  .cards {
+    --card-face: #f4f1fb;
+    --card-edge: #f4f1fb;
+    --card-red: #c62828;
+    --card-black: #1d1a2b;
+    --card-back: #9d94ff;
+    --card-slot: #a29fb8;
+  }
+}
+
+.card,
+.card-slot {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  aspect-ratio: 5 / 7;
+  border-radius: var(--radius-sm);
+}
+
+.card {
+  position: relative;
+  margin: 0;
+  padding: 2px 3px;
+  border: 1px solid var(--card-edge);
+  background: var(--card-face);
+  color: var(--card-black);
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+  overflow: hidden;
+}
+
+button.card {
+  cursor: pointer;
+}
+
+.card.red {
+  color: var(--card-red);
+}
+
+.card-corner {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  font-size: var(--text-md);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.card .suit {
+  flex: none;
+  width: 0.7em;
+  height: 0.7em;
+  fill: currentColor;
+}
+
+.card-pip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10%;
+  display: flex;
+  justify-content: center;
+}
+
+.card-pip .suit {
+  width: 55%;
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.card.back {
+  border-color: var(--card-face);
+  background: var(--card-back);
+}
+
+.card-slot {
+  border: 2px solid var(--card-slot);
+  background: transparent;
+  padding: 0;
+}
+
+/* Highlights the card or pile the player picked. */
+.card.picked {
+  outline: 3px solid var(--accent);
+  outline-offset: 1px;
+}

@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { mineIcon, tilesIcon } from './icons';
+import { cardsIcon, mineIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -51,5 +51,32 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./minesweeper'),
+  },
+  {
+    id: 'solitaire',
+    title: 'Solitaire',
+    description: 'Sort the deck into four suit piles',
+    icon: cardsIcon,
+    howToPlay: {
+      goal: 'Move all 52 cards onto the four piles at the top right, one pile per suit, from ace up to king.',
+      steps: [
+        'The seven columns are the main play area. Only the face-up cards can be moved.',
+        'In a column, you can put a card on one that is <b>one higher</b> and the <b>other color</b>: a red 6 on a black 7, a black 9 on a red 10.',
+        'To move several face-up cards together, tap the highest card of the group you want to move. The cards below it come along.',
+        'When you move the last face-up card off a column, the face-down card under it turns over.',
+        'Only a <b>king</b> (or a run starting with a king) can go in an empty column.',
+        'Tap the <b>deck</b> at the top left to turn over cards. When it runs out, tap the empty space to turn them all back over.',
+        'Aces start the piles at the top right. Then add the 2, 3 and so on of the same suit.',
+        '<b>Tap a card to move it.</b> It goes to the best place it can: its suit pile first, then a column.',
+        'Made a mistake? Tap <b>Undo</b>. Your game is saved after every move.',
+      ],
+      tips: [
+        '<b>Draw 1</b> turns over one card at a time and is easier. <b>Draw 3</b> turns over three, and you can only play the top one.',
+        'Turning over face-down cards in the columns matters most. Work on the longest columns first.',
+        'Don\'t empty a column unless you have a king ready to move into it.',
+        'Once every card is face up, the game finishes itself.',
+      ],
+    },
+    load: () => import('./solitaire'),
   },
 ];

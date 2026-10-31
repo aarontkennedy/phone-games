@@ -4,6 +4,7 @@ import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, fai
 const GAMES = [
   { id: '2048', title: '2048' },
   { id: 'minesweeper', title: 'Mines' },
+  { id: 'solitaire', title: 'Solitaire' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));

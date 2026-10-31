@@ -27,4 +27,5 @@ Offline PWA of personal games (no server, no ads, no accounts). Vite + TypeScrip
 - Each game is lazy-loaded from src/games/index.ts and must implement `mount(container) => cleanup`.
 - Game screens must use the standard layout (`.screen` > `.stats`, `.controls`, `.board-frame`, `.status-line`). It's what makes the landscape side bar work (docs/DESIGN.md, "Landscape"); check new games with `e2e/landscape.spec.ts`.
 - Every game needs `howToPlay` rules in src/games/index.ts, written for a first-time player (docs/DESIGN.md, "How to play"). They open only from the Rules button, never by themselves.
+- Card games use the shared card model and drawings (src/core/cards.ts, src/core/card-view.ts) and follow docs/DESIGN.md, "Playing cards".
 - The About page (src/about.ts, `#/about`) must match LICENSE and public/THIRD_PARTY_NOTICES.txt (docs/LEGAL.md).

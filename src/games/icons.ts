@@ -29,3 +29,10 @@ export const mineIcon = svg(
     })
     .join('')}</g><circle cx="24" cy="24" r="12" fill="#ef5f58"/>`,
 );
+
+/** Two overlapping cards; the front one shows a red heart. */
+export const cardsIcon = svg(
+  '<rect x="6" y="6" width="22" height="31" rx="3" fill="#6c63ff" transform="rotate(-12 17 21)"/>' +
+    '<rect x="18" y="10" width="23" height="32" rx="3" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<path d="M29.5 34C25 30.2 22 27.6 22 24.4a3.75 3.75 0 0 1 7.5-1.5 3.75 3.75 0 0 1 7.5 1.5c0 3.2-3 5.8-7.5 9.6Z" fill="#ef5f58"/>',
+);
