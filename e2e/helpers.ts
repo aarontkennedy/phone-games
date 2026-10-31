@@ -24,6 +24,16 @@ export function failOnErrors(page: Page): void {
   });
 }
 
+/** Marks every game's How to play page as seen, so it doesn't cover the board. */
+export async function skipHowToPlay(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const getItem = Storage.prototype.getItem;
+    Storage.prototype.getItem = function (key: string) {
+      return key.endsWith(':help-seen') ? 'true' : getItem.call(this, key);
+    };
+  });
+}
+
 /** Swipes across an element with pointer events, the way a finger would. */
 export async function swipe(target: Locator, dx: number, dy: number): Promise<void> {
   await target.evaluate(

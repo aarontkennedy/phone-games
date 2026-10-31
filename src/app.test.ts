@@ -4,7 +4,14 @@ import type { GameMeta, GameModule } from './core/game';
 import { flush } from './test/helpers';
 
 function game(id: string, load: () => Promise<GameModule>): GameMeta {
-  return { id, title: `Title ${id}`, description: `About ${id}`, icon: '🎲', load };
+  return {
+    id,
+    title: `Title ${id}`,
+    description: `About ${id}`,
+    icon: '🎲',
+    howToPlay: { goal: `Win ${id}`, steps: ['First', 'Second'], tips: ['Hint'] },
+    load,
+  };
 }
 
 function setup(games: GameMeta[]) {
@@ -56,6 +63,59 @@ describe('startApp', () => {
     expect(unmount).toHaveBeenCalledOnce();
     expect(root.querySelector('.home')).not.toBeNull();
     stop();
+  });
+
+  describe('how to play', () => {
+    const noop = async () => ({ mount: () => () => {} });
+    const panel = (root: HTMLElement) => root.querySelector<HTMLElement>('.help')!;
+
+    it('opens by itself the first time a game is opened', async () => {
+      const { root, stop, go } = setup([game('a', noop)]);
+      await go('#/a');
+      const help = panel(root);
+      expect(help.hidden).toBe(false);
+      expect(help.getAttribute('role')).toBe('dialog');
+      expect(help.querySelector('h2')!.textContent).toBe('How to play Title a');
+      expect(document.activeElement).toBe(help.querySelector('h2'));
+      expect(help.textContent).toContain('Win a');
+      expect([...help.querySelectorAll('ol li')].map((li) => li.textContent)).toEqual(['First', 'Second']);
+      expect(help.querySelector('ul li')!.textContent).toBe('Hint');
+      stop();
+    });
+
+    it('stays closed after Got it, and Rules opens it again', async () => {
+      const { root, stop, go } = setup([game('a', noop)]);
+      await go('#/a');
+      panel(root).querySelector<HTMLButtonElement>('[data-help-close]')!.click();
+      expect(panel(root).hidden).toBe(true);
+      expect(document.activeElement).toBe(root.querySelector('[data-help]'));
+
+      await go('#/');
+      await go('#/a');
+      expect(panel(root).hidden).toBe(true);
+
+      root.querySelector<HTMLButtonElement>('[data-help]')!.click();
+      expect(panel(root).hidden).toBe(false);
+      stop();
+    });
+
+    it('remembers each game separately', async () => {
+      const { root, stop, go } = setup([game('a', noop), game('b', noop)]);
+      await go('#/a');
+      panel(root).querySelector<HTMLButtonElement>('[data-help-close]')!.click();
+      await go('#/b');
+      expect(panel(root).hidden).toBe(false);
+      stop();
+    });
+
+    it('leaves out the tips heading when a game has no tips', async () => {
+      const g = game('a', noop);
+      g.howToPlay = { goal: 'Win', steps: ['Play'] };
+      const { root, stop, go } = setup([g]);
+      await go('#/a');
+      expect(panel(root).querySelector('h3')).toBeNull();
+      stop();
+    });
   });
 
   it('opens the game in the URL on startup', async () => {

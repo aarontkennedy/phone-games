@@ -20,7 +20,7 @@ export function mount(container: HTMLElement): () => void {
         <button class="btn" data-new>New</button>
       </div>
       <div class="board-frame g2048-board" data-board></div>
-      <p class="status-line">Swipe to move. Merge matching tiles to reach ${WIN_TILE}.</p>
+      <p class="status-line">Swipe to slide every tile. Two matching numbers join into one.</p>
     </div>`;
 
   const root = container.querySelector<HTMLElement>('.g2048')!;

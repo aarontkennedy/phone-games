@@ -131,6 +131,22 @@ Shared components live in `src/style.css` and `src/core/ui.ts`:
   only, so it's always optional.
 - **Sound (future):** off by default, synthesized in code.
 
+## How to play
+
+Every game has a **How to play** page, written for someone who has never played it.
+
+- **Where:** a **Rules** button in the top bar opens it. It also opens by itself the
+  first time a game is opened (`<game-id>:help-seen` remembers that it was closed).
+- **Content:** the `howToPlay` field in `src/games/index.ts`: a one-sentence `goal`,
+  at least 3 `steps` and optional `tips`.
+- **Steps:** explain a turn in the order a new player needs it. Name the on-screen
+  buttons and numbers exactly as they appear (**New**, **Best**, **Flag**). Say what
+  ends the game and how you win. Use plain words, not jargon (say "join", not "merge").
+- **Tips:** a few beginner strategies.
+- **Enforced by tests:** `src/games/index.test.ts` requires rules for every game, with
+  no emoji and no protected names. `e2e/help.spec.ts` checks the page opens, reads
+  without glasses and closes.
+
 ## Persistence
 
 - **Keys:** `<game-id>:state` for the game in progress and `<game-id>:best` for

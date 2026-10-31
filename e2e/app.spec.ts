@@ -1,12 +1,15 @@
 import { expect, test } from '@playwright/test';
-import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors } from './helpers';
+import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, skipHowToPlay } from './helpers';
 
 const GAMES = [
   { id: '2048', title: '2048' },
   { id: 'minesweeper', title: 'Mines' },
 ];
 
-test.beforeEach(({ page }) => failOnErrors(page));
+test.beforeEach(async ({ page }) => {
+  failOnErrors(page);
+  await skipHowToPlay(page);
+});
 
 test('home lists every game', async ({ page }) => {
   await page.goto('./');

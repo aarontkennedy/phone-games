@@ -131,6 +131,65 @@ body {
   text-decoration: none;
 }
 
+.help-btn {
+  margin-left: auto;
+  min-height: var(--tap);
+  padding: 0 var(--space-2);
+  border: 0;
+  background: transparent;
+  color: var(--link);
+  font: inherit;
+  font-size: var(--text-lg);
+  cursor: pointer;
+}
+
+/* How to play: covers the whole screen and scrolls on its own. */
+.help {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4)
+    calc(env(safe-area-inset-bottom) + var(--space-5));
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.45;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.help > * {
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.help h2 {
+  margin-top: 0;
+  font-size: var(--text-xl);
+  outline: none;
+}
+
+.help h3 {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.help ol,
+.help ul {
+  padding-left: var(--space-5);
+}
+
+.help li + li {
+  margin-top: var(--space-2);
+}
+
+.help .btn {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-5);
+}
+
 .home {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));

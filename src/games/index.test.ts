@@ -50,9 +50,22 @@ describe('game registry', () => {
     }
   });
 
+  it('gives every game rules a first-time player can follow', () => {
+    for (const g of games) {
+      const { goal, steps, tips = [] } = g.howToPlay;
+      expect(goal.trim(), g.id).not.toBe('');
+      expect(steps.length, `${g.id} needs at least 3 steps`).toBeGreaterThanOrEqual(3);
+      for (const line of [goal, ...steps, ...tips]) {
+        expect(line.trim(), g.id).not.toBe('');
+        expect(line, `${g.id}: no emoji (they aren't flat)`).not.toMatch(/\p{Extended_Pictographic}/u);
+      }
+    }
+  });
+
   it('uses no protected names in visible text', () => {
     for (const g of games) {
-      const text = `${g.title} ${g.description}`.toLowerCase();
+      const { goal, steps, tips = [] } = g.howToPlay;
+      const text = [g.title, g.description, goal, ...steps, ...tips].join(' ').toLowerCase();
       for (const name of PROTECTED_NAMES) {
         expect(text, `${g.id} mentions "${name}"`).not.toMatch(new RegExp(`\\b${name}\\b`));
       }
