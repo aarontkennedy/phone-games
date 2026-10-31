@@ -9,4 +9,11 @@ export const games: GameMeta[] = [
     icon: '🔢',
     load: () => import('./2048'),
   },
+  {
+    id: 'minesweeper',
+    title: 'Minesweeper',
+    description: 'Clear the field without hitting a mine',
+    icon: '💣',
+    load: () => import('./minesweeper'),
+  },
 ];

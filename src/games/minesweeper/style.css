@@ -1,0 +1,130 @@
+.ms {
+  width: min(100%, 560px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ms-bar {
+  display: flex;
+  gap: 8px;
+}
+
+.ms-stat {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  text-align: center;
+}
+
+.ms-stat small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ms-stat b {
+  font-size: 22px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ms-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.ms-levels {
+  flex: 1;
+  display: flex;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--surface);
+}
+
+.ms-levels button {
+  flex: 1;
+  padding: 8px 4px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+}
+
+.ms-levels button.active {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.ms-mode {
+  min-width: 96px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+}
+
+.ms-mode.flag {
+  background: var(--accent);
+  color: #2b2118;
+}
+
+.ms-board {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  gap: 2px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #3a3550;
+  container-type: inline-size;
+  -webkit-touch-callout: none; /* no iOS long-press menu */
+}
+
+.ms-cell {
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  background: #6a6390;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+  font-weight: 800;
+  font-size: calc(55cqw / var(--cols));
+  line-height: 1;
+}
+
+.ms-cell.revealed {
+  background: #2a263d;
+  box-shadow: none;
+}
+
+.ms-cell.exploded {
+  background: #c0392b;
+}
+
+.ms-cell.wrong {
+  background: #5a2a3a;
+}
+
+.ms-cell[data-n='1'] { color: #6fa8ff; }
+.ms-cell[data-n='2'] { color: #6cd17a; }
+.ms-cell[data-n='3'] { color: #ff7070; }
+.ms-cell[data-n='4'] { color: #b98cff; }
+.ms-cell[data-n='5'] { color: #ffb347; }
+.ms-cell[data-n='6'] { color: #4fd6d6; }
+.ms-cell[data-n='7'] { color: #f3f1fa; }
+.ms-cell[data-n='8'] { color: #a29fb8; }
+
+.ms-status {
+  min-height: 1.4em;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  text-align: center;
+}
