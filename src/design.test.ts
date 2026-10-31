@@ -58,3 +58,25 @@ describe('tokens', () => {
     expect(light.tap).toBe('44px');
   });
 });
+
+describe('readable text (no reading glasses needed)', () => {
+  const sheets = import.meta.glob<string>('./**/*.css', { query: '?raw', import: 'default', eager: true });
+  const sizes = Object.entries(light).filter(([name]) => name.startsWith('text-'));
+
+  it.each(sizes)('--%s is at least 18px', (_name, value) => {
+    expect(parseFloat(value)).toBeGreaterThanOrEqual(18);
+  });
+
+  it('sets body text to --text-md', () => {
+    expect(css).toMatch(/body\s*{[^}]*font-size:\s*var\(--text-md\)/);
+  });
+
+  // Fixed sizes must come from the --text-* tokens. Board cells scale with the board
+  // (cqw); the E2E tests check those render at 18px or more.
+  it.each(Object.entries(sheets))('%s sizes text with tokens or board units', (_path, sheet) => {
+    const code = sheet.replace(/\/\*[\s\S]*?\*\//g, '');
+    for (const [, value] of code.matchAll(/font-size:\s*([^;]+);/g)) {
+      expect(value).toMatch(/^(var\(--text-[a-z0-9]+\)|inherit|[\d.]+cqw|calc\(\d+cqw \/ var\(--cols\)\))$/);
+    }
+  });
+});

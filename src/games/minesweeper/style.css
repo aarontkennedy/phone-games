@@ -46,7 +46,7 @@
   border-radius: 3px;
   background: var(--ms-hidden);
   font-weight: 800;
-  font-size: calc(55cqw / var(--cols));
+  font-size: calc(64cqw / var(--cols)); /* 18px+ on Hard at 390px wide */
   line-height: 1;
 }
 

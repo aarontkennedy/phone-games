@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectNoHorizontalOverflow, expectTouchTargets, failOnErrors } from './helpers';
+import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors } from './helpers';
 
 const GAMES = [
   { id: '2048', title: '2048' },
@@ -14,6 +14,7 @@ test('home lists every game', async ({ page }) => {
   for (const g of GAMES) await expect(page.locator(`a[href="#/${g.id}"]`)).toBeVisible();
   await expectNoHorizontalOverflow(page);
   await expectTouchTargets(page);
+  await expectReadableText(page);
 });
 
 for (const g of GAMES) {
@@ -24,6 +25,7 @@ for (const g of GAMES) {
     await expect(page.locator('.game > *')).not.toHaveCount(0);
     await expectNoHorizontalOverflow(page);
     await expectTouchTargets(page);
+    await expectReadableText(page);
 
     await page.getByRole('link', { name: '‹ Games' }).click();
     await expect(page.getByRole('heading', { name: 'Games' })).toBeVisible();

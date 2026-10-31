@@ -11,6 +11,8 @@
 6. **One family.** Every game uses the same tokens, components and screen layout.
 7. **Flat design.** Minimalist, two-dimensional shapes, solid colors and clean lines.
    No realistic textures, shadows, bevels, gradients, glows or 3D effects.
+8. **No reading glasses needed.** All text is large enough to read at arm's length
+   without reading glasses.
 
 ## Flat design
 
@@ -45,9 +47,28 @@ and number colors) live in the game's own CSS, defined for both themes.
 | Color | `--bg --surface --surface-2 --border --text --muted --accent --on-accent --link --danger --danger-soft --board --cell-empty --scrim` |
 | Spacing (4px scale) | `--space-1` (4) `--space-2` (8) `--space-3` (12) `--space-4` (16) `--space-5` (24) `--space-6` (32) |
 | Radius | `--radius-sm` (6) `--radius` (10) `--radius-lg` (16) |
-| Type | `--text-xs` (11) `--text-sm` (13) `--text-md` (15) `--text-lg` (17) `--text-xl` (22) `--text-2xl` (32) |
+| Type | `--text-sm` (18) `--text-md` (20, body) `--text-lg` (22) `--text-xl` (28) `--text-2xl` (36) |
 | Layout | `--tap` (44px touch target), `--content-max` (480px) |
 | Motion | `--dur` (150ms) |
+
+## Readable text (no reading glasses)
+
+The player needs reading glasses for small text, so this app never uses it.
+
+- **Minimum 18px** for all text: labels, hints, status lines, captions and board
+  numbers. There's no smaller size to fall back on, so `--text-sm` (18px) is the floor.
+- **Body text is 20px** (`--text-md`, set on `body`). Buttons and controls inherit it.
+- **Use the `--text-*` tokens** for every fixed size. Never hard-code a `font-size` in
+  px, rem or em.
+- **Board numbers** (tiles, cell counts) scale with the board using `cqw` and must
+  still be **18px or larger on a 390px-wide phone** at every difficulty and for the
+  longest value. If they can't be, make the board smaller or simplify it.
+- **When large text doesn't fit,** wrap onto another line (as `.controls` does) or
+  shorten the words. Never shrink the text below 18px to make it fit.
+- **Enforced by tests:** `src/design.test.ts` checks the tokens, the body size, and that
+  every stylesheet uses tokens or board units. The E2E `expectReadableText()` helper
+  checks that every visible piece of text renders at 18px or larger, on the home screen,
+  every game, every Mines difficulty and a 5-digit 2048 tile.
 
 ## Theme
 

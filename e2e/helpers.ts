@@ -54,6 +54,18 @@ export async function expectNoHorizontalOverflow(page: Page): Promise<void> {
   expect(overflow).toBeLessThanOrEqual(0);
 }
 
+/** All visible text is at least `min` px, so it reads without reading glasses. */
+export async function expectReadableText(page: Page, min = 18): Promise<void> {
+  const small = await page.evaluate((min) => {
+    return [...document.querySelectorAll<HTMLElement>('body *')]
+      .filter((el) => el.checkVisibility())
+      .filter((el) => [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && n.textContent!.trim()))
+      .filter((el) => parseFloat(getComputedStyle(el).fontSize) < min)
+      .map((el) => `${el.textContent!.trim().slice(0, 30)} (${getComputedStyle(el).fontSize})`);
+  }, min);
+  expect(small).toEqual([]);
+}
+
 /** Every visible button and link meets the minimum touch target height. */
 export async function expectTouchTargets(page: Page, min = 44): Promise<void> {
   const small = await page.evaluate((min) => {

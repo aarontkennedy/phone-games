@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { failOnErrors, longPress, seedRandom } from './helpers';
+import { expectNoHorizontalOverflow, expectReadableText, failOnErrors, longPress, seedRandom } from './helpers';
 
 /** Smallest comfortable cell for a finger on a phone grid (see docs/DESIGN.md). */
 const MIN_CELL_PX = 26;
@@ -45,5 +45,13 @@ for (const level of ['easy', 'medium', 'hard']) {
     await page.locator(`[data-level="${level}"]`).click();
     const box = (await cell(page, 0).boundingBox())!;
     expect(box.width).toBeGreaterThanOrEqual(MIN_CELL_PX);
+  });
+
+  test(`${level} numbers and text are readable without glasses`, async ({ page }) => {
+    await page.locator(`[data-level="${level}"]`).click();
+    const size = await cell(page, 0).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    expect(size).toBeGreaterThanOrEqual(18);
+    await expectReadableText(page);
+    await expectNoHorizontalOverflow(page);
   });
 }

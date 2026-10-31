@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { failOnErrors, seedRandom, swipe } from './helpers';
+import { expectReadableText, failOnErrors, seedRandom, swipe } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   failOnErrors(page);
@@ -32,4 +32,14 @@ test('the board is square and fills the width', async ({ page }) => {
   const width = page.viewportSize()!.width;
   expect(Math.abs(box.width - box.height)).toBeLessThan(2);
   expect(box.width).toBeGreaterThan(width * 0.8);
+});
+
+test('tile numbers are readable without glasses, even 5 digits', async ({ page }) => {
+  const board = [2, 64, 1024, 16384, ...Array(12).fill(0)];
+  await page.evaluate((b) => localStorage.setItem('pg:2048:state', JSON.stringify({ board: b, score: 0 })), board);
+  // Reopen the game instead of reloading: a reload can interrupt WebKit's service worker install.
+  await page.getByRole('link', { name: '‹ Games' }).click();
+  await page.locator('a[href="#/2048"]').click();
+  await expect(page.locator('.g2048-cell[data-digits="5"]')).toHaveText('16384');
+  await expectReadableText(page);
 });

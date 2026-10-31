@@ -24,7 +24,7 @@
 
 .g2048-cell[data-digits='3'] { font-size: 8.5cqw; }
 .g2048-cell[data-digits='4'] { font-size: 6.5cqw; }
-.g2048-cell[data-digits='5'] { font-size: 5.2cqw; }
+.g2048-cell[data-digits='5'] { font-size: 6cqw; } /* 18px+ at 390px wide */
 
 .t-2 { background: #efe8ff; }
 .t-4 { background: #dccdfb; }
