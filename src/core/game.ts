@@ -8,6 +8,7 @@ export interface GameMeta {
   id: string;
   title: string;
   description: string;
+  /** Inline flat SVG markup (see src/games/icons.ts). */
   icon: string;
   load: () => Promise<GameModule>;
 }

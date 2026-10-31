@@ -1,38 +1,45 @@
-// Generates the app icons as PNGs with no dependencies: a 2x2 grid of
-// 2048-style tiles on the app background. Run with `npm run icons`.
+// Generates the app icons as PNGs with no dependencies. Flat design: a solid
+// background with four simple game-piece shapes (circle, square, triangle,
+// diamond) in solid colors. Run with `npm run icons`.
 import { deflateSync } from 'node:zlib';
 import { writeFileSync } from 'node:fs';
 
 const OUT = new URL('../public/icons/', import.meta.url);
-const BG = [0x15, 0x13, 0x1f];
-const TILES = [
-  [0xee, 0xe4, 0xda],
-  [0xf2, 0xb1, 0x79],
-  [0xf6, 0x7c, 0x5f],
-  [0xed, 0xc2, 0x2e],
-];
-// Keep the artwork inside the central 60% so it survives maskable cropping.
-const START = 0.2;
-const GAP = 0.04;
-const TILE = (0.6 - GAP) / 2;
-const RADIUS = 0.05;
-const SAMPLES = 4; // supersampling per axis for smooth corners
+const BG = [0x6c, 0x63, 0xff];
+const WHITE = [0xff, 0xff, 0xff];
+const GOLD = [0xff, 0xd2, 0x3f];
+const SAMPLES = 4; // supersampling per axis for clean edges
 
-function inRoundedRect(u, v, x0, y0) {
-  const x1 = x0 + TILE;
-  const y1 = y0 + TILE;
+// Shapes in unit coordinates, kept inside the central 60% so they survive
+// maskable-icon cropping. Each returns true if (u, v) is inside.
+const SHAPES = [
+  // circle, top-left
+  [WHITE, (u, v) => (u - 0.36) ** 2 + (v - 0.36) ** 2 <= 0.11 ** 2],
+  // rounded square, top-right
+  [GOLD, (u, v) => inRoundedRect(u, v, 0.54, 0.26, 0.74, 0.46, 0.03)],
+  // triangle, bottom-left
+  [GOLD, (u, v) => inTriangle(u, v, [0.36, 0.53], [0.245, 0.74], [0.475, 0.74])],
+  // diamond, bottom-right
+  [WHITE, (u, v) => Math.abs(u - 0.64) + Math.abs(v - 0.64) <= 0.12],
+];
+
+function inRoundedRect(u, v, x0, y0, x1, y1, r) {
   if (u < x0 || u > x1 || v < y0 || v > y1) return false;
-  const dx = Math.max(x0 + RADIUS - u, 0, u - (x1 - RADIUS));
-  const dy = Math.max(y0 + RADIUS - v, 0, v - (y1 - RADIUS));
-  return dx * dx + dy * dy <= RADIUS * RADIUS;
+  const dx = Math.max(x0 + r - u, 0, u - (x1 - r));
+  const dy = Math.max(y0 + r - v, 0, v - (y1 - r));
+  return dx * dx + dy * dy <= r * r;
+}
+
+function inTriangle(u, v, a, b, c) {
+  const side = (p, q) => (u - q[0]) * (p[1] - q[1]) - (p[0] - q[0]) * (v - q[1]);
+  const s1 = side(a, b);
+  const s2 = side(b, c);
+  const s3 = side(c, a);
+  return !((s1 < 0 || s2 < 0 || s3 < 0) && (s1 > 0 || s2 > 0 || s3 > 0));
 }
 
 function colorAt(u, v) {
-  for (let i = 0; i < 4; i++) {
-    const x0 = START + (i % 2) * (TILE + GAP);
-    const y0 = START + Math.floor(i / 2) * (TILE + GAP);
-    if (inRoundedRect(u, v, x0, y0)) return TILES[i];
-  }
+  for (const [color, inside] of SHAPES) if (inside(u, v)) return color;
   return BG;
 }
 

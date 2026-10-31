@@ -1,54 +1,23 @@
+/* Original tile palette (not taken from any other 2048 implementation). */
 .g2048 {
-  width: min(100%, 440px);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
   touch-action: none; /* let swipes reach our handler instead of scrolling */
 }
 
-.g2048-bar {
-  display: flex;
-  gap: 8px;
-}
-
-.g2048-score {
-  flex: 1;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: var(--surface);
-  text-align: center;
-}
-
-.g2048-score small {
-  display: block;
-  color: var(--muted);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.g2048-score b {
-  font-size: 22px;
-}
-
 .g2048-board {
-  position: relative;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 3%;
   padding: 3%;
   aspect-ratio: 1;
-  border-radius: 12px;
-  background: #3a3550;
   container-type: inline-size;
 }
 
 .g2048-cell {
   display: grid;
   place-items: center;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #776e65;
+  border-radius: var(--radius-sm);
+  background: var(--cell-empty);
+  color: var(--tile-ink-dark);
   font-weight: 800;
   font-size: 11cqw;
 }
@@ -57,25 +26,25 @@
 .g2048-cell[data-digits='4'] { font-size: 6.5cqw; }
 .g2048-cell[data-digits='5'] { font-size: 5.2cqw; }
 
-.t-2 { background: #eee4da; }
-.t-4 { background: #ede0c8; }
-.t-8 { background: #f2b179; color: #fff; }
-.t-16 { background: #f59563; color: #fff; }
-.t-32 { background: #f67c5f; color: #fff; }
-.t-64 { background: #f65e3b; color: #fff; }
-.t-128 { background: #edcf72; color: #fff; }
-.t-256 { background: #edcc61; color: #fff; }
-.t-512 { background: #edc850; color: #fff; }
-.t-1024 { background: #edc53f; color: #fff; }
-.t-2048 { background: #edc22e; color: #fff; }
-.t-big { background: #3c3a32; color: #fff; }
+.t-2 { background: #efe8ff; }
+.t-4 { background: #dccdfb; }
+.t-8 { background: #ffd08a; }
+.t-16 { background: #ffad6b; }
+.t-32 { background: #ff8a65; }
+.t-64 { background: #ef5f58; color: var(--tile-ink-light); }
+.t-128 { background: #8ad8c8; }
+.t-256 { background: #4fbcac; }
+.t-512 { background: #2a968a; color: var(--tile-ink-light); }
+.t-1024 { background: #6c63ff; color: var(--tile-ink-light); }
+.t-2048 { background: #ffd23f; }
+.t-big { background: #1d1a2b; color: var(--tile-ink-light); }
 
 .g2048-cell.new {
-  animation: g2048-pop 150ms ease-out;
+  animation: g2048-pop var(--dur) ease-out;
 }
 
 .g2048-cell.merged {
-  animation: g2048-bump 150ms ease-out;
+  animation: g2048-bump var(--dur) ease-out;
 }
 
 @keyframes g2048-pop {
@@ -84,32 +53,4 @@
 
 @keyframes g2048-bump {
   50% { transform: scale(1.12); }
-}
-
-.g2048-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  border-radius: 12px;
-  background: rgba(21, 19, 31, 0.8);
-}
-
-.g2048-overlay[hidden] {
-  display: none;
-}
-
-.g2048-overlay h2 {
-  margin: 0 0 8px;
-  font-size: 32px;
-}
-
-.g2048-hint {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-  text-align: center;
 }
