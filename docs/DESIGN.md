@@ -31,10 +31,12 @@ This style contrasts with realistic designs (skeuomorphism).
   shapes and solid fills, with no glossy or 3D rendering.
 - **Enforced by tests:** `src/design.test.ts` scans every stylesheet for gradients,
   shadows, filters and `url()`. `src/games/index.test.ts` checks every game icon is a
-  flat SVG.
-- **Known gap:** some in-game symbols are still emoji (🚩 💣 ❌ ⛏️ 🎉 💥). The phone's
-  emoji font draws them, and on iPhone they're glossy and shaded. Replace them with flat
-  SVG icons as games are built or touched.
+  flat SVG, and each game's tests check its board symbols.
+- **Board symbols** (flags, mines and marks) are inline SVG too, kept with the game
+  (e.g. `src/games/minesweeper/symbols.ts`). Give each one `role="img"` and an
+  `aria-label`, and color it from CSS tokens so it works in light and dark mode.
+- **No emoji anywhere.** Phones draw them glossy and shaded. `scripts/no-emoji.test.mjs`
+  fails if any app source file contains one.
 
 ## Tokens
 
@@ -117,10 +119,13 @@ Shared components live in `src/style.css` and `src/core/ui.ts`:
 
 - **Normal text:** at least **4.5:1** against its background (WCAG AA).
 - **Large bold numerals** (tiles, counts): at least **3:1**.
+- **Symbols** (flags, mines, marks): at least **3:1** against the square they sit on. If
+  a color can't reach that, add a solid edge in a color that can (as the dark-mode flag
+  does).
 - These are tested in `src/design.test.ts` and in each game's tests. Every new color
   pair that carries text needs a contrast test.
 - **Never use color alone** to carry meaning. Pair it with a number, symbol or text
-  (e.g. 🚩, ❌, 💣).
+  (e.g. the flag, X and mine symbols).
 
 ## Motion and feedback
 

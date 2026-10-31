@@ -24,14 +24,17 @@ test('long-press flags a cell', async ({ page }) => {
   await cell(page, 14).click();
   const hidden = page.locator('.ms-cell:not(.revealed)').first();
   await longPress(hidden);
-  await expect(hidden).toHaveText('🚩');
+  await expect(hidden.getByRole('img', { name: 'Flag' })).toBeVisible();
   await expect(page.locator('[data-mines]')).toHaveText('4');
 });
 
 test('flag mode flags with a tap', async ({ page }) => {
   await page.locator('[data-mode]').click();
   await cell(page, 0).click();
-  await expect(cell(page, 0)).toHaveText('🚩');
+  const flag = cell(page, 0).getByRole('img', { name: 'Flag' });
+  await expect(flag).toBeVisible();
+  // Big enough to see without glasses, like text (docs/DESIGN.md).
+  expect((await flag.boundingBox())!.width).toBeGreaterThanOrEqual(18);
 });
 
 test('progress survives a reload', async ({ page }) => {

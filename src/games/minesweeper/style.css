@@ -9,6 +9,8 @@
   --ms-n6: #00777a;
   --ms-n7: #1d1a2b;
   --ms-n8: #625d78;
+  --ms-flag: #b3141b;
+  --ms-flag-edge: #b3141b; /* deep enough red that no edge is needed */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +25,8 @@
     --ms-n6: #4fd6d6;
     --ms-n7: #f3f1fa;
     --ms-n8: #a29fb8;
+    --ms-flag: #ff5a4f;
+    --ms-flag-edge: #f3f1fa; /* a light edge keeps the red flag 3:1 on the purple square */
   }
 }
 
@@ -48,6 +52,30 @@
   font-weight: 800;
   font-size: calc(64cqw / var(--cols)); /* 18px+ on Hard at 390px wide */
   line-height: 1;
+}
+
+.ms-sym {
+  display: block;
+  width: 0.95em;
+  height: 0.95em;
+}
+
+.ms-sym-ink {
+  fill: var(--ms-n7);
+}
+
+.ms-sym-line {
+  fill: none;
+  stroke: var(--ms-n7);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.ms-sym-cloth {
+  fill: var(--ms-flag);
+  stroke: var(--ms-flag-edge);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
 }
 
 .ms-cell.revealed {

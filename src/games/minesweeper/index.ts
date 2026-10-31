@@ -11,6 +11,7 @@ import {
   type Level,
   type State,
 } from './logic';
+import * as sym from './symbols';
 import './style.css';
 
 const STATE_KEY = 'minesweeper:state';
@@ -142,6 +143,7 @@ export function mount(container: HTMLElement): () => void {
       const isMine = !!state.mines?.[i];
       let cls = 'ms-cell';
       let text = '';
+      let symbol = '';
       delete cell.dataset.n;
       if (state.revealed[i] && !isMine) {
         cls += ' revealed';
@@ -152,30 +154,31 @@ export function mount(container: HTMLElement): () => void {
         }
       } else if (lost && isMine && !state.flagged[i]) {
         cls += i === state.exploded ? ' revealed exploded' : ' revealed';
-        text = '💣';
+        symbol = sym.mine;
       } else if (state.flagged[i]) {
         const wrong = lost && !isMine;
         if (wrong) cls += ' wrong';
-        text = wrong ? '❌' : '🚩';
+        symbol = wrong ? sym.wrongFlag : sym.flag;
       }
       cell.className = cls;
-      cell.textContent = text;
+      if (symbol) cell.innerHTML = symbol;
+      else cell.textContent = text;
     });
 
     minesEl.textContent = String(flagsLeft(state));
     renderClock();
 
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
-    modeBtn.textContent = flagMode ? '🚩 Flag' : '⛏️ Dig';
+    modeBtn.textContent = flagMode ? 'Flag' : 'Dig';
     modeBtn.setAttribute('aria-pressed', String(flagMode));
 
     const bestTime = best[state.level];
     const bestText = bestTime !== undefined ? ` Best: ${bestTime}s.` : '';
     statusEl.textContent =
       state.status === 'won'
-        ? `🎉 Cleared in ${Math.floor(state.elapsed / 1000)}s!${bestText}`
+        ? `Cleared in ${Math.floor(state.elapsed / 1000)}s!${bestText}`
         : lost
-          ? '💥 Boom! Tap New to try again.'
+          ? 'Boom! Tap New to try again.'
           : `Tap to dig. Long-press to flag.${bestText}`;
   }
 

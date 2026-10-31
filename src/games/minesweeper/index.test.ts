@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import css from './style.css?raw';
+import appCss from '../../style.css?raw';
+import * as symbols from './symbols';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
 import { makeContainer, pointer, setHidden, tap, track } from '../../test/helpers';
@@ -15,9 +17,11 @@ function setup(saved: State | null = fixture()) {
   const $ = <T extends HTMLElement = HTMLElement>(sel: string) => container.querySelector<T>(sel)!;
   const cells = () => [...container.querySelectorAll<HTMLElement>('.ms-cell')];
   const cell = (i: number) => cells()[i];
+  /** A cell's symbol label ("Flag", "Mine", "Wrong flag"), or its number text. */
+  const mark = (i: number) => cell(i).querySelector('svg')?.getAttribute('aria-label') ?? cell(i).textContent;
   const revealed = () => cells().filter((c) => c.classList.contains('revealed')).length;
   const stored = () => load<State | null>('minesweeper:state', null)!;
-  return { container, unmount, $, cells, cell, revealed, stored };
+  return { container, unmount, $, cells, cell, mark, revealed, stored };
 }
 
 beforeEach(() => {
@@ -37,7 +41,7 @@ describe('Mines screen', () => {
     expect($('[data-time]').textContent).toBe('0');
     expect($('[data-status]').textContent).toBe('Tap to dig. Long-press to flag.');
     expect($('[data-level="easy"]').getAttribute('aria-pressed')).toBe('true');
-    expect($('[data-mode]').textContent).toBe('⛏️ Dig');
+    expect($('[data-mode]').textContent).toBe('Dig');
     expect(stored()).toBeNull();
   });
 
@@ -70,11 +74,11 @@ describe('Mines screen', () => {
     it('flags on long-press without digging', () => {
       const vibrate = vi.fn();
       Object.defineProperty(navigator, 'vibrate', { value: vibrate, configurable: true });
-      const { cell, $, revealed } = setup();
+      const { mark, cell, $, revealed } = setup();
       pointer(cell(3), 'pointerdown');
       vi.advanceTimersByTime(LONG_PRESS_MS);
       pointer(cell(3), 'pointerup');
-      expect(cell(3).textContent).toBe('🚩');
+      expect(mark(3)).toBe('Flag');
       expect($('[data-mines]').textContent).toBe('4');
       expect(revealed()).toBe(0);
       expect(vibrate).toHaveBeenCalledWith(15);
@@ -91,11 +95,11 @@ describe('Mines screen', () => {
     });
 
     it('allows a little finger wobble', () => {
-      const { cell } = setup();
+      const { mark, cell } = setup();
       pointer(cell(3), 'pointerdown', { x: 0, y: 0 });
       pointer(cell(3), 'pointermove', { x: 5, y: 5 });
       vi.advanceTimersByTime(LONG_PRESS_MS);
-      expect(cell(3).textContent).toBe('🚩');
+      expect(mark(3)).toBe('Flag');
     });
 
     it('ignores pointermove without a press', () => {
@@ -115,21 +119,21 @@ describe('Mines screen', () => {
     });
 
     it('flags with right-click', () => {
-      const { cell, container } = setup();
+      const { mark, cell, container } = setup();
       const e = new MouseEvent('contextmenu', { bubbles: true, cancelable: true });
       cell(3).dispatchEvent(e);
       expect(e.defaultPrevented).toBe(true);
-      expect(cell(3).textContent).toBe('🚩');
+      expect(mark(3)).toBe('Flag');
       container.querySelector('[data-board]')!.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true }));
-      expect(cell(3).textContent).toBe('🚩');
+      expect(mark(3)).toBe('Flag');
     });
 
     it('ignores the contextmenu that some phones fire during a long-press', () => {
-      const { cell } = setup();
+      const { mark, cell } = setup();
       pointer(cell(3), 'pointerdown');
       cell(3).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
       vi.advanceTimersByTime(LONG_PRESS_MS);
-      expect(cell(3).textContent).toBe('🚩');
+      expect(mark(3)).toBe('Flag');
     });
 
     it('does not vibrate when the flag is not allowed', () => {
@@ -142,26 +146,26 @@ describe('Mines screen', () => {
     });
 
     it('works without vibration support', () => {
-      const { cell } = setup();
+      const { mark, cell } = setup();
       cell(3).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
-      expect(cell(3).textContent).toBe('🚩');
+      expect(mark(3)).toBe('Flag');
     });
 
     it('flags on tap in flag mode, and still chords revealed numbers', () => {
-      const { cell, $ } = setup();
+      const { mark, cell, $ } = setup();
       tap(cell(35));
       const mode = $('[data-mode]');
       mode.click();
-      expect(mode.textContent).toBe('🚩 Flag');
+      expect(mode.textContent).toBe('Flag');
       expect(mode.getAttribute('aria-pressed')).toBe('true');
 
       tap(cell(4));
-      expect(cell(4).textContent).toBe('🚩');
+      expect(mark(4)).toBe('Flag');
       tap(cell(11)); // revealed number: chord opens cell 5 and wins
       expect($('[data-status]').textContent).toContain('Cleared');
 
       mode.click();
-      expect(mode.textContent).toBe('⛏️ Dig');
+      expect(mode.textContent).toBe('Dig');
     });
   });
 
@@ -175,19 +179,19 @@ describe('Mines screen', () => {
   });
 
   it('shows the board and stops the clock when a mine is hit', () => {
-    const { cell, $, stored } = setup();
+    const { mark, cell, $, stored } = setup();
     cell(5).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true })); // wrong flag
     cell(1).dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true })); // right flag
     vi.advanceTimersByTime(2000);
     tap(cell(0));
 
     expect(cell(0).className).toBe('ms-cell revealed exploded');
-    expect(cell(2).textContent).toBe('💣');
+    expect(mark(2)).toBe('Mine');
     expect(cell(2).className).toBe('ms-cell revealed');
-    expect(cell(1).textContent).toBe('🚩');
-    expect(cell(5).textContent).toBe('❌');
+    expect(mark(1)).toBe('Flag');
+    expect(mark(5)).toBe('Wrong flag');
     expect(cell(5).classList.contains('wrong')).toBe(true);
-    expect($('[data-status]').textContent).toBe('💥 Boom! Tap New to try again.');
+    expect($('[data-status]').textContent).toBe('Boom! Tap New to try again.');
 
     vi.advanceTimersByTime(5000);
     expect($('[data-time]').textContent).toBe('2');
@@ -208,14 +212,14 @@ describe('Mines screen', () => {
 
     it('records the time as the best', () => {
       const { $ } = playToWin(12);
-      expect($('[data-status]').textContent).toBe('🎉 Cleared in 12s! Best: 12s.');
+      expect($('[data-status]').textContent).toBe('Cleared in 12s! Best: 12s.');
       expect(load('minesweeper:best:v3', {})).toEqual({ easy: 12 });
     });
 
     it('keeps a better previous best and shows it', () => {
       save('minesweeper:best:v3', { easy: 5 });
       const { $ } = playToWin(12);
-      expect($('[data-status]').textContent).toBe('🎉 Cleared in 12s! Best: 5s.');
+      expect($('[data-status]').textContent).toBe('Cleared in 12s! Best: 5s.');
       expect(load('minesweeper:best:v3', {})).toEqual({ easy: 5 });
     });
 
@@ -308,5 +312,32 @@ describe('Mines colors', () => {
     for (let n = 1; n <= 8; n++) {
       expect(contrast(t[`ms-n${n}`], t['ms-open']), `number ${n}`).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  const app = themes(appCss, ':root');
+
+  it.each([
+    ['light', light, app.light],
+    ['dark', dark, app.dark],
+  ])('flags, mines and Xs stand out (3:1) in the %s theme', (_name, t, a) => {
+    expect(contrast(t['ms-flag-edge'], t['ms-hidden']), 'flag on a closed square').toBeGreaterThanOrEqual(3);
+    expect(contrast(t['ms-n7'], t['ms-hidden']), 'flag pole on a closed square').toBeGreaterThanOrEqual(3);
+    expect(contrast(t['ms-n7'], t['ms-open']), 'mine on an open square').toBeGreaterThanOrEqual(3);
+    expect(contrast(t['ms-n7'], a.danger), 'mine on the exploded square').toBeGreaterThanOrEqual(3);
+    expect(contrast(t['ms-n7'], a['danger-soft']), 'X on a wrong flag').toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('Mines symbols', () => {
+  it.each(Object.entries(symbols))('%s is a flat, labeled SVG', (_name, markup) => {
+    const doc = new DOMParser().parseFromString(markup, 'image/svg+xml');
+    const root = doc.documentElement;
+    expect(doc.querySelector('parsererror')).toBeNull();
+    expect(root.nodeName).toBe('svg');
+    expect(root.getAttribute('role')).toBe('img');
+    expect(root.getAttribute('aria-label')).toBeTruthy();
+    expect(
+      doc.querySelectorAll('linearGradient, radialGradient, pattern, filter, image, foreignObject, [filter], [opacity]'),
+    ).toHaveLength(0);
   });
 });
