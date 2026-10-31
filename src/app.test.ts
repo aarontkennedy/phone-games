@@ -68,10 +68,20 @@ describe('startApp', () => {
   describe('how to play', () => {
     const noop = async () => ({ mount: () => () => {} });
     const panel = (root: HTMLElement) => root.querySelector<HTMLElement>('.help')!;
+    const rules = (root: HTMLElement) => root.querySelector<HTMLButtonElement>('[data-help]')!;
 
-    it('opens by itself the first time a game is opened', async () => {
+    it('stays closed until Rules is tapped', async () => {
       const { root, stop, go } = setup([game('a', noop)]);
       await go('#/a');
+      expect(panel(root).hidden).toBe(true);
+      expect(rules(root).textContent).toBe('Rules');
+      stop();
+    });
+
+    it('shows the goal, steps and tips when Rules is tapped', async () => {
+      const { root, stop, go } = setup([game('a', noop)]);
+      await go('#/a');
+      rules(root).click();
       const help = panel(root);
       expect(help.hidden).toBe(false);
       expect(help.getAttribute('role')).toBe('dialog');
@@ -83,28 +93,13 @@ describe('startApp', () => {
       stop();
     });
 
-    it('stays closed after Got it, and Rules opens it again', async () => {
+    it('closes with Got it and returns focus to Rules', async () => {
       const { root, stop, go } = setup([game('a', noop)]);
       await go('#/a');
+      rules(root).click();
       panel(root).querySelector<HTMLButtonElement>('[data-help-close]')!.click();
       expect(panel(root).hidden).toBe(true);
-      expect(document.activeElement).toBe(root.querySelector('[data-help]'));
-
-      await go('#/');
-      await go('#/a');
-      expect(panel(root).hidden).toBe(true);
-
-      root.querySelector<HTMLButtonElement>('[data-help]')!.click();
-      expect(panel(root).hidden).toBe(false);
-      stop();
-    });
-
-    it('remembers each game separately', async () => {
-      const { root, stop, go } = setup([game('a', noop), game('b', noop)]);
-      await go('#/a');
-      panel(root).querySelector<HTMLButtonElement>('[data-help-close]')!.click();
-      await go('#/b');
-      expect(panel(root).hidden).toBe(false);
+      expect(document.activeElement).toBe(rules(root));
       stop();
     });
 
@@ -114,6 +109,26 @@ describe('startApp', () => {
       const { root, stop, go } = setup([g]);
       await go('#/a');
       expect(panel(root).querySelector('h3')).toBeNull();
+      stop();
+    });
+  });
+
+  describe('about', () => {
+    it('is linked from the home screen', () => {
+      const { root, stop } = setup([game('a', vi.fn())]);
+      expect(root.querySelector('.topbar a[href="#/about"]')!.textContent).toBe('About');
+      stop();
+    });
+
+    it('opens the About page with a way back', async () => {
+      const unmount = vi.fn();
+      const { root, stop, go } = setup([game('a', async () => ({ mount: () => unmount }))]);
+      await go('#/a');
+      await go('#/about');
+      expect(unmount).toHaveBeenCalledOnce();
+      expect(root.querySelector('h1')!.textContent).toBe('About');
+      expect(root.querySelector('.back')!.getAttribute('href')).toBe('#/');
+      expect(root.querySelector('.about')!.textContent).toContain('All rights reserved');
       stop();
     });
   });

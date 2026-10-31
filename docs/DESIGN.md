@@ -140,8 +140,7 @@ Shared components live in `src/style.css` and `src/core/ui.ts`:
 
 Every game has a **How to play** page, written for someone who has never played it.
 
-- **Where:** a **Rules** button in the top bar opens it. It also opens by itself the
-  first time a game is opened (`<game-id>:help-seen` remembers that it was closed).
+- **Where:** the **Rules** button in the top bar opens it. It never opens by itself.
 - **Content:** the `howToPlay` field in `src/games/index.ts`: a one-sentence `goal`,
   at least 3 `steps` and optional `tips`.
 - **Steps:** explain a turn in the order a new player needs it. Name the on-screen
@@ -149,8 +148,15 @@ Every game has a **How to play** page, written for someone who has never played 
   ends the game and how you win. Use plain words, not jargon (say "join", not "merge").
 - **Tips:** a few beginner strategies.
 - **Enforced by tests:** `src/games/index.test.ts` requires rules for every game, with
-  no emoji and no protected names. `e2e/help.spec.ts` checks the page opens, reads
-  without glasses and closes.
+  no emoji and no protected names. `e2e/help.spec.ts` checks it stays closed until Rules
+  is tapped, reads without glasses and closes.
+
+## About page
+
+`#/about`, linked from **About** on the home screen (`src/about.ts`). It covers what the
+app is, how to add it to the home screen on iPhone and Android, privacy, copyright and
+third-party software. The license notices load from `public/THIRD_PARTY_NOTICES.txt`,
+which is precached so they work offline. No game may use the id `about`.
 
 ## Persistence
 

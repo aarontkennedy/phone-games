@@ -131,7 +131,10 @@ body {
   text-decoration: none;
 }
 
-.help-btn {
+/* A text action on the right of the top bar (About, Rules). */
+.top-action {
+  display: inline-flex;
+  align-items: center;
   margin-left: auto;
   min-height: var(--tap);
   padding: 0 var(--space-2);
@@ -140,7 +143,54 @@ body {
   color: var(--link);
   font: inherit;
   font-size: var(--text-lg);
+  text-decoration: none;
   cursor: pointer;
+}
+
+/* Readable long-form text: How to play and About. */
+.prose {
+  line-height: 1.45;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.prose > * {
+  max-width: var(--content-max);
+  margin-inline: auto;
+}
+
+.prose h2 {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-xl);
+  outline: none;
+}
+
+.prose h3 {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.prose ol,
+.prose ul {
+  padding-left: var(--space-5);
+}
+
+.prose li + li {
+  margin-top: var(--space-2);
+}
+
+.prose summary {
+  min-height: var(--tap);
+  display: flex;
+  align-items: center;
+  color: var(--link);
+  cursor: pointer;
+}
+
+.prose pre {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  font-size: var(--text-sm);
 }
 
 /* How to play: covers the whole screen and scrolls on its own. */
@@ -154,40 +204,20 @@ body {
     calc(env(safe-area-inset-bottom) + var(--space-5));
   background: var(--bg);
   color: var(--text);
-  line-height: 1.45;
-  -webkit-user-select: text;
-  user-select: text;
-}
-
-.help > * {
-  max-width: var(--content-max);
-  margin-inline: auto;
 }
 
 .help h2 {
   margin-top: 0;
-  font-size: var(--text-xl);
-  outline: none;
-}
-
-.help h3 {
-  margin-bottom: var(--space-2);
-  font-size: var(--text-lg);
-}
-
-.help ol,
-.help ul {
-  padding-left: var(--space-5);
-}
-
-.help li + li {
-  margin-top: var(--space-2);
 }
 
 .help .btn {
   display: block;
   width: 100%;
   margin-top: var(--space-5);
+}
+
+.about {
+  padding: 0 var(--space-4) var(--space-6);
 }
 
 .home {

@@ -1,10 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { expectReadableText, failOnErrors, seedRandom, skipHowToPlay, swipe } from './helpers';
+import { expectReadableText, failOnErrors, seedRandom, swipe } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   failOnErrors(page);
   await seedRandom(page);
-  await skipHowToPlay(page);
   await page.goto('./#/2048');
 });
 

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectNoHorizontalOverflow, expectReadableText, failOnErrors, longPress, seedRandom, skipHowToPlay } from './helpers';
+import { expectNoHorizontalOverflow, expectReadableText, failOnErrors, longPress, seedRandom } from './helpers';
 
 /** Smallest comfortable cell for a finger on a phone grid (see docs/DESIGN.md). */
 const MIN_CELL_PX = 26;
@@ -7,7 +7,6 @@ const MIN_CELL_PX = 26;
 test.beforeEach(async ({ page }) => {
   failOnErrors(page);
   await seedRandom(page);
-  await skipHowToPlay(page);
   await page.goto('./#/minesweeper');
 });
 

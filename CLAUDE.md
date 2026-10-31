@@ -25,4 +25,5 @@ Offline PWA of personal games (no server, no ads, no accounts). Vite + TypeScrip
 
 - In a sandboxed session, npm network installs can fail. Ask the user to run `npm install` themselves.
 - Each game is lazy-loaded from src/games/index.ts and must implement `mount(container) => cleanup`.
-- Every game needs `howToPlay` rules in src/games/index.ts, written for a first-time player (docs/DESIGN.md, "How to play").
+- Every game needs `howToPlay` rules in src/games/index.ts, written for a first-time player (docs/DESIGN.md, "How to play"). They open only from the Rules button, never by themselves.
+- The About page (src/about.ts, `#/about`) must match LICENSE and public/THIRD_PARTY_NOTICES.txt (docs/LEGAL.md).

@@ -27,7 +27,7 @@ export default defineConfig({
       },
       workbox: {
         // Precache every game chunk so the whole app works offline after the first visit.
-        globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,png,svg,woff2,txt}'], // txt: license notices on the About page
       },
     }),
   ],

@@ -1,15 +1,14 @@
+import { mountAbout } from './about';
 import type { GameMeta } from './core/game';
-import { load, save } from './core/storage';
 
 const list = (tag: string, items: string[]) => `<${tag}>${items.map((s) => `<li>${s}</li>`).join('')}</${tag}>`;
 
-/** Full-screen How to play page. Opens by itself the first time a game is opened. */
+/** Full-screen How to play page, opened by the Rules button. */
 function setUpHelp(root: HTMLElement, meta: GameMeta): void {
   const { goal, steps, tips } = meta.howToPlay;
-  const seenKey = `${meta.id}:help-seen`;
   root.insertAdjacentHTML(
     'beforeend',
-    `<div class="help" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+    `<div class="help prose" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
       <h2 id="help-title" tabindex="-1">How to play ${meta.title}</h2>
       <p><b>Goal:</b> ${goal}</p>
       ${list('ol', steps)}
@@ -20,28 +19,31 @@ function setUpHelp(root: HTMLElement, meta: GameMeta): void {
   const panel = root.querySelector<HTMLElement>('.help')!;
   const openBtn = root.querySelector<HTMLButtonElement>('[data-help]')!;
 
-  const open = () => {
+  openBtn.addEventListener('click', () => {
     panel.hidden = false;
     panel.scrollTop = 0;
     panel.querySelector<HTMLElement>('h2')!.focus();
-  };
-  openBtn.addEventListener('click', open);
+  });
   panel.querySelector('[data-help-close]')!.addEventListener('click', () => {
     panel.hidden = true;
-    save(seenKey, true);
     openBtn.focus();
   });
-  if (!load(seenKey, false)) open();
 }
 
-/** Hash router: `#/` shows the game list, `#/<id>` opens a game. Returns a stop function. */
+/**
+ * Hash router: `#/` shows the game list, `#/about` the About page, and `#/<id>` opens a
+ * game. Returns a stop function.
+ */
 export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
   let cleanup: (() => void) | null = null;
   let navigation = 0;
 
   function renderHome() {
     root.innerHTML = `
-      <header class="topbar"><h1>Games</h1></header>
+      <header class="topbar">
+        <h1>Games</h1>
+        <a class="top-action" href="#/about">About</a>
+      </header>
       <main class="home">
         ${games
           .map(
@@ -56,12 +58,26 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
       </main>`;
   }
 
+  function renderAbout() {
+    root.innerHTML = `
+      <header class="topbar">
+        <a class="back" href="#/">‹ Games</a>
+        <h1>About</h1>
+      </header>
+      <main class="about prose"></main>`;
+    mountAbout(root.querySelector<HTMLElement>('.about')!);
+  }
+
   async function route() {
     const current = ++navigation;
     cleanup?.();
     cleanup = null;
 
     const id = location.hash.replace(/^#\/?/, '');
+    if (id === 'about') {
+      renderAbout();
+      return;
+    }
     const meta = games.find((g) => g.id === id);
     if (!meta) {
       renderHome();
@@ -72,7 +88,7 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
       <header class="topbar">
         <a class="back" href="#/">‹ Games</a>
         <h1>${meta.title}</h1>
-        <button class="help-btn" data-help aria-haspopup="dialog">Rules</button>
+        <button class="top-action" data-help aria-haspopup="dialog">Rules</button>
       </header>
       <main class="game"></main>`;
     const main = root.querySelector<HTMLElement>('.game')!;

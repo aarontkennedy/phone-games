@@ -27,6 +27,7 @@ describe('game registry', () => {
     const ids = games.map((g) => g.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const id of ids) expect(id).toMatch(/^[a-z0-9-]+$/);
+    expect(ids, '#/about is the About page').not.toContain('about');
   });
 
   it('gives every game a title and description', () => {

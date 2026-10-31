@@ -52,8 +52,8 @@ protected list. Add to that list when you learn of a new one.
   standard pips and our own simple court-card designs, never artwork from a commercial
   deck.
 - **Fonts:** the phone's system fonts only.
-- **Emoji:** the phone's own emoji font draws them. Don't bundle an emoji image set,
-  because those carry their own licenses (e.g. Twemoji is CC-BY).
+- **Emoji:** not used at all, because they aren't flat (docs/DESIGN.md). Never bundle an
+  emoji image set either: those carry their own licenses (e.g. Twemoji is CC-BY).
 - **Sounds:** synthesize them with the Web Audio API in code.
 - **Anything else** must be CC0 or created by you, logged in the table below with its
   source.
@@ -68,6 +68,9 @@ protected list. Add to that list when you learn of a new one.
 The repository is public, which GitHub Pages on a free plan requires. `LICENSE`
 reserves all rights. GitHub's terms still allow other users to view and fork public
 repositories on GitHub, but nothing else.
+
+The About page (`src/about.ts`) shows the same copyright holder and terms to players.
+If `LICENSE` changes, update `OWNER`, `YEAR` and the Copyright section there too.
 
 ## Privacy
 
