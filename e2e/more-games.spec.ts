@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, seedRandom } from './helpers';
 
 // Browser checks for Tic-Tac-Toe, Four in a Row, Checkers, Number Place, Free Cells,
-// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala, Hangman and Spider: each fits the phone, reads without
+// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala, Hangman, Spider and Backgammon: each fits the phone, reads without
 // glasses, and plays a first move.
 
 test.beforeEach(async ({ page }) => {
@@ -150,5 +150,18 @@ test('Spider Solitaire: ten columns fit, the deck deals a card onto each', async
   const faceUp = () => page.locator('.sp-col .card:not(.back)').count();
   await page.locator('[data-deal]').click();
   expect(await faceUp()).toBe(20);
+  await expectGoodLayout(page);
+});
+
+test('Backgammon: roll, move a checker, the computer answers', async ({ page }) => {
+  await page.goto('./#/backgammon');
+  await expectGoodLayout(page);
+  await page.locator('[data-roll]').click();
+  const source = page.locator('.bg-board .source').first();
+  if (await source.count()) {
+    await source.click();
+    await page.locator('.bg-board .target').first().click();
+  }
+  await expect(status(page)).toHaveText(/^(You rolled|The computer|Your turn|Tap)/);
   await expectGoodLayout(page);
 });

@@ -186,3 +186,10 @@ export const spiderIcon = svg(
     .map((x, i) => [0, 1, 2].map((r) => `<rect x="${x}" y="${6 + r * 7 + i * 3}" width="12" height="17" rx="2" fill="${r === 2 ? '#6c63ff' : '#ffffff'}" stroke="#6c63ff" stroke-width="1.5"/>`).join(''))
     .join('') + '<path d="M9 40h30" stroke="#ef5f58" stroke-width="3" stroke-linecap="round"/>',
 );
+
+/** A strip of backgammon points with a purple and an orange checker. */
+export const backgammonIcon = svg(
+  '<rect x="3" y="6" width="42" height="36" rx="4" fill="#2b283a"/>' +
+    [0, 1, 2, 3, 4, 5].map((i) => `<path d="M${5 + i * 6.5} 8l3.25 14 3.25-14z" fill="${i % 2 ? '#6e6690' : '#ffffff'}"/><path d="M${5 + i * 6.5} 40l3.25-14 3.25 14z" fill="${i % 2 ? '#ffffff' : '#6e6690'}"/>`).join('') +
+    '<circle cx="14.5" cy="35" r="4" fill="#9d94ff"/><circle cx="33.5" cy="13" r="4" fill="#ffb347"/>',
+);

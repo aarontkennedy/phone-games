@@ -1,0 +1,143 @@
+/* The board: points 13-24 along the top, 12-1 along the bottom, the bar in the middle
+   and the borne-off trays on the right. Your home is the bottom right. Points you can move
+   from are outlined; where the picked checker can go is marked with a ring. */
+.bg-board {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  grid-template-rows: 1fr 1fr;
+  gap: 2px var(--sp, 2px);
+  padding: var(--space-2);
+  background: var(--bg-felt);
+  touch-action: manipulation;
+}
+
+.bg-pt,
+.bg-bar,
+.bg-off {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 130px;
+  border-radius: var(--radius-sm);
+}
+
+.bg-pt.top,
+.bg-bar.top,
+.bg-off.top {
+  justify-content: flex-start;
+}
+
+.bg-pt.bottom,
+.bg-bar.bottom,
+.bg-off.bottom {
+  justify-content: flex-end;
+}
+
+.bg-pt.a {
+  background: var(--bg-point-a);
+}
+
+.bg-pt.b {
+  background: var(--bg-point-b);
+}
+
+.bg-bar {
+  background: var(--bg-felt);
+}
+
+.bg-off {
+  align-items: center;
+  border: 2px solid var(--bg-point-a);
+  color: var(--bg-mark);
+}
+
+.bg-stack {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.bg-stack.top {
+  flex-direction: column;
+}
+
+.bg-ck {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  color: #1d1a2b;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.bg-ck.p0 {
+  background: var(--bg-you);
+}
+
+.bg-ck.p1 {
+  background: var(--bg-them);
+}
+
+.bg-board .source {
+  outline: 2px solid var(--bg-mark);
+  outline-offset: -2px;
+  cursor: pointer;
+}
+
+.bg-board .selected {
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.bg-board .target::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 60%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--bg-mark);
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.bg-dice {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.bg-die {
+  width: 40px;
+  height: 40px;
+}
+
+.bg-die rect {
+  fill: var(--surface);
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+
+.bg-die circle {
+  fill: var(--text);
+}
+
+.bg-die.used rect {
+  stroke-dasharray: 3 2;
+}
+
+.bg-die.used circle {
+  fill: var(--muted);
+}
+
+/* The board looks the same in light and dark mode. */
+.bg {
+  --bg-felt: #2b283a;
+  --bg-point-a: #6e6690;
+  --bg-point-b: #3d3852;
+  --bg-you: #c9c3ff;
+  --bg-them: #ffbe5c;
+  --bg-mark: #f4f1fb;
+}

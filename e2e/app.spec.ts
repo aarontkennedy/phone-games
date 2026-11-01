@@ -24,6 +24,7 @@ const GAMES = [
   { id: 'mancala', title: 'Mancala' },
   { id: 'hangman', title: 'Hangman' },
   { id: 'spider', title: 'Spider Solitaire' },
+  { id: 'backgammon', title: 'Backgammon' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));

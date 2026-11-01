@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -565,5 +565,30 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./spider'),
+  },
+  {
+    id: 'backgammon',
+    title: 'Backgammon',
+    description: 'Race your checkers home and bear them off',
+    icon: backgammonIcon,
+    category: 'board',
+    howToPlay: {
+      goal: 'Be the first to move all 15 of your checkers home and then off the board.',
+      steps: [
+        'Your checkers are <b>light purple</b>. You move counter-clockwise: right to left along the top, then left to right along the bottom, toward your <b>home</b> in the bottom right. The computer’s orange checkers go the other way.',
+        'Tap <b>Roll</b>. Each die moves one checker that many points. Tap a checker, then tap a marked point to move it. Doubles let you move four times.',
+        'You can’t land on a point holding two or more of the computer’s checkers. Land on a single one and you <b>hit</b> it: it goes to the bar in the middle and must come back in from the start.',
+        'If one of yours is on the bar, you must bring it back in first, into the computer’s home (top right).',
+        'Once all 15 of yours are in your home, you can <b>bear off</b>: move them past the end into the tray on the right.',
+        'You must use both dice if you can (the larger one if only one fits). Changed your mind? <b>Undo</b> takes back this turn’s moves.',
+        'Win with none of the computer’s checkers off and it’s a <b>gammon</b>, worth 2.',
+      ],
+      tips: [
+        '<b>Easy</b> plays any legal move. <b>Strong</b> races, hits and keeps its checkers safe. You can switch at any time.',
+        'Two checkers on a point are safe. A lone checker (a blot) can be hit.',
+        'Making points in your home makes it hard for hit checkers to come back in.',
+      ],
+    },
+    load: () => import('./backgammon'),
   },
 ];
