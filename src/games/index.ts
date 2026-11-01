@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, eightIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -374,5 +374,30 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./hotdice'),
+  },
+  {
+    id: 'gin',
+    title: 'Gin Rummy',
+    description: 'Make sets and runs, then knock',
+    icon: fanIcon,
+    howToPlay: {
+      goal: 'Score 100 points first by making sets and runs and keeping your loose cards low.',
+      steps: [
+        'You and the computer each get 10 cards. One card starts the discard pile.',
+        'On your turn, take the top card of the <b>pile</b> or a card from the <b>deck</b>, then tap a card to discard. You can’t discard the card you just took from the pile.',
+        'Group cards into <b>melds</b>: three or four of the same rank (a set), or three or more in a row of the same suit (a run). Aces are low: A-2-3, not Q-K-A.',
+        'Cards not in a meld are <b>deadwood</b>. Aces count 1, picture cards 10, others their number. Your hand shows melds first, and loose cards have a dashed outline.',
+        'When your deadwood is 10 or less, tap <b>Knock</b>, then tap your discard. The computer can add its loose cards to your melds, then you compare deadwood.',
+        'The lower deadwood scores the difference. If the computer ties or beats you, it’s an <b>undercut</b> and it scores 25 more.',
+        'Knock with no deadwood at all and it’s <b>gin</b>: 25 extra points, and nothing can be added to your melds.',
+        'If the deck gets down to two cards, nobody scores that hand.',
+      ],
+      tips: [
+        '<b>Easy</b> takes cards only for an obvious meld. <b>Strong</b> plays carefully and knocks early. You can switch at any time.',
+        'Throw away high loose cards first: they cost the most.',
+        'Watch what the computer takes from the pile, and don’t give it cards it needs.',
+      ],
+    },
+    load: () => import('./gin'),
   },
 ];

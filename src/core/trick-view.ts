@@ -37,18 +37,23 @@ export interface HandView {
   picked?: Card[];
   /** Cards just passed to you: a dashed outline. */
   received?: Card[];
+  /** Extra classes for some cards, e.g. { loose: [...] }. */
+  marked?: Record<string, Card[]>;
+  /** Keep the hand in the order given instead of sorting by suit. */
+  keepOrder?: boolean;
 }
 
 /** Your hand, sorted. Playable cards lift when some aren't; the rest are disabled, never dimmed. */
-export function handHtml(hand: Card[], { playable, picked = [], received = [] }: HandView): string {
+export function handHtml(hand: Card[], { playable, picked = [], received = [], marked = {}, keepOrder = false }: HandView): string {
   const has = (list: Card[], c: Card) => list.some((x) => sameCard(x, c));
   const someIllegal = playable !== 'all' && playable.length < hand.length;
-  const cards = sortHand(hand).map((c) => {
+  const cards = (keepOrder ? hand : sortHand(hand)).map((c) => {
     const canPlay = playable === 'all' || has(playable, c);
     const className = [
       has(picked, c) ? 'picked' : '',
       has(picked, c) || (canPlay && someIllegal) ? 'lift' : '',
       has(received, c) ? 'received' : '',
+      ...Object.entries(marked).flatMap(([name, list]) => (has(list, c) ? [name] : [])),
     ]
       .filter(Boolean)
       .join(' ');

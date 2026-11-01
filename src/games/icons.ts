@@ -127,3 +127,11 @@ export const diceIcon = svg(
     '<rect x="22" y="20" width="22" height="22" rx="4" fill="#ef5f58"/>' +
     '<circle cx="28" cy="26" r="2.2" fill="#ffffff"/><circle cx="38" cy="26" r="2.2" fill="#ffffff"/><circle cx="28" cy="36" r="2.2" fill="#ffffff"/><circle cx="38" cy="36" r="2.2" fill="#ffffff"/>',
 );
+
+/** Three cards fanned out, the front one with a purple run marker. */
+export const fanIcon = svg(
+  '<rect x="6" y="10" width="20" height="28" rx="3" fill="#ffffff" stroke="#6c63ff" stroke-width="2" transform="rotate(-14 16 24)"/>' +
+    '<rect x="14" y="8" width="20" height="28" rx="3" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<rect x="22" y="10" width="20" height="28" rx="3" fill="#6c63ff" transform="rotate(14 32 24)"/>' +
+    '<path d="M18 16h12M18 22h12M18 28h8" stroke="#ef5f58" stroke-width="3" stroke-linecap="round"/>',
+);

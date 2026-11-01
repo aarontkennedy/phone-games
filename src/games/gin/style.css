@@ -1,0 +1,58 @@
+/* The computer's hand, the deck and discard pile, then your hand, melds first. Loose
+   cards (deadwood) have a dashed outline. */
+.gin-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.gin-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.gin-fan {
+  display: flex;
+  min-width: 0;
+}
+
+.gin-fan > * {
+  flex: none;
+  width: 36px;
+}
+
+.gin-fan > * + * {
+  margin-left: -18px;
+}
+
+/* Face up at the end of a hand: wider cards, 24px of each showing, so ranks stay readable. */
+.gin-fan.open > * {
+  width: 44px;
+}
+
+.gin-fan.open > * + * {
+  margin-left: -20px;
+}
+
+.gin-fan.open .card-corner {
+  font-size: var(--text-sm);
+}
+
+.gin-piles > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.gin-piles .card,
+.gin-piles .card-slot {
+  width: 52px;
+}
+
+.gin .tt-hand .card.loose {
+  outline: 3px dashed var(--muted);
+  outline-offset: -3px;
+}
