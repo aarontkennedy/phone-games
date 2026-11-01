@@ -20,6 +20,8 @@ const PROTECTED_NAMES = [
   'freecell',
   'wordle',
   'sudoku',
+  'connect four',
+  'farkle',
 ];
 
 describe('game registry', () => {

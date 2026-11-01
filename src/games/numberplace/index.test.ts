@@ -13,7 +13,7 @@ function setup(saved: unknown = null) {
   const container = makeContainer();
   const unmount = track(mount(container));
   const $ = <T extends HTMLElement = HTMLElement>(sel: string) => container.querySelector<T>(sel)!;
-  const cell = (i: number) => $<HTMLButtonElement>(`[data-cell="${i}"]`);
+  const cell = (i: number) => $(`[data-cell="${i}"]`);
   const num = (n: number) => $<HTMLButtonElement>(`[data-num="${n}"]`);
   const stored = () => load<State>('numberplace:state', null as unknown as State);
   const status = () => $('[data-status]').textContent;
@@ -90,6 +90,7 @@ describe('Number place screen', () => {
     expect(status()).toBe('Solved in 0:05! Best: 0:05.');
     expect($('.overlay h2').textContent).toBe('Solved!');
     expect(load('numberplace:best', {})).toEqual({ easy: 5 });
+    cell(0).click(); // squares can't be picked once solved
     $('.overlay .btn').click();
     expect(stored().won).toBe(false);
     expect(status()).toBe('Tap an empty square, then a number. Best: 0:05.');

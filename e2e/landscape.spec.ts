@@ -111,6 +111,13 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
+    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes']) {
+      test(`${id}: side bar on the left, board on the right`, async ({ page }) => {
+        await page.goto(`./#/${id}`);
+        await expectSideBarLayout(page);
+      });
+    }
+
     test('home and About still fit the width', async ({ page }) => {
       await page.goto('./');
       await expectNoHorizontalOverflow(page);

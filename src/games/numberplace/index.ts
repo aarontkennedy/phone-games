@@ -93,7 +93,8 @@ export function mount(container: HTMLElement): () => void {
           .filter(Boolean)
           .join(' ');
         const label = `Row ${r + 1}, column ${c + 1}: ${n || 'empty'}${given ? ', given' : ''}${bad.has(i) ? ', clashes' : ''}`;
-        return `<button class="${cls}" data-cell="${i}" aria-label="${label}"${state.won ? ' disabled' : ''}>${n || ''}</button>`;
+        // Grid squares, like Mines: 26px minimum rather than the 44px button rule (docs/DESIGN.md).
+        return `<div class="${cls}" data-cell="${i}" role="button" tabindex="0" aria-label="${label}"${state.won ? ' aria-disabled="true"' : ''}>${n || ''}</div>`;
       })
       .join('');
     container.querySelector('[data-left]')!.textContent = String(grid.filter((n) => !n).length);
@@ -126,8 +127,8 @@ export function mount(container: HTMLElement): () => void {
   }
 
   boardEl.addEventListener('click', (e) => {
-    const el = (e.target as Element).closest<HTMLButtonElement>('[data-cell]');
-    if (!el) return;
+    const el = (e.target as Element).closest<HTMLElement>('[data-cell]');
+    if (!el || state.won) return;
     selected = Number(el.dataset.cell);
     render();
   });

@@ -10,6 +10,15 @@ const GAMES = [
   { id: 'spades', title: 'Spades' },
   { id: 'euchre', title: 'Euchre' },
   { id: 'cribbage', title: 'Cribbage' },
+  { id: 'tictactoe', title: 'Tic-Tac-Toe' },
+  { id: 'fourinarow', title: 'Four in a Row' },
+  { id: 'checkers', title: 'Checkers' },
+  { id: 'numberplace', title: 'Number Place' },
+  { id: 'freecells', title: 'Free Cells' },
+  { id: 'crazyeights', title: 'Crazy Eights' },
+  { id: 'hotdice', title: 'Hot Dice' },
+  { id: 'gin', title: 'Gin Rummy' },
+  { id: 'dominoes', title: 'Dominoes' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));

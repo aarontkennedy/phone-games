@@ -26,6 +26,8 @@ protected list. Add to that list when you learn of a new one.
 | FreeCell | Free Cells | FreeCell |
 | Yahtzee | Yacht, Five Dice | Yahtzee |
 | Sudoku | Number Place | Sudoku |
+| Connect Four | Four in a Row | Connect Four |
+| Farkle | Hot Dice | Farkle (possibly a trademark; kept off to be safe) |
 | Chess, Checkers, Cribbage, Blackjack, Spades, Hearts, Euchre, Dominoes, Gin Rummy | Same. These are generic. | Brand names of specific apps |
 | Falling-block puzzles | Don't build one | Tetris (its owners actively enforce its look and name) |
 
