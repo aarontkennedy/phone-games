@@ -48,3 +48,19 @@
     --ce-red: #ff7070;
   }
 }
+
+/* Sideways, the extra deck row would push the table past the screen: smaller pile cards. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .ce-pile {
+    gap: 0;
+  }
+
+  .ce-pile > .card {
+    width: 42px;
+  }
+
+  .ce-suit .suit {
+    width: 28px;
+    height: 28px;
+  }
+}
