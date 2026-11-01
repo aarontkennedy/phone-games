@@ -147,6 +147,25 @@ body {
   cursor: pointer;
 }
 
+/* Two actions side by side: only the first is pushed to the right. */
+.top-action + .top-action {
+  margin-left: 0;
+}
+
+/* Text and email links, shown when the browser has no share sheet. */
+.share-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-2);
+}
+
+.share-menu .btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
 /* Readable long-form text: How to play and About. */
 .prose {
   line-height: 1.45;

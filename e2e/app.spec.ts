@@ -23,6 +23,21 @@ test('home lists every game', async ({ page }) => {
   await expectReadableText(page);
 });
 
+test('Share offers text and email when the browser has no share sheet', async ({ page }) => {
+  await page.addInitScript(() => {
+    delete (Navigator.prototype as { share?: unknown }).share;
+  });
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Share' }).click();
+  const text = page.getByRole('link', { name: 'Send a text' });
+  await expect(text).toBeVisible();
+  await expect(text).toHaveAttribute('href', /^sms:\?&body=/);
+  await expect(page.getByRole('link', { name: 'Send an email' })).toHaveAttribute('href', /^mailto:/);
+  await expectNoHorizontalOverflow(page);
+  await expectTouchTargets(page);
+  await expectReadableText(page);
+});
+
 for (const g of GAMES) {
   test(`${g.title}: opens, fits the screen, and goes back`, async ({ page }) => {
     await page.goto('./');

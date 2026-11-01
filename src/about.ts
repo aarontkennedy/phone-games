@@ -37,6 +37,9 @@ const html = `
   <p>From then on, open Games from its icon on your home screen. Open it once while
   you're online, and after that it works anywhere.</p>
 
+  <p>To send Games to someone else, tap <b>Share</b> on the home screen. You can send it
+  by text or email.</p>
+
   <h2>Privacy</h2>
   <p>Your games, scores and settings are saved only on this device. The app doesn't
   collect, send or share anything. Its files are delivered by GitHub Pages, like any

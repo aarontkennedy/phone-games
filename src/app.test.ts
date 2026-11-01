@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { startApp } from './app';
 import type { GameMeta, GameModule } from './core/game';
 import { flush } from './test/helpers';
@@ -109,6 +109,42 @@ describe('startApp', () => {
       const { root, stop, go } = setup([g]);
       await go('#/a');
       expect(panel(root).querySelector('h3')).toBeNull();
+      stop();
+    });
+  });
+
+  describe('share', () => {
+    afterEach(() => {
+      Reflect.deleteProperty(navigator, 'share');
+    });
+
+    it('opens the phone’s share sheet from the home screen', async () => {
+      const share = vi.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'share', { configurable: true, value: share });
+      const { root, stop } = setup([game('a', vi.fn())]);
+      root.querySelector<HTMLButtonElement>('[data-share]')!.click();
+      await flush();
+      expect(share).toHaveBeenCalledOnce();
+      expect(root.querySelector<HTMLElement>('[data-share-menu]')!.hidden).toBe(true);
+      stop();
+    });
+
+    it('offers text and email links when there’s no share sheet', async () => {
+      const { root, stop } = setup([game('a', vi.fn())]);
+      const btn = root.querySelector<HTMLButtonElement>('[data-share]')!;
+      const menu = root.querySelector<HTMLElement>('[data-share-menu]')!;
+      expect(menu.hidden).toBe(true);
+      btn.click();
+      await flush();
+      expect(menu.hidden).toBe(false);
+      expect(btn.getAttribute('aria-expanded')).toBe('true');
+      const links = [...menu.querySelectorAll('a')];
+      expect(links.map((a) => a.textContent)).toEqual(['Send a text', 'Send an email']);
+      expect(links[0].getAttribute('href')).toMatch(/^sms:\?&body=/);
+      expect(links[1].getAttribute('href')).toMatch(/^mailto:\?subject=/);
+      btn.click();
+      await flush();
+      expect(menu.hidden).toBe(true);
       stop();
     });
   });

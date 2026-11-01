@@ -1,4 +1,5 @@
 import { mountAbout } from './about';
+import { openShareSheet, shareLinks } from './share';
 import type { GameMeta } from './core/game';
 
 const list = (tag: string, items: string[]) => `<${tag}>${items.map((s) => `<li>${s}</li>`).join('')}</${tag}>`;
@@ -39,11 +40,17 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
   let navigation = 0;
 
   function renderHome() {
+    const links = shareLinks();
     root.innerHTML = `
       <header class="topbar">
         <h1>Games</h1>
+        <button class="top-action" data-share aria-expanded="false">Share</button>
         <a class="top-action" href="#/about">About</a>
       </header>
+      <div class="share-menu" data-share-menu hidden>
+        <a class="btn" href="${links.text}">Send a text</a>
+        <a class="btn secondary" href="${links.email}">Send an email</a>
+      </div>
       <main class="home">
         ${games
           .map(
@@ -56,6 +63,13 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
           )
           .join('')}
       </main>`;
+    const shareBtn = root.querySelector<HTMLButtonElement>('[data-share]')!;
+    const menu = root.querySelector<HTMLElement>('[data-share-menu]')!;
+    shareBtn.addEventListener('click', async () => {
+      if (await openShareSheet()) return;
+      menu.hidden = !menu.hidden; // no share sheet: offer text and email links instead
+      shareBtn.setAttribute('aria-expanded', String(!menu.hidden));
+    });
   }
 
   function renderAbout() {
