@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, mineIcon, tilesIcon } from './icons';
+import { cardsIcon, chipIcon, mineIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -78,5 +78,32 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./solitaire'),
+  },
+  {
+    id: 'blackjack',
+    title: 'Blackjack',
+    description: 'Get closer to 21 than the dealer',
+    icon: chipIcon,
+    howToPlay: {
+      goal: 'Finish with a hand closer to 21 than the dealer’s, without going over 21.',
+      steps: [
+        'Cards 2 to 10 count their number. Jacks, queens and kings count 10. An ace counts 11, or 1 if 11 would take you over 21. A hand with an ace counting 11 is called <b>soft</b>.',
+        'Choose a bet (10, 20, 50 or 100 chips) and tap <b>Deal</b>. You and the dealer each get two cards. One of the dealer’s cards stays face down.',
+        'An ace with a 10, jack, queen or king is a <b>blackjack</b>. It wins at once and pays 3 to 2 (a 20 bet wins 30), unless the dealer has one too.',
+        '<b>Hit</b> to take another card. <b>Stand</b> to keep your total. Go over 21 and you <b>bust</b>: you lose straight away.',
+        '<b>Double</b> on your first two cards to double your bet and take exactly one more card.',
+        '<b>Split</b> two cards of the same value into two hands, with a second bet. You play them one after the other. Split aces get one card each.',
+        'When you’re done, the dealer turns over the face-down card and must take cards until reaching 17 or more.',
+        'You win if the dealer busts or you’re closer to 21. A win pays even money (a 20 bet wins 20). A tie is a <b>push</b>: your bet comes back.',
+        'These are play chips, not money. If you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve ever had.',
+      ],
+      tips: [
+        'Turn on <b>Hints</b> and the line under the table tells you the best play for every hand.',
+        'Always split aces and eights. Never split tens or fives.',
+        'Stand on 12 to 16 when the dealer shows 2 to 6 (the dealer is likely to bust), and hit when the dealer shows 7 or higher.',
+        'Double on 11 unless the dealer shows an ace.',
+      ],
+    },
+    load: () => import('./blackjack'),
   },
 ];

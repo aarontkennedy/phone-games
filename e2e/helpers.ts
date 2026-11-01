@@ -76,3 +76,22 @@ export async function expectTouchTargets(page: Page, min = 44): Promise<void> {
   }, min);
   expect(small).toEqual([]);
 }
+
+/**
+ * Opens Blackjack with a table whose next deal is `order` ("8H 10S 8C 7D ..."): you,
+ * dealer up, you, dealer hole, then draws. Leaves the game first and waits for it to
+ * close, because closing it saves the current table and would overwrite this one.
+ */
+export async function openBlackjackWith(page: Page, order: string): Promise<void> {
+  const back = page.getByRole('link', { name: '‹ Games' });
+  if (await back.count()) await back.click();
+  // The home screen appears only after the game has closed (and saved), so nothing
+  // can overwrite the table below.
+  await expect(page.getByRole('heading', { name: 'Games', level: 1 })).toBeVisible();
+  const ranks: Record<string, number> = { A: 1, J: 11, Q: 12, K: 13 };
+  const cards = order.split(' ').map((id) => ({ suit: id.slice(-1), rank: ranks[id.slice(0, -1)] ?? Number(id.slice(0, -1)) }));
+  const filler = Array.from({ length: 100 }, () => ({ suit: 'S', rank: 5 }));
+  const state = { shoe: [...filler, ...cards.reverse()], chips: 1000, bet: 20, phase: 'betting', dealer: [], hands: [], active: 0 };
+  await page.evaluate((s) => localStorage.setItem('pg:blackjack:state', JSON.stringify(s)), state);
+  await page.locator('a[href="#/blackjack"]').click();
+}

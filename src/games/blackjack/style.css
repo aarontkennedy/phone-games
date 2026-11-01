@@ -1,0 +1,80 @@
+/* The table: the dealer's hand on top, your hand (or two after a split) below. */
+.bj-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  touch-action: manipulation;
+}
+
+/* Split hands sit side by side, wrapping only if a hand grows too long. */
+.bj-player {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.bj-player > .bj-hand {
+  /* Share the row equally. A hand never gets narrower than its cards (flex items
+     default to min-width: auto), and its label wraps instead of widening it. */
+  flex: 1 1 0;
+}
+
+.bj-hand {
+  padding: var(--space-2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+}
+
+/* The hand you're playing now. Also named in the label ("Hand 1"), not by color alone. */
+.bj-hand.active {
+  border-color: var(--accent);
+}
+
+.bj-label {
+  margin: 0 0 var(--space-2);
+  min-height: 1.3em;
+}
+
+.bj-bet {
+  color: var(--muted);
+}
+
+.bj-result {
+  font-weight: 700;
+}
+
+.bj-result.won {
+  color: var(--bj-won);
+}
+
+/* Cards overlap left to right, leaving each rank in view. */
+.bj-cards {
+  display: flex;
+}
+
+.bj-cards > * {
+  flex: none;
+  width: 56px;
+}
+
+.bj-cards > * + * {
+  margin-left: -28px;
+}
+
+.bj-actions {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.bj {
+  --bj-won: #17692c;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bj {
+    --bj-won: #6cd17a;
+  }
+}

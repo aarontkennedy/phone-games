@@ -36,3 +36,12 @@ export const cardsIcon = svg(
     '<rect x="18" y="10" width="23" height="32" rx="3" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
     '<path d="M29.5 34C25 30.2 22 27.6 22 24.4a3.75 3.75 0 0 1 7.5-1.5 3.75 3.75 0 0 1 7.5 1.5c0 3.2-3 5.8-7.5 9.6Z" fill="#ef5f58"/>',
 );
+
+/** A betting chip: a red disc with a white ring and four edge marks. */
+export const chipIcon = svg(
+  '<circle cx="24" cy="24" r="20" fill="#ef5f58"/>' +
+    [0, 90, 180, 270]
+      .map((deg) => `<rect x="21" y="4" width="6" height="7" fill="#ffffff" transform="rotate(${deg} 24 24)"/>`)
+      .join('') +
+    '<circle cx="24" cy="24" r="11" fill="none" stroke="#ffffff" stroke-width="3"/>',
+);

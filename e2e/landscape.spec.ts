@@ -4,6 +4,7 @@ import {
   expectReadableText,
   expectTouchTargets,
   failOnErrors,
+  openBlackjackWith,
   seedRandom,
   swipe,
 } from './helpers';
@@ -76,6 +77,15 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
       await page.locator('[data-draw="3"]').click();
       await page.locator('[data-stock]').click();
+      await expectSideBarLayout(page);
+    });
+
+    test('Blackjack: side bar on the left, table on the right, even after a split', async ({ page }) => {
+      await page.goto('./#/blackjack');
+      await expectSideBarLayout(page);
+      await openBlackjackWith(page, '8H 10S 8C 7D 3H 2C');
+      await page.locator('[data-deal]').click();
+      await page.locator('[data-action="split"]').click();
       await expectSideBarLayout(page);
     });
 
