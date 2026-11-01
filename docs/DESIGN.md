@@ -5,7 +5,8 @@
 1. **Yours alone.** No ads, accounts, nags, notifications, analytics or network calls.
 2. **Works anywhere.** Fully offline after the first visit.
 3. **One thumb, portrait first.** Everything reachable and readable while holding the
-   phone in one hand. Turning the phone sideways also works (see "Landscape").
+   phone in one hand, with the buttons you tap during play at the bottom (see "Screen
+   layout"). Turning the phone sideways also works (see "Landscape").
 4. **Instant resume.** Every move auto-saves, so closing the app never loses a game.
 5. **Calm.** Quick, subtle motion and no flashing. Celebrate wins briefly.
 6. **One family.** Every game uses the same tokens, components and screen layout.
@@ -84,11 +85,21 @@ Every game screen uses this structure, top to bottom:
 ```
 topbar        ‹ Games   Title                    (app shell)
 .screen
-  .stats      [stat] [New] [stat]                score/time and the main action
-  .controls   [segmented options] [toggle]       optional
+  .stats      [stat] [New] [stat]                score/time and the New/Deal button
   .board-frame                                   the playing surface; hosts .overlay
   .status-line                                   hint, or result (aria-live)
+  .controls   [segmented options] [toggle]       optional; pinned to the bottom
 ```
+
+- **Thumb first.** Most people hold the phone in their right hand and tap with the
+  thumb, which reaches the bottom of the screen most easily. So scores and timers go at
+  the top, the board in the middle, and the buttons you tap during play at the bottom.
+  `.controls` gets `margin-top: auto`, so it sits at the bottom of the screen even when
+  the board is short. Put the markup in this order too, so screen readers and the Tab
+  key follow what's on screen.
+- **New stays at the top.** New (or Deal) lives in `.stats`, away from the thumb, so a
+  stray tap doesn't throw away a game.
+- **Tested** by `e2e/app.spec.ts` for every game.
 
 ### Landscape
 
@@ -96,17 +107,20 @@ When a phone is turned sideways (landscape and at most 560px tall), every game s
 switches to a side bar layout automatically:
 
 ```
-| ‹ Games  Title   Rules |                    |
-| [stat] [New] [stat]    |      board         |
-| [options] [toggle]     |  (fills the        |
-| status line            |   screen height)   |
+|                    | ‹ Games  Title   Rules |
+|      board         | [stat] [New] [stat]    |
+|  (fills the        | status line            |
+|   screen height)   |                        |
+|                    | [options] [toggle]     |
 ```
+
+The side bar is on the right, under a right thumb, with the controls at its bottom.
 
 - **Pure CSS** in `src/style.css`. It works for any screen built from the structure
   above, so new games get it for free. Don't add game-specific landscape rules unless a
   game truly needs them.
 - **Everything fits on one screen.** No scrolling either way, the board fully visible,
-  every control left of the board. Touch target, cell size and text size rules still
+  every control right of the board. Touch target, cell size and text size rules still
   apply.
 - **Gesture surfaces** set `touch-action: none` on the board itself, not only on the
   `.screen` wrapper, because the wrapper has no box in this layout.

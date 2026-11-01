@@ -53,6 +53,8 @@ export function mount(container: HTMLElement): () => void {
         <button class="btn" data-new>New</button>
         <div class="stat"><small>Them</small><b data-them></b></div>
       </div>
+      <div class="board-frame tt-table" data-board></div>
+      <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="segmented" aria-label="Computer players">
           <button data-level="easy">Easy</button>
@@ -60,8 +62,6 @@ export function mount(container: HTMLElement): () => void {
         </div>
         <div class="eu-bid" data-bidding></div>
       </div>
-      <div class="board-frame tt-table" data-board></div>
-      <p class="status-line" data-status aria-live="polite"></p>
     </div>`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;

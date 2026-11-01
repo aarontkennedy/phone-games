@@ -57,6 +57,16 @@ for (const g of GAMES) {
     await expectTouchTargets(page);
     await expectReadableText(page);
 
+    // Thumb-friendly order: stats at the top, then the board, then the controls.
+    const board = (await page.locator('.board-frame').boundingBox())!;
+    const stats = (await page.locator('.stats').boundingBox())!;
+    expect(stats.y + stats.height).toBeLessThanOrEqual(board.y + 1);
+    const controls = page.locator('.controls');
+    if (await controls.count()) {
+      const box = (await controls.boundingBox())!;
+      expect(box.y).toBeGreaterThanOrEqual(board.y + board.height - 1);
+    }
+
     await page.getByRole('link', { name: '‹ Games' }).click();
     await expect(page.getByRole('heading', { name: 'Games' })).toBeVisible();
   });

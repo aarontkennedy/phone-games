@@ -34,6 +34,8 @@ export function mount(container: HTMLElement): () => void {
         <button class="btn" data-new>New</button>
         <div class="stat"><small>Computer</small><b data-score="1"></b></div>
       </div>
+      <div class="board-frame dom-table" data-board></div>
+      <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="segmented" aria-label="Computer player">
           <button data-level="easy">Easy</button>
@@ -41,8 +43,6 @@ export function mount(container: HTMLElement): () => void {
         </div>
         <div class="dom-actions" data-actions></div>
       </div>
-      <div class="board-frame dom-table" data-board></div>
-      <p class="status-line" data-status aria-live="polite"></p>
     </div>`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;

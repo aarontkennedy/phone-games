@@ -9,7 +9,7 @@ import {
   swipe,
 } from './helpers';
 
-// Phones turned sideways: controls in a side bar on the left, the board on the right,
+// Phones turned sideways: the board on the left, controls in a side bar on the right,
 // everything on one screen (docs/DESIGN.md, "Landscape").
 const SIZES = [
   { name: 'iPhone 13', width: 844, height: 390 },
@@ -27,16 +27,18 @@ async function expectSideBarLayout(page: Page) {
   const viewport = page.viewportSize()!;
   const board = (await page.locator('.board-frame').boundingBox())!;
 
-  // The board is fully on screen and on the right.
+  // The board is fully on screen and on the left.
+  expect(board.x).toBeGreaterThanOrEqual(0);
   expect(board.y).toBeGreaterThanOrEqual(0);
   expect(board.y + board.height).toBeLessThanOrEqual(viewport.height + 1);
   expect(board.x + board.width).toBeLessThanOrEqual(viewport.width + 1);
   expect(board.width).toBeGreaterThan(viewport.height * 0.8);
 
-  // Every control sits to the left of the board.
+  // Every control sits to the right of the board.
   for (const el of await page.locator('.topbar, .stats, .controls, .status-line').all()) {
     const box = (await el.boundingBox())!;
-    expect(box.x + box.width).toBeLessThanOrEqual(board.x + 1);
+    expect(box.x).toBeGreaterThanOrEqual(board.x + board.width - 1);
+    expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
     expect(box.y + box.height).toBeLessThanOrEqual(viewport.height + 1);
   }
 
@@ -52,7 +54,7 @@ for (const size of SIZES) {
   test.describe(`${size.name} sideways`, () => {
     test.beforeEach(({ page }) => page.setViewportSize({ width: size.width, height: size.height }));
 
-    test('2048: side bar on the left, board on the right, swipes still work', async ({ page }) => {
+    test('2048: board on the left, side bar on the right, swipes still work', async ({ page }) => {
       await page.goto('./#/2048');
       await expectSideBarLayout(page);
 
@@ -63,7 +65,7 @@ for (const size of SIZES) {
     });
 
     for (const level of ['easy', 'medium', 'hard']) {
-      test(`Mines ${level}: side bar on the left, board on the right`, async ({ page }) => {
+      test(`Mines ${level}: board on the left, side bar on the right`, async ({ page }) => {
         await page.goto('./#/minesweeper');
         await page.locator(`[data-level="${level}"]`).click();
         await expectSideBarLayout(page);
@@ -72,7 +74,7 @@ for (const size of SIZES) {
       });
     }
 
-    test('Solitaire: side bar on the left, cards on the right', async ({ page }) => {
+    test('Solitaire: cards on the left, side bar on the right', async ({ page }) => {
       await page.goto('./#/solitaire');
       await expectSideBarLayout(page);
       await page.locator('[data-draw="3"]').click();
@@ -80,7 +82,7 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
-    test('Blackjack: side bar on the left, table on the right, even after a split', async ({ page }) => {
+    test('Blackjack: table on the left, side bar on the right, even after a split', async ({ page }) => {
       await page.goto('./#/blackjack');
       await expectSideBarLayout(page);
       await openBlackjackWith(page, '8H 10S 8C 7D 3H 2C');
@@ -89,30 +91,30 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
-    test('Hearts: side bar on the left, table and hand on the right', async ({ page }) => {
+    test('Hearts: table and hand on the left, side bar on the right', async ({ page }) => {
       await page.goto('./#/hearts');
       await expectSideBarLayout(page);
     });
 
-    test('Spades: side bar with the bid controls, table on the right', async ({ page }) => {
+    test('Spades: side bar with the bid controls, table on the left', async ({ page }) => {
       await page.goto('./#/spades');
       await expect(page.locator('[data-bidding]')).toBeVisible();
       await expectSideBarLayout(page);
     });
 
-    test('Euchre: side bar with the bidding buttons, table on the right', async ({ page }) => {
+    test('Euchre: side bar with the bidding buttons, table on the left', async ({ page }) => {
       await page.goto('./#/euchre');
       await expect(page.locator('[data-bidding]')).toBeVisible();
       await expectSideBarLayout(page);
     });
 
-    test('Cribbage: side bar on the left, score track and cards on the right', async ({ page }) => {
+    test('Cribbage: score track and cards on the left, side bar on the right', async ({ page }) => {
       await page.goto('./#/cribbage');
       await expectSideBarLayout(page);
     });
 
     for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes']) {
-      test(`${id}: side bar on the left, board on the right`, async ({ page }) => {
+      test(`${id}: board on the left, side bar on the right`, async ({ page }) => {
         await page.goto(`./#/${id}`);
         await expectSideBarLayout(page);
       });

@@ -25,11 +25,11 @@ export function mount(container: HTMLElement): () => void {
         <button class="btn" data-new>New</button>
         <div class="stat"><small>Time</small><b data-time></b></div>
       </div>
+      <div class="board-frame fc-board" data-board></div>
+      <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <button class="btn secondary" data-undo>Undo</button>
       </div>
-      <div class="board-frame fc-board" data-board></div>
-      <p class="status-line" data-status aria-live="polite"></p>
     </div>`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;

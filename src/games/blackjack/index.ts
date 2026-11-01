@@ -53,9 +53,9 @@ export function mount(container: HTMLElement): () => void {
         <button class="btn" data-deal></button>
         <div class="stat"><small>Best</small><b data-best></b></div>
       </div>
-      <div class="controls" data-controls></div>
       <div class="board-frame bj-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
+      <div class="controls" data-controls></div>
     </div>`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;

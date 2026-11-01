@@ -20,6 +20,8 @@ export function mount(container: HTMLElement): () => void {
         <button class="btn" data-new>New</button>
         <div class="stat"><small>Time</small><b data-time></b></div>
       </div>
+      <div class="board-frame np-board" data-board></div>
+      <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="segmented" aria-label="Difficulty">
           ${Object.entries(LEVELS).map(([id, l]) => `<button data-level="${id}">${l.label}</button>`).join('')}
@@ -29,8 +31,6 @@ export function mount(container: HTMLElement): () => void {
           <button class="btn secondary" data-num="0">Erase</button>
         </div>
       </div>
-      <div class="board-frame np-board" data-board></div>
-      <p class="status-line" data-status aria-live="polite"></p>
     </div>`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
