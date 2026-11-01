@@ -36,7 +36,7 @@ async function expectSideBarLayout(page: Page) {
   expect(board.width).toBeGreaterThan(viewport.height * 0.8);
 
   // Every control sits to the right of the board.
-  for (const el of await page.locator('.topbar, .stats, .controls, .status-line').all()) {
+  for (const el of await page.locator('.topbar:visible, .stats, .controls, .status-line').all()) { // not the hidden rules bar
     const box = (await el.boundingBox())!;
     expect(box.x).toBeGreaterThanOrEqual(board.x + board.width - 1);
     expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);

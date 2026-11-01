@@ -50,7 +50,10 @@ function setUpHelp(root: HTMLElement, meta: GameMeta): void {
   root.insertAdjacentHTML(
     'beforeend',
     `<div class="help prose" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
-      <h2 id="help-title" tabindex="-1">How to play ${meta.title}</h2>
+      <header class="topbar sub help-bar">
+        <button class="back top-icon" data-help-close aria-label="Back to the game">${BACK_ICON}</button>
+        <h2 id="help-title" tabindex="-1">How to play ${meta.title}</h2>
+      </header>
       <p><b>Goal:</b> ${goal}</p>
       ${list('ol', steps)}
       ${tips?.length ? `<h3>Tips</h3>${list('ul', tips)}` : ''}
@@ -65,10 +68,13 @@ function setUpHelp(root: HTMLElement, meta: GameMeta): void {
     panel.scrollTop = 0;
     panel.querySelector<HTMLElement>('h2')!.focus();
   });
-  panel.querySelector('[data-help-close]')!.addEventListener('click', () => {
-    panel.hidden = true;
-    openBtn.focus();
-  });
+  // The back arrow at the top and Got it at the bottom both close the rules.
+  panel.querySelectorAll('[data-help-close]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      panel.hidden = true;
+      openBtn.focus();
+    }),
+  );
 }
 
 /**

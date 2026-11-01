@@ -30,7 +30,7 @@ const GAMES = [
 test.beforeEach(({ page }) => failOnErrors(page));
 
 for (const g of GAMES) {
-  test(`${g.title}: Rules opens How to play, and Got it closes it`, async ({ page }) => {
+  test(`${g.title}: Rules opens How to play; the back arrow or Got it closes it`, async ({ page }) => {
     await page.goto(`./#/${g.id}`);
     await expect(page.locator('.game > *')).not.toHaveCount(0);
     const help = page.getByRole('dialog', { name: `How to play ${g.title}` });
@@ -44,6 +44,11 @@ for (const g of GAMES) {
     await expectNoHorizontalOverflow(page);
 
     await help.getByRole('button', { name: 'Got it' }).click();
+    await expect(help).toBeHidden();
+
+    // The back arrow at the top closes it too.
+    await page.getByRole('button', { name: 'Rules' }).click();
+    await help.getByRole('button', { name: 'Back to the game' }).click();
     await expect(help).toBeHidden();
   });
 }

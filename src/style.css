@@ -129,7 +129,8 @@ body {
   grid-template-columns: var(--tap) minmax(0, 1fr) var(--tap);
 }
 
-.topbar.sub h1 {
+.topbar.sub h1,
+.topbar.sub h2 {
   grid-column: 2;
   text-align: center;
   line-height: 1.15;
@@ -287,14 +288,30 @@ body {
   z-index: 10;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: calc(env(safe-area-inset-top) + var(--space-4)) var(--space-4)
-    calc(env(safe-area-inset-bottom) + var(--space-5));
+  padding: 0 var(--space-4) calc(env(safe-area-inset-bottom) + var(--space-5));
   background: var(--bg);
   color: var(--text);
 }
 
-.help h2 {
-  margin-top: 0;
+/* The rules' top bar: a back arrow like the game screen's, staying put while you scroll. */
+.help-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin-bottom: var(--space-2);
+  padding: calc(env(safe-area-inset-top) + var(--space-2)) 0 var(--space-2);
+  background: var(--bg);
+}
+
+.help-bar .back {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.topbar h2 {
+  margin: 0;
+  font-size: var(--text-xl);
 }
 
 .help .btn {

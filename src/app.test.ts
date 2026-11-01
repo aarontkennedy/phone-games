@@ -136,13 +136,18 @@ describe('startApp', () => {
       stop();
     });
 
-    it('closes with Got it and returns focus to Rules', async () => {
+    it('closes with the back arrow at the top or Got it at the bottom, returning focus to Rules', async () => {
       const { root, stop, go } = setup([game('a', noop)]);
       await go('#/a');
-      rules(root).click();
-      panel(root).querySelector<HTMLButtonElement>('[data-help-close]')!.click();
-      expect(panel(root).hidden).toBe(true);
-      expect(document.activeElement).toBe(rules(root));
+      const [back, gotIt] = [...panel(root).querySelectorAll<HTMLButtonElement>('[data-help-close]')];
+      expect(back.getAttribute('aria-label')).toBe('Back to the game');
+      expect(gotIt.textContent).toBe('Got it');
+      for (const close of [back, gotIt]) {
+        rules(root).click();
+        close.click();
+        expect(panel(root).hidden).toBe(true);
+        expect(document.activeElement).toBe(rules(root));
+      }
       stop();
     });
 
