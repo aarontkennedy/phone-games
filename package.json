@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "licenses": "node scripts/check-licenses.mjs",
+    "deps": "npm outdated; npm audit",
     "check": "tsc && npm run licenses && npm test && npm run test:e2e",
     "icons": "node scripts/make-icons.mjs"
   },

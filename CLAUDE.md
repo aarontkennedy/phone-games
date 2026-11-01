@@ -12,6 +12,7 @@ Offline PWA of personal games (no server, no ads, no accounts). Vite + TypeScrip
   - No emoji anywhere, because they aren't flat. Board symbols (like the Mines flag) are inline SVG with `role="img"` and an `aria-label`, colored from CSS tokens, at 3:1 or better against their square.
   - Enforced by src/design.test.ts, src/games/index.test.ts and scripts/no-emoji.test.mjs. Details are in docs/DESIGN.md.
 - **Readable without reading glasses (required):** the player needs reading glasses for small text. All text is at least 18px, and body text is 20px. Use the `--text-*` tokens. Never hard-code a `font-size`, and never shrink text to make something fit: wrap it, shorten it, or simplify the layout. Board numbers must be at least 18px on a 390px-wide phone. Enforced by src/design.test.ts and the E2E `expectReadableText()` helper. Details are in docs/DESIGN.md.
+- docs/SECURITY.md: check dependencies every few weeks (Dependabot opens a monthly pull request; `npm run deps` checks by hand). Fix advisories in shipped code at once, high or critical in build tools within days. Never `npm audit fix --force` blindly; update one major version at a time and run `npm run check`.
 - docs/LEGAL.md: generic game names only (e.g. "Mines", not "Minesweeper"); permissive licenses only; no copied code or assets; shipped third-party code listed in public/THIRD_PARTY_NOTICES.txt.
 
 ## Commands
@@ -19,6 +20,7 @@ Offline PWA of personal games (no server, no ads, no accounts). Vite + TypeScrip
 - `npm test`: vitest with coverage thresholds
 - `npm run test:e2e`: Playwright, iPhone (WebKit) and Android (Chromium) projects, including offline
 - `npm run licenses`: dependency license allowlist
+- `npm run deps`: outdated packages and security advisories
 - `npm run check`: all of the above plus tsc
 
 ## Notes

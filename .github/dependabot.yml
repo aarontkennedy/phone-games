@@ -1,0 +1,24 @@
+# Monthly dependency check (docs/SECURITY.md). One grouped pull request per ecosystem;
+# CI runs every test on it. New releases wait a week, so hijacked versions get pulled first.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      npm:
+        patterns: ['*']
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    cooldown:
+      default-days: 7
+    groups:
+      actions:
+        patterns: ['*']
