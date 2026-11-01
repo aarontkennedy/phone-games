@@ -32,7 +32,7 @@ describe('Hearts screen', () => {
   it('starts a game by asking you to pass three cards left', () => {
     const { $, $$, status, hand } = setup();
     expect(hand()).toHaveLength(13);
-    expect($$('.hrt-name').map((n) => n.textContent)).toEqual(['West', 'North', 'East', 'You']);
+    expect($$('.tt-name').map((n) => n.textContent)).toEqual(['West', 'North', 'East', 'You']);
     expect($('[data-pass]').textContent).toBe('Pass to West');
     expect($<HTMLButtonElement>('[data-pass]').disabled).toBe(true);
     expect($('[data-round]').textContent).toBe('1');
@@ -103,8 +103,8 @@ describe('Hearts screen', () => {
 
   it('shows points taken this round next to each score', () => {
     const { $ } = setup(position(['5D', '3C', '4C', 'KC'], { points: [0, 5, 0, 13], scores: [10, 20, 30, 40] }));
-    expect($('[data-seat="1"] .hrt-score').textContent).toBe('20 +5');
-    expect($('[data-seat="0"] .hrt-score').textContent).toBe('10');
+    expect($('[data-seat="1"] .tt-info').textContent).toBe('20 +5');
+    expect($('[data-seat="0"] .tt-info').textContent).toBe('10');
     expect($('[data-score]').textContent).toBe('10');
   });
 

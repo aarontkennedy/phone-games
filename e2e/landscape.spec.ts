@@ -94,6 +94,12 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
+    test('Spades: side bar with the bid controls, table on the right', async ({ page }) => {
+      await page.goto('./#/spades');
+      await expect(page.locator('[data-bidding]')).toBeVisible();
+      await expectSideBarLayout(page);
+    });
+
     test('home and About still fit the width', async ({ page }) => {
       await page.goto('./');
       await expectNoHorizontalOverflow(page);

@@ -50,3 +50,8 @@ export const chipIcon = svg(
 export const heartIcon = svg(
   '<path d="M24 42C12 32.5 4 25.5 4 16.5A10 10 0 0 1 24 12a10 10 0 0 1 20 4.5C44 25.5 36 32.5 24 42Z" fill="#ef5f58"/>',
 );
+
+/** A large spade, in purple so it shows in light and dark mode. */
+export const spadeIcon = svg(
+  '<path d="M24 4C34 14 43 21 43 29a8.5 8.5 0 0 1-15.5 4.8L30 44H18l2.5-10.2A8.5 8.5 0 0 1 5 29C5 21 14 14 24 4Z" fill="#6c63ff"/>',
+);

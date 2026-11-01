@@ -29,7 +29,7 @@ test('pass three cards, then play a trick with the computer players', async ({ p
   await page.locator('[data-hand]:enabled').first().click();
   await expect(page.locator('[data-seat="0"] .card')).toBeVisible();
   await expect(page.locator('[data-status]')).toHaveText(/takes? the trick/, { timeout: 10_000 });
-  await expect(page.locator('.hrt-play .card')).toHaveCount(4);
+  await expect(page.locator('.tt-play .card')).toHaveCount(4);
   await expectNoHorizontalOverflow(page);
   await expectReadableText(page);
 });

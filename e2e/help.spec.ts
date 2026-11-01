@@ -7,6 +7,7 @@ const GAMES = [
   { id: 'solitaire', title: 'Solitaire' },
   { id: 'blackjack', title: 'Blackjack' },
   { id: 'hearts', title: 'Hearts' },
+  { id: 'spades', title: 'Spades' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));

@@ -1,7 +1,7 @@
-import { cardFace, cardSlot } from '../../core/card-view';
 import { cardId, cardName, sameCard, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
-import { SEATS, SEAT_NAMES, nextSeat, sortHand, trickWinner, type Seat } from '../../core/tricks';
+import { SEATS, SEAT_NAMES, nextSeat, trickWinner, type Seat } from '../../core/tricks';
+import { handHtml, seatsHtml } from '../../core/trick-view';
 import { showOverlay, hideOverlay } from '../../core/ui';
 import {
   chooseCard,
@@ -17,15 +17,12 @@ import {
   type Level,
   type State,
 } from './logic';
-import './style.css';
 
 const STATE_KEY = 'hearts:state';
 /** Pause before each computer play, so you can follow along. */
 export const AI_DELAY = 600;
 /** How long a finished trick stays on the table. */
 export const TRICK_PAUSE = 1100;
-/** Seats shown left to right: the order cards are played after yours. */
-const SEAT_ORDER: Seat[] = [1, 2, 3, 0];
 const PASS_TO = { left: 'West', right: 'East', across: 'North' } as const;
 
 /** "A, B and C". Always called with at least two items. */
@@ -52,7 +49,7 @@ export function mount(container: HTMLElement): () => void {
         </div>
         <button class="btn" data-pass>Pass</button>
       </div>
-      <div class="board-frame hrt-table" data-board></div>
+      <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
     </div>`;
 
@@ -91,35 +88,18 @@ export function mount(container: HTMLElement): () => void {
 
   const myTurn = () => state.phase === 'playing' && state.turn === 0 && state.trick.length < 4;
 
-  function renderSeat(seat: Seat): string {
-    const played = state.trick.find((p) => p.seat === seat);
-    const turn = state.phase === 'playing' && state.trick.length < 4 && state.turn === seat;
-    const round = state.points[seat] ? `<span class="hrt-round"> +${state.points[seat]}</span>` : '';
-    return `<div class="hrt-seat${turn ? ' turn' : ''}" data-seat="${seat}">
-      <span class="hrt-name">${SEAT_NAMES[seat]}</span>
-      <span class="hrt-score">${state.scores[seat]}${round}</span>
-      <div class="hrt-play">${played ? cardFace(played.card) : cardSlot()}</div>
-    </div>`;
-  }
-
-  function renderHand(): string {
-    const legal = myTurn() ? legalPlays(state, 0) : [];
-    const someIllegal = legal.length < state.hands[0].length;
-    return sortHand(state.hands[0])
-      .map((c) => {
-        const isPicked = picked.some((p) => sameCard(p, c));
-        const canPlay = legal.some((l) => sameCard(l, c));
-        const className = [
-          isPicked ? 'picked' : '',
-          (canPlay && someIllegal) || isPicked ? 'lift' : '',
-          state.received.some((r) => sameCard(r, c)) ? 'received' : '',
-        ]
-          .filter(Boolean)
-          .join(' ');
-        const enabled = state.phase === 'passing' || canPlay;
-        return cardFace(c, { button: true, className, attrs: `data-hand${enabled ? '' : ' disabled'}` });
-      })
-      .join('');
+  function renderTable(): string {
+    const seats = seatsHtml((seat) => ({
+      info: `${state.scores[seat]}${state.points[seat] ? `<span class="tt-muted"> +${state.points[seat]}</span>` : ''}`,
+      card: state.trick.find((p) => p.seat === seat)?.card,
+      turn: state.phase === 'playing' && state.trick.length < 4 && state.turn === seat,
+    }));
+    const hand = handHtml(state.hands[0], {
+      playable: state.phase === 'passing' ? 'all' : myTurn() ? legalPlays(state, 0) : [],
+      picked,
+      received: state.received,
+    });
+    return seats + hand;
   }
 
   function statusText(): string {
@@ -155,9 +135,7 @@ export function mount(container: HTMLElement): () => void {
   }
 
   function render() {
-    boardEl.innerHTML = `
-      <div class="hrt-seats">${SEAT_ORDER.map(renderSeat).join('')}</div>
-      <div class="hrt-hand" aria-label="Your cards">${renderHand()}</div>`;
+    boardEl.innerHTML = renderTable();
     scoreEl.textContent = String(state.scores[0]);
     roundEl.textContent = String(state.round + 1);
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));

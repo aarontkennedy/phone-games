@@ -192,7 +192,9 @@ everywhere.
   are disabled, but are never dimmed, so every rank stays readable.
 - **Trick games** share `src/core/tricks.ts`: seats (You, West, North, East, played
   clockwise), aces-high ranking, trick winners with optional trump, follow-suit rules,
-  hand sorting and dealing.
+  hand sorting and dealing. They also share the table in `src/core/trick-view.ts`: a row
+  of seats in play order (West, North, East, You), each with its name, one line of game
+  info (score, or bid and tricks) and the card it played, then your hand in two rows.
 
 ## How to play
 

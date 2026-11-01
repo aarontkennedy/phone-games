@@ -1,0 +1,19 @@
+/* Your bid: − amount + and the Bid button, shown only on your turn to bid. */
+.spd-bid {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.spd-bid [data-step] {
+  min-width: var(--tap);
+  padding: 0;
+}
+
+.spd-amount {
+  min-width: 2ch;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}

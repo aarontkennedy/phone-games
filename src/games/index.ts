@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, chipIcon, heartIcon, mineIcon, tilesIcon } from './icons';
+import { cardsIcon, chipIcon, heartIcon, mineIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -132,5 +132,33 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./hearts'),
+  },
+  {
+    id: 'spades',
+    title: 'Spades',
+    description: 'Bid your tricks with a partner',
+    icon: spadeIcon,
+    howToPlay: {
+      goal: 'With your partner, win the number of tricks you bid. The first team to 500 points wins.',
+      steps: [
+        'You and North are a team, against West and East. Everyone gets 13 cards.',
+        'First everyone <b>bids</b>: how many tricks they think they’ll win. Use <b>−</b> and <b>+</b>, then tap <b>Bid</b>. The suggested number is a good start. Your bid and North’s add up to your team’s bid.',
+        'Bidding <b>0</b> is <b>nil</b>: a promise to win no tricks at all. Make it for +100, miss it for −100.',
+        'Then each trick, everyone plays one card in turn. You must play the same suit as the first card if you can.',
+        '<b>Spades are trump</b>: any spade beats every card of the other suits. If you can’t follow suit, you can play a spade to win, or throw away anything.',
+        'You can’t start a trick with a spade until a spade has been played, unless you only have spades.',
+        'The highest spade wins the trick. If no spade was played, the highest card of the suit that was led wins. Aces are high.',
+        'Make your team’s bid and score 10 points per trick bid, plus 1 for each extra trick. Fall short and lose 10 points per trick bid.',
+        'Extra tricks are called <b>bags</b>. Every 10 bags your team collects costs 100 points, so don’t win too many!',
+        'Each seat shows its bid and how many tricks it has won so far. Cards you can play right now sit a little higher.',
+      ],
+      tips: [
+        '<b>Easy</b> computer players bid loosely and play at random. <b>Strong</b> ones bid carefully, help their partner and avoid bags. You can switch at any time.',
+        'Aces usually win a trick. Kings often do. Each spade beyond your third is likely to win one too.',
+        'Once your team has made its bid, play low to avoid bags.',
+        'If North bids nil, help out: win the tricks North might otherwise be stuck with.',
+      ],
+    },
+    load: () => import('./spades'),
   },
 ];
