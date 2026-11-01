@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { CATEGORIES } from '../core/game';
 import { games } from './index';
 import { makeContainer } from '../test/helpers';
 
@@ -34,6 +35,11 @@ describe('game registry', () => {
     expect(new Set(ids).size).toBe(ids.length);
     for (const id of ids) expect(id).toMatch(/^[a-z0-9-]+$/);
     expect(ids, '#/about is the About page').not.toContain('about');
+  });
+
+  it('puts every game in a home screen group', () => {
+    const ids = CATEGORIES.map((c) => c.id as string);
+    for (const g of games) expect(ids, g.id).toContain(g.category);
   });
 
   it('gives every game a title and description', () => {

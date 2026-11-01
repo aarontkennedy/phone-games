@@ -67,7 +67,7 @@ test('the game is still there after leaving and coming back', async ({ page }) =
   await page.locator('[data-stock]').click();
   const waste = await page.locator('.sol-waste .card').last().getAttribute('data-card');
   await page.getByRole('link', { name: 'Back to games' }).click();
-  await page.locator('a[href="#/solitaire"]').click();
+  await page.locator('a[href="#/solitaire"]').first().click(); // also under Most played by now
   await expect(page.locator('[data-moves]')).toHaveText('2');
   await expect(page.locator('.sol-waste .card').last()).toHaveAttribute('data-card', waste!);
 });

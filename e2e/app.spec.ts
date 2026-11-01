@@ -27,10 +27,23 @@ const GAMES = [
 
 test.beforeEach(({ page }) => failOnErrors(page));
 
+test('home groups the games, and shows the most played once you’ve played', async ({ page }) => {
+  await page.goto('./');
+  const groups = page.locator('.home-group h2');
+  await expect(groups).toHaveText(['Card games', 'Solitaire and puzzles', 'Board games', 'Dice and tiles']);
+  await expectNoHorizontalOverflow(page);
+  await expectReadableText(page);
+
+  await page.locator('a[href="#/yacht"]').first().click();
+  await page.getByRole('link', { name: 'Back to games' }).click();
+  await expect(groups.first()).toHaveText('Most played');
+  await expect(page.locator('[aria-labelledby="group-most-played"] .game-card')).toHaveText([/Yacht/]);
+});
+
 test('home lists every game', async ({ page }) => {
   await page.goto('./');
-  await expect(page.getByRole('heading', { name: 'Games' })).toBeVisible();
-  for (const g of GAMES) await expect(page.locator(`a[href="#/${g.id}"]`)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible();
+  for (const g of GAMES) await expect(page.locator(`a[href="#/${g.id}"]`).first()).toBeVisible();
   await expectNoHorizontalOverflow(page);
   await expectTouchTargets(page);
   await expectReadableText(page);
@@ -72,7 +85,7 @@ for (const g of GAMES) {
     }
 
     await page.getByRole('link', { name: 'Back to games' }).click();
-    await expect(page.getByRole('heading', { name: 'Games' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible();
   });
 }
 

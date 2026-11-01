@@ -308,10 +308,23 @@ body {
 }
 
 .home {
+  padding: var(--space-2) var(--space-4) var(--space-5);
+}
+
+/* A group of games under a heading: Most played, then each kind of game. */
+.home-group + .home-group {
+  margin-top: var(--space-5);
+}
+
+.home-group h2 {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-lg);
+}
+
+.home-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-4) var(--space-5);
 }
 
 .game-card {

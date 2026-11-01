@@ -9,6 +9,7 @@ export const games: GameMeta[] = [
     title: '2048',
     description: 'Slide and merge tiles',
     icon: tilesIcon,
+    category: 'puzzles',
     howToPlay: {
       goal: 'Join numbered tiles until you make a tile that says 2048.',
       steps: [
@@ -34,6 +35,7 @@ export const games: GameMeta[] = [
     title: 'Mines',
     description: 'Clear the field without hitting a mine',
     icon: mineIcon,
+    category: 'puzzles',
     howToPlay: {
       goal: 'Open every square that doesn’t hide a mine.',
       steps: [
@@ -57,6 +59,7 @@ export const games: GameMeta[] = [
     title: 'Solitaire',
     description: 'Sort the deck into four suit piles',
     icon: cardsIcon,
+    category: 'puzzles',
     howToPlay: {
       goal: 'Move all 52 cards onto the four piles at the top right, one pile per suit, from ace up to king.',
       steps: [
@@ -84,6 +87,7 @@ export const games: GameMeta[] = [
     title: 'Blackjack',
     description: 'Get closer to 21 than the dealer',
     icon: chipIcon,
+    category: 'cards',
     howToPlay: {
       goal: 'Finish with a hand closer to 21 than the dealer’s, without going over 21.',
       steps: [
@@ -111,6 +115,7 @@ export const games: GameMeta[] = [
     title: 'Hearts',
     description: 'Avoid hearts and the queen of spades',
     icon: heartIcon,
+    category: 'cards',
     howToPlay: {
       goal: 'Take as few points as you can. When anyone reaches 100 points, the game ends and the lowest score wins.',
       steps: [
@@ -138,6 +143,7 @@ export const games: GameMeta[] = [
     title: 'Spades',
     description: 'Bid your tricks with a partner',
     icon: spadeIcon,
+    category: 'cards',
     howToPlay: {
       goal: 'With your partner, win the number of tricks you bid. The first team to 500 points wins.',
       steps: [
@@ -166,6 +172,7 @@ export const games: GameMeta[] = [
     title: 'Euchre',
     description: 'Call trump and take three tricks',
     icon: pairIcon,
+    category: 'cards',
     howToPlay: {
       goal: 'With your partner, win at least 3 of the 5 tricks when your team picks trump. The first team to 10 points wins.',
       steps: [
@@ -193,6 +200,7 @@ export const games: GameMeta[] = [
     title: 'Cribbage',
     description: 'Count fifteens, pairs and runs to 121',
     icon: pegboardIcon,
+    category: 'cards',
     howToPlay: {
       goal: 'Be the first to score 121 points, playing against the computer.',
       steps: [
@@ -220,6 +228,7 @@ export const games: GameMeta[] = [
     title: 'Tic-Tac-Toe',
     description: 'Three in a row on a 3 by 3 grid',
     icon: gridIcon,
+    category: 'board',
     howToPlay: {
       goal: 'Get three of your X marks in a row: across, down or diagonally.',
       steps: [
@@ -241,6 +250,7 @@ export const games: GameMeta[] = [
     title: 'Four in a Row',
     description: 'Drop discs to line up four',
     icon: discsIcon,
+    category: 'board',
     howToPlay: {
       goal: 'Get four of your discs in a line: across, up and down, or diagonally.',
       steps: [
@@ -263,6 +273,7 @@ export const games: GameMeta[] = [
     title: 'Checkers',
     description: 'Jump and capture to clear the board',
     icon: checkersIcon,
+    category: 'board',
     howToPlay: {
       goal: 'Capture all of the computer’s pieces, or leave it with no moves.',
       steps: [
@@ -287,6 +298,7 @@ export const games: GameMeta[] = [
     title: 'Number Place',
     description: 'Fill the grid with 1 to 9',
     icon: numberGridIcon,
+    category: 'puzzles',
     howToPlay: {
       goal: 'Fill every empty square so that each row, each column and each 3 by 3 box has the numbers 1 to 9 exactly once.',
       steps: [
@@ -310,6 +322,7 @@ export const games: GameMeta[] = [
     title: 'Free Cells',
     description: 'Solitaire with every card face up',
     icon: freeCellsIcon,
+    category: 'puzzles',
     howToPlay: {
       goal: 'Move all 52 cards onto the four piles at the top right, one pile per suit, from ace up to king.',
       steps: [
@@ -335,6 +348,7 @@ export const games: GameMeta[] = [
     title: 'Crazy Eights',
     description: 'Match suits or numbers; 8s are wild',
     icon: eightIcon,
+    category: 'cards',
     howToPlay: {
       goal: 'Be the first to play all your cards. The first to 100 points wins the game.',
       steps: [
@@ -358,6 +372,7 @@ export const games: GameMeta[] = [
     title: 'Hot Dice',
     description: 'Roll, keep and bank to 10,000',
     icon: diceIcon,
+    category: 'dice',
     howToPlay: {
       goal: 'Be the first to score 10,000 points, playing against the computer.',
       steps: [
@@ -381,6 +396,7 @@ export const games: GameMeta[] = [
     title: 'Gin Rummy',
     description: 'Make sets and runs, then knock',
     icon: fanIcon,
+    category: 'cards',
     howToPlay: {
       goal: 'Score 100 points first by making sets and runs and keeping your loose cards low.',
       steps: [
@@ -406,6 +422,7 @@ export const games: GameMeta[] = [
     title: 'Dominoes',
     description: 'Match ends and play out your tiles',
     icon: dominoIcon,
+    category: 'dice',
     howToPlay: {
       goal: 'Be first to play all your tiles. The first to 100 points wins the game.',
       steps: [
@@ -430,6 +447,7 @@ export const games: GameMeta[] = [
     title: 'Yacht',
     description: 'Roll five dice to fill a score card',
     icon: yachtIcon,
+    category: 'dice',
     howToPlay: {
       goal: 'Score as many points as you can by filling all 13 boxes on the score card.',
       steps: [
@@ -453,6 +471,7 @@ export const games: GameMeta[] = [
     title: 'Reversi',
     description: 'Trap and flip discs to own the board',
     icon: reversiIcon,
+    category: 'board',
     howToPlay: {
       goal: 'Have more discs of your color on the board than the computer when the game ends.',
       steps: [
@@ -477,6 +496,7 @@ export const games: GameMeta[] = [
     title: 'Mancala',
     description: 'Sow seeds around the board and fill your store',
     icon: mancalaIcon,
+    category: 'board',
     howToPlay: {
       goal: 'Finish with more seeds in your store than the computer has in its store.',
       steps: [
@@ -500,6 +520,7 @@ export const games: GameMeta[] = [
     title: 'Hangman',
     description: 'Guess the word one letter at a time',
     icon: hangmanIcon,
+    category: 'puzzles',
     howToPlay: {
       goal: 'Find the hidden word before the figure is finished.',
       steps: [

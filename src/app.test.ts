@@ -1,14 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { startApp } from './app';
-import type { GameMeta, GameModule } from './core/game';
+import type { Category, GameMeta, GameModule } from './core/game';
 import { flush } from './test/helpers';
 
-function game(id: string, load: () => Promise<GameModule>): GameMeta {
+function game(id: string, load: () => Promise<GameModule>, category: Category = 'cards', title = `Title ${id}`): GameMeta {
   return {
     id,
-    title: `Title ${id}`,
+    title,
     description: `About ${id}`,
     icon: '🎲',
+    category,
     howToPlay: { goal: `Win ${id}`, steps: ['First', 'Second'], tips: ['Hint'] },
     load,
   };
@@ -43,6 +44,34 @@ describe('startApp', () => {
     expect([...cards].map((c) => c.getAttribute('href'))).toEqual(['#/a', '#/b']);
     expect(cards[0].textContent).toContain('Title a');
     expect(cards[0].textContent).toContain('About a');
+    stop();
+  });
+
+  it('groups games by kind, A to Z within each group', () => {
+    const { root, stop } = setup([
+      game('z', vi.fn(), 'board', 'Zebra'),
+      game('y', vi.fn(), 'cards', 'Yak'),
+      game('x', vi.fn(), 'board', 'Antelope'),
+    ]);
+    const headings = [...root.querySelectorAll('.home-group h2')].map((h) => h.textContent);
+    expect(headings).toEqual(['Card games', 'Board games']); // empty groups are left out
+    const board = root.querySelector('[aria-labelledby="group-board"]')!;
+    expect([...board.querySelectorAll('.game-title')].map((t) => t.textContent)).toEqual(['Antelope', 'Zebra']);
+    stop();
+  });
+
+  it('shows the two most played games first, once any have been played', async () => {
+    const mount = () => () => {};
+    const games = ['a', 'b', 'c'].map((id) => game(id, async () => ({ mount })));
+    const { root, stop, go } = setup(games);
+    expect(root.querySelector('#group-most-played')).toBeNull();
+    for (const hash of ['#/b', '#/', '#/c', '#/', '#/b', '#/', '#/a', '#/']) await go(hash);
+    const top = root.querySelector('[aria-labelledby="group-most-played"]')!;
+    expect(top.querySelector('h2')!.textContent).toBe('Most played');
+    // b twice; a and c once each, a more recently.
+    expect([...top.querySelectorAll('.game-card')].map((c) => c.getAttribute('href'))).toEqual(['#/b', '#/a']);
+    expect(root.querySelectorAll('.home-group')[0]).toBe(top);
+    expect(root.querySelectorAll('[href="#/b"]')).toHaveLength(2); // also in its own group
     stop();
   });
 

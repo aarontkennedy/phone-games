@@ -24,6 +24,8 @@ test('the game survives a reload', async ({ page }) => {
   await swipe(board, 0, 120);
   const before = await tiles(page);
   await page.reload();
+  // Wait for the board to draw after the reload: reading at once can find no tiles yet.
+  await expect(page.locator('.g2048-cell')).toHaveCount(16);
   expect(await tiles(page)).toEqual(before);
 });
 
@@ -39,7 +41,7 @@ test('tile numbers are readable without glasses, even 5 digits', async ({ page }
   await page.evaluate((b) => localStorage.setItem('pg:2048:state', JSON.stringify({ board: b, score: 0 })), board);
   // Reopen the game instead of reloading: a reload can interrupt WebKit's service worker install.
   await page.getByRole('link', { name: 'Back to games' }).click();
-  await page.locator('a[href="#/2048"]').click();
+  await page.locator('a[href="#/2048"]').first().click(); // also under Most played by now
   await expect(page.locator('.g2048-cell[data-digits="5"]')).toHaveText('16384');
   await expectReadableText(page);
 });

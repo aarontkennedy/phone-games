@@ -93,5 +93,5 @@ export async function openBlackjackWith(page: Page, order: string): Promise<void
   const filler = Array.from({ length: 100 }, () => ({ suit: 'S', rank: 5 }));
   const state = { shoe: [...filler, ...cards.reverse()], chips: 1000, bet: 20, phase: 'betting', dealer: [], hands: [], active: 0 };
   await page.evaluate((s) => localStorage.setItem('pg:blackjack:state', JSON.stringify(s)), state);
-  await page.locator('a[href="#/blackjack"]').click();
+  await page.locator('a[href="#/blackjack"]').first().click(); // also under Most played by now
 }

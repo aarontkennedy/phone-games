@@ -13,6 +13,16 @@ export interface HowToPlay {
   tips?: string[];
 }
 
+/** Home screen groups, in the order they appear. Games are A to Z within a group. */
+export const CATEGORIES = [
+  { id: 'cards', title: 'Card games' },
+  { id: 'puzzles', title: 'Solitaire and puzzles' },
+  { id: 'board', title: 'Board games' },
+  { id: 'dice', title: 'Dice and tiles' },
+] as const;
+
+export type Category = (typeof CATEGORIES)[number]['id'];
+
 /** Registry entry shown on the home screen. Games are lazy-loaded on open. */
 export interface GameMeta {
   id: string;
@@ -20,6 +30,8 @@ export interface GameMeta {
   description: string;
   /** Inline flat SVG markup (see src/games/icons.ts). */
   icon: string;
+  /** Which home screen group it's listed in. */
+  category: Category;
   howToPlay: HowToPlay;
   load: () => Promise<GameModule>;
 }

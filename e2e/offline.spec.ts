@@ -9,10 +9,10 @@ test('works offline after the first visit, including every game', async ({ page,
   await context.setOffline(true);
 
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Games' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible();
 
   const links = await page.locator('.game-card').evaluateAll((els) => els.map((e) => e.getAttribute('href')!));
-  for (const href of links) {
+  for (const href of new Set(links)) {
     await page.goto(`./${href}`);
     await expect(page.locator('.game > *')).not.toHaveCount(0);
     await expect(page.getByText("Couldn't load")).toHaveCount(0);

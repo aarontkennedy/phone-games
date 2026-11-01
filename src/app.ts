@@ -1,7 +1,8 @@
 import { mountAbout } from './about';
 import { reportProblem } from './report';
 import { openShareSheet, shareLinks } from './share';
-import type { GameMeta } from './core/game';
+import { CATEGORIES, type GameMeta } from './core/game';
+import { mostPlayed, recordPlay } from './plays';
 
 // Top bar icons: flat line drawings in the link color. Share is three joined dots, not
 // a square with an arrow, so it isn't confused with Safari's own Share button.
@@ -10,6 +11,31 @@ const SHARE_ICON =
 const BACK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg>';
 const INFO_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 11v6"/><circle class="dot" cx="12" cy="7.5" r="0.6"/></svg>';
+
+const card = (g: GameMeta) => `
+  <a class="game-card" href="#/${g.id}">
+    <span class="game-icon" aria-hidden="true">${g.icon}</span>
+    <span class="game-title">${g.title}</span>
+    <span class="game-desc">${g.description}</span>
+  </a>`;
+
+/** A titled group of game cards on the home screen. */
+const group = (id: string, title: string, list: GameMeta[]) => `
+  <section class="home-group" aria-labelledby="group-${id}">
+    <h2 id="group-${id}">${title}</h2>
+    <div class="home-grid">${list.map(card).join('')}</div>
+  </section>`;
+
+/** Most played first (once anything has been played), then each category A to Z. */
+export function homeGroups(games: GameMeta[]): string {
+  const byId = new Map(games.map((g) => [g.id, g]));
+  const top = mostPlayed(games.map((g) => g.id)).map((id) => byId.get(id)!);
+  const sections = CATEGORIES.map((c) => {
+    const list = games.filter((g) => g.category === c.id).sort((a, b) => a.title.localeCompare(b.title));
+    return list.length ? group(c.id, c.title, list) : '';
+  });
+  return (top.length ? group('most-played', 'Most played', top) : '') + sections.join('');
+}
 
 const list = (tag: string, items: string[]) => `<${tag}>${items.map((s) => `<li>${s}</li>`).join('')}</${tag}>`;
 
@@ -60,18 +86,7 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
         <a class="btn" href="${links.text}">Send a text</a>
         <a class="btn secondary" href="${links.email}">Send an email</a>
       </div>
-      <main class="home">
-        ${games
-          .map(
-            (g) => `
-          <a class="game-card" href="#/${g.id}">
-            <span class="game-icon" aria-hidden="true">${g.icon}</span>
-            <span class="game-title">${g.title}</span>
-            <span class="game-desc">${g.description}</span>
-          </a>`,
-          )
-          .join('')}
-      </main>`;
+      <main class="home">${homeGroups(games)}</main>`;
     const shareBtn = root.querySelector<HTMLButtonElement>('[data-share]')!;
     const menu = root.querySelector<HTMLElement>('[data-share-menu]')!;
     shareBtn.addEventListener('click', async () => {
@@ -106,6 +121,7 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
       renderHome();
       return;
     }
+    recordPlay(meta.id);
 
     root.innerHTML = `
       <header class="topbar sub">

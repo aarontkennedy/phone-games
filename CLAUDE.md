@@ -29,7 +29,7 @@ Offline PWA of personal games (no server, no ads, no accounts). Vite + TypeScrip
 - In a sandboxed session, npm network installs can fail. Ask the user to run `npm install` themselves.
 - Each game is lazy-loaded from src/games/index.ts and must implement `mount(container) => cleanup`.
 - Game screens must use the standard layout, in this order: `.screen` > `.stats`, `.board-frame`, `.status-line`, `.controls` (stats on top, buttons at the bottom for the thumb; board on the left and side bar on the right when sideways). It's what makes the landscape side bar work (docs/DESIGN.md, "Landscape"); check new games with `e2e/landscape.spec.ts`.
-- Every game needs `howToPlay` rules in src/games/index.ts, written for a first-time player (docs/DESIGN.md, "How to play"). They open only from the Rules button, never by themselves.
+- Every game needs a `category` (its home screen group: src/core/game.ts `CATEGORIES`; games are A to Z within a group, under a Most played row) and `howToPlay` rules in src/games/index.ts, written for a first-time player (docs/DESIGN.md, "How to play"). They open only from the Rules button, never by themselves.
 - Card games use the shared card model and drawings (src/core/cards.ts, src/core/card-view.ts, and src/core/tricks.ts for trick-taking) and follow docs/DESIGN.md, "Playing cards".
 - The About page (src/about.ts, `#/about`) must match LICENSE and public/THIRD_PARTY_NOTICES.txt (docs/LEGAL.md).
 - Crashes and feedback: src/report.ts shows a "something went wrong" banner with an Email a report link, and About has Email feedback. Email only, opened in the player's own app; never add automatic reporting (docs/LEGAL.md, "Privacy").
