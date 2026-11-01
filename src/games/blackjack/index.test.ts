@@ -54,11 +54,11 @@ describe('Blackjack screen', () => {
   });
 
   it('deals with the dealer’s second card face down', () => {
-    const { $, $$, labels, press, status } = table('9H 7S 8C 10D');
+    const { container, $, $$, labels, press, status } = table('9H 7S 8C 10D');
     press('[data-deal]');
     expect(labels()).toEqual(['Dealer shows 7', 'You 17 Bet 20']);
     expect($$('.bj-table .card.back')).toHaveLength(1);
-    expect($<HTMLButtonElement>('[data-deal]').disabled).toBe(true);
+    expect(container.querySelector('[data-deal]')).toBeNull(); // the play buttons replace it
     expect($$('[data-action]').map((b) => b.textContent)).toEqual(['Hit', 'Stand', 'Double', 'Split']);
     expect($<HTMLButtonElement>('[data-action="split"]').disabled).toBe(true);
     expect($('.bj-hand.active')).not.toBeNull();

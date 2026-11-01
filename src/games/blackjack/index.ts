@@ -50,7 +50,6 @@ export function mount(container: HTMLElement): () => void {
     <div class="screen cards bj">
       <div class="stats">
         <div class="stat"><small>Chips</small><b data-chips></b></div>
-        <button class="btn" data-deal></button>
         <div class="stat"><small>Best</small><b data-best></b></div>
       </div>
       <div class="board-frame bj-table" data-board></div>
@@ -62,7 +61,6 @@ export function mount(container: HTMLElement): () => void {
   const controlsEl = container.querySelector<HTMLElement>('[data-controls]')!;
   const chipsEl = container.querySelector<HTMLElement>('[data-chips]')!;
   const bestEl = container.querySelector<HTMLElement>('[data-best]')!;
-  const dealBtn = container.querySelector<HTMLButtonElement>('[data-deal]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
 
   function update(next: State | null) {
@@ -126,6 +124,7 @@ export function mount(container: HTMLElement): () => void {
       ).join('')}</div>`;
       return;
     }
+    // Deal sits with the bets at the bottom, under the thumb: it's tapped every hand.
     controlsEl.innerHTML = `
       <div class="segmented" aria-label="Bet">
         ${BETS.map(
@@ -133,7 +132,8 @@ export function mount(container: HTMLElement): () => void {
             `<button data-bet="${b}" aria-pressed="${b === state.bet}"${b > state.chips ? ' disabled' : ''}>${b}</button>`,
         ).join('')}
       </div>
-      <button class="btn secondary" data-hints aria-pressed="${hints}">Hints</button>`;
+      <button class="btn secondary" data-hints aria-pressed="${hints}">Hints</button>
+      <button class="btn" data-deal>${isBroke(state) ? 'Start over' : 'Deal'}</button>`;
   }
 
   function statusText(): string {
@@ -158,18 +158,16 @@ export function mount(container: HTMLElement): () => void {
     renderControls();
     chipsEl.textContent = String(state.chips);
     bestEl.textContent = String(best);
-    dealBtn.textContent = isBroke(state) ? 'Start over' : 'Deal';
-    dealBtn.disabled = state.phase === 'playing';
     statusEl.textContent = statusText();
   }
 
   // --- Input ---
 
-  dealBtn.addEventListener('click', () => update(isBroke(state) ? restart(state) : deal(state)));
   controlsEl.addEventListener('click', (e) => {
     const el = (e.target as Element).closest<HTMLButtonElement>('button');
     if (!el) return;
-    if (el.dataset.action) update(act(state, el.dataset.action as Action));
+    if (el.hasAttribute('data-deal')) update(isBroke(state) ? restart(state) : deal(state));
+    else if (el.dataset.action) update(act(state, el.dataset.action as Action));
     else if (el.dataset.bet) update(setBet(state, Number(el.dataset.bet)));
     else {
       hints = !hints;

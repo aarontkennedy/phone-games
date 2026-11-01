@@ -8,15 +8,17 @@
   touch-action: manipulation;
 }
 
+/* The label wraps before the fan shrinks; a fan too wide to share the row drops below. */
 .gin-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
 }
 
 .gin-fan {
+  flex: none;
   display: flex;
-  min-width: 0;
 }
 
 .gin-fan > * {

@@ -85,7 +85,7 @@ Every game screen uses this structure, top to bottom:
 ```
 topbar        ‹ Games   Title                    (app shell)
 .screen
-  .stats      [stat] [New] [stat]                score/time and the New/Deal button
+  .stats      [stat] [New] [stat]                score/time and the New button
   .board-frame                                   the playing surface; hosts .overlay
   .status-line                                   hint, or result (aria-live)
   .controls   [segmented options] [toggle]       optional; pinned to the bottom
@@ -97,8 +97,13 @@ topbar        ‹ Games   Title                    (app shell)
   `.controls` gets `margin-top: auto`, so it sits at the bottom of the screen even when
   the board is short. Put the markup in this order too, so screen readers and the Tab
   key follow what's on screen.
-- **New stays at the top.** New (or Deal) lives in `.stats`, away from the thumb, so a
-  stray tap doesn't throw away a game.
+- **New stays at the top.** New lives in `.stats`, away from the thumb, so a stray tap
+  doesn't throw away a game. A button tapped every round, like Blackjack's Deal, goes
+  in `.controls` instead.
+- **Leave slack in every row.** CI runs on Linux, whose fallback font is wider than the
+  phones' system fonts, so a row that just fits on a Mac can overflow there (and on a
+  phone with a wider font). Let labels wrap and let rows wrap (`flex-wrap`) rather than
+  sizing anything to fit exactly.
 - **Tested** by `e2e/app.spec.ts` for every game.
 
 ### Landscape
