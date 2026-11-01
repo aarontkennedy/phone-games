@@ -20,6 +20,19 @@ test('deals seven columns that fit the phone and read without glasses', async ({
   await expectReadableText(page);
 });
 
+test('every face-up card has its rank in the top corner, tappable or not', async ({ page }) => {
+  await page.locator('[data-draw="3"]').click();
+  await page.locator('[data-stock]').click(); // Draw 3 fans plain (not tappable) cards under the top one
+  const offsets = await page.locator('.card:not(.back)').evaluateAll((cards) =>
+    cards.map((c) => ({
+      tag: c.tagName,
+      top: c.querySelector('.card-corner')!.getBoundingClientRect().top - c.getBoundingClientRect().top,
+    })),
+  );
+  expect(new Set(offsets.map((o) => o.tag))).toEqual(new Set(['BUTTON', 'DIV']));
+  for (const o of offsets) expect(o.top, `${o.tag} card corner`).toBeLessThanOrEqual(5);
+});
+
 test('the deck turns over one card, or three in Draw 3', async ({ page }) => {
   await page.locator('[data-stock]').click();
   await expect(page.locator('.sol-waste .card')).toHaveCount(1);

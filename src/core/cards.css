@@ -29,8 +29,14 @@
   border-radius: var(--radius-sm);
 }
 
+/* A flex column, so tappable cards (buttons) keep the corner at the top: browsers
+   vertically center a button's content otherwise, sliding the rank down the card. */
 .card {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   margin: 0;
   padding: 2px 3px;
   border: 1px solid var(--card-edge);
