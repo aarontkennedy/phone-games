@@ -40,6 +40,22 @@ test('home groups the games, and shows the most played once you’ve played', as
   await expect(page.locator('[aria-labelledby="group-most-played"] .game-card')).toHaveText([/Yacht/]);
 });
 
+test('New asks before throwing away a game in progress', async ({ page }) => {
+  await page.goto('./#/tictactoe');
+  await page.locator('[data-cell="4"]').click();
+  await page.locator('[data-new]').click();
+  const dialog = page.getByRole('alertdialog');
+  await expect(dialog).toContainText('Start a new game?');
+  await expectReadableText(page);
+  await expectTouchTargets(page);
+  await dialog.getByRole('button', { name: 'Keep playing' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('[data-cell="4"]')).toHaveAttribute('aria-label', /: X$/);
+  await page.locator('[data-new]').click();
+  await page.getByRole('button', { name: 'New game' }).click();
+  await expect(page.locator('[data-cell="4"]')).not.toHaveAttribute('aria-label', /: X$/);
+});
+
 test('home lists every game', async ({ page }) => {
   await page.goto('./');
   await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible();

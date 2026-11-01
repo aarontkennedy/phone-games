@@ -127,6 +127,47 @@ export function bestTarget(s: State, src: Source): Target | null {
   return empty;
 }
 
+export type Hint = { src: Source; tgt: Target } | { draw: true };
+
+/** Every card that can be picked up: the turned-over card and each face-up tableau card. */
+function sources(s: State): Source[] {
+  const out: Source[] = s.waste.length ? [{ from: 'waste' }] : [];
+  s.tableau.forEach((col, c) => col.up.forEach((_, index) => out.push({ from: 'tableau', col: c, index })));
+  return out;
+}
+
+/** True if some card in the deck could be played right now. */
+const deckUseful = (s: State) =>
+  [...s.stock, ...s.waste].some((c) => canFound(s, c) || s.tableau.some((col) => canStack(c, col)));
+
+/**
+ * A move to suggest, most useful first: a card up to its pile, a move that turns over a
+ * face-down card, the turned-over card onto a column, turning the deck (when it holds a
+ * card that could be played), then any other legal move. Null when there's none at all.
+ */
+export function findHint(s: State): Hint | null {
+  if (s.won) return null;
+  const all = sources(s);
+  const foundation = all.find((src) => isLegal(s, src, { to: 'foundation' }));
+  if (foundation) return { src: foundation, tgt: { to: 'foundation' } };
+  for (const src of all) {
+    if (src.from !== 'tableau' || src.index !== 0 || !s.tableau[src.col].down.length) continue;
+    const tgt = bestTarget(s, src);
+    if (tgt) return { src, tgt };
+  }
+  const fromWaste = s.waste.length ? bestTarget(s, { from: 'waste' }) : null;
+  if (fromWaste) return { src: { from: 'waste' }, tgt: fromWaste };
+  if ((s.stock.length || s.waste.length) && deckUseful(s)) return { draw: true };
+  for (const src of all) {
+    const tgt = bestTarget(s, src);
+    if (tgt) return { src, tgt };
+  }
+  return null;
+}
+
+/** No legal move, and no card in the deck that could ever be played: the deal is lost. */
+export const isStuck = (s: State): boolean => findHint(s) === null && !s.won;
+
 /** True when every card is face up and out of the stock, so the game can finish itself. */
 export function canAutoFinish(s: State): boolean {
   return !s.won && !s.stock.length && !s.waste.length && s.tableau.every((c) => !c.down.length);

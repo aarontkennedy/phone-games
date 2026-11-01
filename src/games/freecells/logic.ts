@@ -123,6 +123,44 @@ export function bestTarget(s: State, src: Source): Target | null {
   return isLegal(s, src, { to: 'cell' }) ? { to: 'cell' } : null;
 }
 
+/**
+ * A move to suggest, most useful first: a card to its foundation, a card or run onto
+ * another column's card, onto an empty column, a column's top card to a free cell, then
+ * any other legal move. Cards already sitting on their natural place in a run aren't
+ * shuffled around. Null when there's no move at all.
+ */
+export function findHint(s: State): { src: Source; tgt: Target } | null {
+  if (s.won) return null;
+  const srcs: Source[] = s.cells.flatMap((c, i) => (c ? [{ from: 'cell' as const, i }] : []));
+  s.columns.forEach((col, c) => col.forEach((_, index) => isRun(col.slice(index)) && srcs.push({ from: 'col', col: c, index })));
+  const settled = (src: Source) => src.from === 'col' && src.index > 0 && isRun(s.columns[src.col].slice(src.index - 1, src.index + 1));
+  const first = (ok: (src: Source) => boolean, tgt: (src: Source) => Target | null) => {
+    for (const src of srcs) {
+      const t = ok(src) ? tgt(src) : null;
+      if (t) return { src, tgt: t };
+    }
+    return null;
+  };
+  const toColumn = (withCards: boolean) => (src: Source) => {
+    for (let col = 0; col < 8; col++) {
+      const t: Target = { to: 'col', col };
+      if (!!s.columns[col].length === withCards && isLegal(s, src, t)) return t;
+    }
+    return null;
+  };
+  const top = (src: Source) => src.from === 'col' && src.index === s.columns[src.col].length - 1;
+  return (
+    first(() => true, (src) => (isLegal(s, src, { to: 'foundation' }) ? { to: 'foundation' } : null)) ??
+    first((src) => !settled(src), toColumn(true)) ??
+    first((src) => !settled(src) && !(src.from === 'col' && src.index === 0), toColumn(false)) ??
+    first((src) => top(src) && !settled(src), (src) => (isLegal(s, src, { to: 'cell' }) ? { to: 'cell' } : null)) ??
+    first(() => true, (src) => bestTarget(s, src))
+  );
+}
+
+/** No legal move at all: the deal is lost. */
+export const isStuck = (s: State): boolean => !s.won && findHint(s) === null;
+
 export function isValidState(s: unknown): s is State {
   const st = s as State | null;
   return (

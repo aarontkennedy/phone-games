@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { confirmNew } from '../../core/ui';
 import { chooseMove, count, isValidState, legalMoves, move, newGame, newRound, type Level, type State } from './logic';
 import './style.css';
 
@@ -75,7 +76,9 @@ export function mount(container: HTMLElement): () => void {
     const el = (e.target as Element).closest<HTMLButtonElement>('[data-sq]');
     if (el && state.turn === 0) update(move(state, Number(el.dataset.sq)));
   });
-  container.querySelector('[data-new]')!.addEventListener('click', () => update(newRound(state)));
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.result === null && state.last !== null;
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newRound(state))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   update(state);

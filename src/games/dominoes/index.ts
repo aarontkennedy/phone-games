@@ -1,5 +1,5 @@
 import { load, save } from '../../core/storage';
-import { showOverlay, hideOverlay } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import { applyTurn, chooseTurn, draw, ends, isValidState, legalMoves, newGame, nextRound, pass, play, winner, type End, type Level, type State, type Tile } from './logic';
 import './style.css';
 
@@ -144,7 +144,9 @@ export function mount(container: HTMLElement): () => void {
     else if (el.hasAttribute('data-draw')) update(draw(state, 0));
     else update(pass(state, 0));
   });
-  container.querySelector('[data-new]')!.addEventListener('click', () => update(newGame(state.level)));
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.phase !== 'gameOver' && (state.line.length > 0 || state.scores.some((n) => n > 0));
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   update(state);

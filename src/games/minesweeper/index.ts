@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { confirmNew } from '../../core/ui';
 import {
   LEVELS,
   countAt,
@@ -228,8 +229,10 @@ export function mount(container: HTMLElement): () => void {
     if (i >= 0) flag(i);
   });
 
-  container.querySelector('[data-new]')!.addEventListener('click', () => newGame(state.level));
-  levelBtns.forEach((b) => b.addEventListener('click', () => newGame(b.dataset.level as Level)));
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.status === 'playing';
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => newGame(state.level)));
+  levelBtns.forEach((b) => b.addEventListener('click', () => confirmNew(inProgress(), () => newGame(b.dataset.level as Level))));
   modeBtn.addEventListener('click', () => {
     flagMode = !flagMode;
     render();

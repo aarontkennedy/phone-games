@@ -90,6 +90,9 @@ describe('game registry', () => {
     const container = makeContainer();
     const unmount = module.mount(container);
     expect(container.children.length).toBeGreaterThan(0);
+    // A fresh game has nothing to lose: New starts over without asking.
+    container.querySelector<HTMLButtonElement>('[data-new]')?.click();
+    expect(document.querySelector('.confirm')).toBeNull();
     unmount();
     expect(container.children).toHaveLength(0);
   });

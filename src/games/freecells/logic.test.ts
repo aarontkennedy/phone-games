@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { isFullDeck, type Card, type Suit } from '../../core/cards';
 import { seededRng } from '../../core/random';
-import { bestTarget, cardsAt, isLegal, isRun, isValidState, maxMove, move, newGame, type State } from './logic';
+import { bestTarget, cardsAt, findHint, isLegal, isRun, isStuck, isValidState, maxMove, move, newGame, type State } from './logic';
 
 const RANKS: Record<string, number> = { A: 1, J: 11, Q: 12, K: 13 };
 const card = (id: string): Card => ({ suit: id.slice(-1) as Suit, rank: RANKS[id.slice(0, -1)] ?? Number(id.slice(0, -1)) });
@@ -115,5 +115,38 @@ describe('free cells', () => {
     expect(isValidState({ ...s, columns: s.columns.slice(1) })).toBe(false);
     expect(isValidState({ ...s, foundations: [[card('2S')], [], [], []] })).toBe(false);
     expect(isValidState({ ...s, moves: 'x' })).toBe(false);
+  });
+});
+
+describe('hints', () => {
+  it('suggests, in order: foundation, onto a card, an empty column, a free cell', () => {
+    const s = blank();
+    s.foundations[0] = upTo('S', 1);
+    s.columns[0] = cards('9H 2S');
+    s.columns[1] = cards('8C');
+    expect(findHint(s)).toEqual({ src: { from: 'col', col: 0, index: 1 }, tgt: { to: 'foundation' } });
+    s.foundations[0] = [];
+    s.columns[0] = cards('2S 9H');
+    expect(findHint(s)).toEqual({ src: { from: 'col', col: 1, index: 0 }, tgt: { to: 'col', col: 0 } });
+    s.columns[1] = cards('KD 8D');
+    expect(findHint(s)).toEqual({ src: { from: 'col', col: 0, index: 1 }, tgt: { to: 'col', col: 2 } });
+  });
+
+  it('moves a top card to a free cell when nothing better is left, and leaves settled runs alone', () => {
+    const s = blank();
+    s.columns = Array.from({ length: 8 }, (_, i) => cards(['KH QS', 'KC QD', 'KS QH', 'KD QC', 'JH 3C', 'JC 3H', 'JS 3D', 'JD 3S'][i]));
+    expect(findHint(s)).toEqual({ src: { from: 'col', col: 4, index: 1 }, tgt: { to: 'cell' } });
+  });
+
+  it('says stuck only when no card can move at all', () => {
+    const s = blank();
+    s.cells = cards('2C 3C 4C 5C');
+    // All red: nothing stacks, the cells are full, and no ace is out.
+    s.columns = Array.from({ length: 8 }, (_, i) => cards(['KH', 'KD', 'QH', 'QD', 'JH', 'JD', '9H', '9D'][i]));
+    expect(findHint(s)).toBeNull();
+    expect(isStuck(s)).toBe(true);
+    expect(isStuck({ ...s, won: true })).toBe(false);
+    s.columns[7] = cards('10C'); // now the 9 of hearts fits on it
+    expect(findHint(s)).toEqual({ src: { from: 'col', col: 6, index: 0 }, tgt: { to: 'col', col: 7 } });
   });
 });

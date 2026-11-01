@@ -56,15 +56,40 @@
 }
 
 /* Numbers 1 to 9 and Erase, five to a row so they fit a narrow side bar. */
+/* 1 to 6, then 7 to 9, Erase and Hint. Narrower than 44px only on the smallest phones
+   sideways; the keys stay 44px tall. */
 .np-pad {
   display: grid;
-  grid-template-columns: repeat(5, minmax(44px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: var(--space-2);
   flex: 1 1 100%;
 }
 
 .np-pad .btn {
   padding-inline: 0;
+}
+
+/* Erase is a backspace key, like a phone keyboard's, so it fits the narrowest pad. */
+.np-erase svg {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.np-hint {
+  font-size: var(--text-sm);
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .np-pad {
+    gap: var(--space-1);
+  }
 }
 
 .np {

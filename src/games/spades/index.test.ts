@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { load, save } from '../../core/storage';
-import { makeContainer, track } from '../../test/helpers';
+import { makeContainer, track, answerNewGame } from '../../test/helpers';
 import { AI_DELAY, TRICK_PAUSE, mount } from './index';
 import { estimateTricks, type State } from './logic';
 import { position, trick } from './test-fixtures';
@@ -157,6 +157,7 @@ describe('Spades screen', () => {
     expect(stored().level).toBe('easy');
     expect(stored().scores).toEqual([120, 80]);
     $('[data-new]').click();
+    answerNewGame();
     expect(stored().scores).toEqual([0, 0]);
     expect(stored().level).toBe('easy');
   });

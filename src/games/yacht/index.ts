@@ -1,5 +1,5 @@
 import { load, save } from '../../core/storage';
-import { showOverlay, hideOverlay } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import {
   BOXES,
   LOWER,
@@ -152,7 +152,9 @@ export function mount(container: HTMLElement): () => void {
     if (el) update(toggleHold(state, Number(el.dataset.die)));
   });
   rollBtn.addEventListener('click', () => update(roll(state)));
-  container.querySelector('[data-new]')!.addEventListener('click', () => update(newGame()));
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => !isGameOver(state) && (state.rolls > 0 || BOXES.some((b) => state.scores[b] !== null));
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame())));
 
   update(state);
 

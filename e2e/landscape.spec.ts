@@ -8,6 +8,7 @@ import {
   seedRandom,
   swipe,
 } from './helpers';
+import { newGame as newCrazyEights } from '../src/games/crazyeights/logic';
 
 // Phones turned sideways: the board on the left, controls in a side bar on the right,
 // everything on one screen (docs/DESIGN.md, "Landscape").
@@ -116,6 +117,17 @@ for (const size of SIZES) {
     for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman']) {
       test(`${id}: board on the left, side bar on the right`, async ({ page }) => {
         await page.goto(`./#/${id}`);
+        await expectSideBarLayout(page);
+      });
+    }
+
+    for (const held of [12, 18]) {
+      test(`Crazy Eights: a ${held}-card hand still fits beside the side bar`, async ({ page }) => {
+        const s = newCrazyEights('strong');
+        s.hands[0].push(...s.stock.splice(0, held - s.hands[0].length)); // drawn until something played
+        await page.addInitScript((saved) => localStorage.setItem('pg:crazyeights:state', saved), JSON.stringify(s));
+        await page.goto('./#/crazyeights');
+        await expect(page.locator('[data-hand]')).toHaveCount(held);
         await expectSideBarLayout(page);
       });
     }

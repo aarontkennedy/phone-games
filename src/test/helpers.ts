@@ -68,3 +68,10 @@ export function setHidden(hidden: boolean): void {
 export function flush(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 0));
 }
+
+/** Answers "Start a new game?" (confirmNew). Fails if the question wasn't asked. */
+export function answerNewGame(choice: 'new' | 'keep' = 'new'): void {
+  const button = document.querySelector<HTMLButtonElement>(`.confirm [data-${choice === 'new' ? 'confirm' : 'cancel'}]`);
+  if (!button) throw new Error('Expected "Start a new game?" to be asked');
+  button.click();
+}

@@ -1,4 +1,5 @@
 import { mountAbout } from './about';
+import { closeConfirm } from './core/ui';
 import { reportProblem } from './report';
 import { openShareSheet, shareLinks } from './share';
 import { CATEGORIES, type GameMeta } from './core/game';
@@ -108,6 +109,7 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
 
   async function route() {
     const current = ++navigation;
+    closeConfirm(); // a pending "Start a new game?" belongs to the game being left
     cleanup?.();
     cleanup = null;
 

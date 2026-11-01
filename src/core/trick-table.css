@@ -44,15 +44,16 @@
   margin-top: var(--space-1);
 }
 
-/* Seven cards per row; the second row overlaps the bottom of the first, leaving ranks in view. */
+/* Seven cards per row (up to ten for a long hand); later rows overlap the bottom of the
+   row above, leaving ranks in view. */
 .tt-hand {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--hand-cols, 7), minmax(0, 1fr));
   column-gap: 3px;
   padding-top: var(--space-2);
 }
 
-.tt-hand > :nth-child(n + 8) {
+.tt-hand > .next-row {
   margin-top: -63%; /* of the card's width: 45% of its height */
 }
 

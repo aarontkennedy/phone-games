@@ -72,6 +72,7 @@ export const games: GameMeta[] = [
         'Aces start the piles at the top right. Then add the 2, 3 and so on of the same suit.',
         '<b>Tap a card to move it.</b> It goes to the best place it can: its suit pile first, then a column.',
         'Made a mistake? Tap <b>Undo</b>. Your game is saved after every move.',
+        'Not sure what to do? Tap <b>Hint</b>: it outlines a good card to move and says where. If no moves are left, the line under the cards says so.',
       ],
       tips: [
         '<b>Draw 1</b> turns over one card at a time and is easier. <b>Draw 3</b> turns over three, and you can only play the top one.',
@@ -303,7 +304,8 @@ export const games: GameMeta[] = [
       goal: 'Fill every empty square so that each row, each column and each 3 by 3 box has the numbers 1 to 9 exactly once.',
       steps: [
         'Some numbers are given at the start, in bold. You can’t change those.',
-        'Tap an empty square, then tap a number on the pad to put it there. Tap <b>Erase</b> to clear it.',
+        'Tap an empty square, then tap a number on the pad to put it there. The <b>erase key</b> (an arrow with an X, like a phone keyboard’s) clears it.',
+        'Stuck? Tap <b>Hint</b> to fill in one square: the one you picked, a wrong one, or the easiest one to work out.',
         'Your numbers are purple. When you pick a square, the same number is shaded everywhere else, to help you spot where it can’t go.',
         'If a number repeats in a row, column or box, both copies turn red and get underlined.',
         'Every puzzle has exactly one answer. Fill the whole grid correctly to solve it.',
@@ -334,6 +336,7 @@ export const games: GameMeta[] = [
         '<b>Tap a card to move it.</b> It goes to the best place: its suit pile first, then a column, then a free cell.',
         'Cards that are safe to put up go to the suit piles by themselves.',
         'Made a mistake? Tap <b>Undo</b>. Your game is saved after every move.',
+        'Not sure what to do? Tap <b>Hint</b>: it outlines a good card to move and says where. If no moves are left, the line under the cards says so.',
       ],
       tips: [
         'Almost every deal can be won, so take your time.',

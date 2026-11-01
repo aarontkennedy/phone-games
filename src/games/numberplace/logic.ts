@@ -126,6 +126,28 @@ export function enter(s: State, i: number, n: number): State | null {
   return next;
 }
 
+/**
+ * The square a Hint should fill: the chosen one if it's empty or wrong, else a wrong
+ * entry, else the empty square with the fewest possible numbers (the most logical next
+ * step). -1 once solved.
+ */
+export function hintSquare(s: State, chosen = -1): number {
+  if (s.won) return -1;
+  const open = (i: number) => !s.puzzle[i] && s.entries[i] !== s.solution[i];
+  if (chosen >= 0 && chosen < 81 && open(chosen)) return chosen;
+  const wrong = s.entries.findIndex((n, i) => n > 0 && n !== s.solution[i]);
+  if (wrong >= 0) return wrong;
+  const grid = shown(s);
+  let best = -1;
+  let fewest = 10;
+  for (let i = 0; i < 81; i++) {
+    if (!open(i)) continue;
+    const n = candidates(grid, i).length;
+    if (n < fewest) [best, fewest] = [i, n];
+  }
+  return best;
+}
+
 export function isValidState(s: unknown): s is State {
   const st = s as State | null;
   const grid = (g: unknown) => Array.isArray(g) && g.length === 81 && g.every((n) => Number.isInteger(n) && n >= 0 && n <= 9);

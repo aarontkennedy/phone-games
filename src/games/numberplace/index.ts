@@ -1,7 +1,7 @@
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { showOverlay, hideOverlay } from '../../core/ui';
-import { LEVELS, clashes, enter, isValidState, newGame, shown, type Level, type State } from './logic';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { LEVELS, clashes, enter, hintSquare, isValidState, newGame, shown, type Level, type State } from './logic';
 import './style.css';
 
 const STATE_KEY = 'numberplace:state';
@@ -12,6 +12,8 @@ export function mount(container: HTMLElement): () => void {
   let state: State = isValidState(saved) ? saved : newGame();
   const best = load<Partial<Record<Level, number>>>(BEST_KEY, {});
   let selected = -1;
+  /** Says what Hint just filled in, until the next tap. */
+  let note = '';
 
   container.innerHTML = `
     <div class="screen np">
@@ -28,7 +30,8 @@ export function mount(container: HTMLElement): () => void {
         </div>
         <div class="np-pad" aria-label="Numbers">
           ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button class="btn secondary" data-num="${n}">${n}</button>`).join('')}
-          <button class="btn secondary" data-num="0">Erase</button>
+          <button class="btn secondary np-erase" data-num="0" aria-label="Erase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/></svg></button>
+          <button class="btn secondary np-hint" data-hint>Hint</button>
         </div>
       </div>
     </div>`;
@@ -106,19 +109,21 @@ export function mount(container: HTMLElement): () => void {
     const bestText = bestTime !== undefined ? ` Best: ${formatTime(bestTime * 1000)}.` : '';
     statusEl.textContent = state.won
       ? `Solved in ${formatTime(state.elapsed)}!${bestText}`
-      : bad.size
+      : note ||
+        (bad.size
         ? 'Some numbers clash: they’re marked in red and underlined.'
         : selected < 0
           ? `Tap an empty square, then a number.${bestText}`
           : state.puzzle[selected]
             ? 'That number was given. Tap an empty square.'
-            : 'Tap a number to fill the square, or Erase.';
+            : 'Tap a number to fill the square, or the erase key to clear it.');
     if (state.won) showOverlay(boardEl, 'Solved!', [['New puzzle', () => startNew(state.level)]]);
     else hideOverlay(boardEl);
   }
 
   function startNew(level: Level) {
     selected = -1;
+    note = '';
     stopClock();
     state = newGame(level);
     startClock();
@@ -130,11 +135,26 @@ export function mount(container: HTMLElement): () => void {
     const el = (e.target as Element).closest<HTMLElement>('[data-cell]');
     if (!el || state.won) return;
     selected = Number(el.dataset.cell);
+    note = '';
     render();
   });
-  padBtns.forEach((b) => b.addEventListener('click', () => update(enter(state, selected, Number(b.dataset.num)))));
-  container.querySelector('[data-new]')!.addEventListener('click', () => startNew(state.level));
-  levelBtns.forEach((b) => b.addEventListener('click', () => startNew(b.dataset.level as Level)));
+  padBtns.forEach((b) =>
+    b.addEventListener('click', () => {
+      note = '';
+      update(enter(state, selected, Number(b.dataset.num)));
+    }),
+  );
+  container.querySelector('[data-hint]')!.addEventListener('click', () => {
+    const i = hintSquare(state, selected);
+    if (i < 0) return;
+    selected = i;
+    note = `Hint: row ${Math.floor(i / 9) + 1}, column ${(i % 9) + 1} is ${state.solution[i]}.`;
+    update(enter(state, i, state.solution[i]));
+  });
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.entries.some(Boolean) && !state.won;
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => startNew(state.level)));
+  levelBtns.forEach((b) => b.addEventListener('click', () => confirmNew(inProgress(), () => startNew(b.dataset.level as Level))));
 
   const onVisibility = () => {
     if (document.hidden) {

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { hideOverlay, showOverlay } from './ui';
+import { closeConfirm, confirmNew, hideOverlay, showOverlay } from './ui';
 
 describe('overlay', () => {
   function host() {
@@ -53,5 +53,46 @@ describe('overlay', () => {
     const el = host();
     expect(() => hideOverlay(el)).not.toThrow();
     expect(el.children).toHaveLength(0);
+  });
+});
+
+describe('confirmNew', () => {
+  const dialog = () => document.querySelector<HTMLElement>('.confirm');
+
+  it('starts at once when nothing would be lost', () => {
+    const start = vi.fn();
+    confirmNew(false, start);
+    expect(start).toHaveBeenCalledOnce();
+    expect(dialog()).toBeNull();
+  });
+
+  it('asks first for a game partway through: Keep playing changes nothing', () => {
+    const start = vi.fn();
+    confirmNew(true, start);
+    expect(dialog()!.getAttribute('role')).toBe('alertdialog');
+    expect(dialog()!.textContent).toContain('Start a new game?');
+    expect(document.activeElement).toBe(dialog()!.querySelector('[data-cancel]')); // the safe choice
+    dialog()!.querySelector<HTMLButtonElement>('[data-cancel]')!.click();
+    expect(start).not.toHaveBeenCalled();
+    expect(dialog()).toBeNull();
+  });
+
+  it('starts the new game when confirmed, and only ever shows one question', () => {
+    const first = vi.fn();
+    const second = vi.fn();
+    confirmNew(true, first);
+    confirmNew(true, second);
+    expect(document.querySelectorAll('.confirm')).toHaveLength(1);
+    dialog()!.querySelector<HTMLButtonElement>('[data-confirm]')!.click();
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledOnce();
+    expect(dialog()).toBeNull();
+  });
+
+  it('can be closed from outside, e.g. when leaving the game', () => {
+    confirmNew(true, vi.fn());
+    closeConfirm();
+    expect(dialog()).toBeNull();
+    closeConfirm(); // nothing open: fine
   });
 });

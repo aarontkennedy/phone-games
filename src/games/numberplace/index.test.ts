@@ -44,7 +44,7 @@ describe('Number place screen', () => {
     const { cell, num, status, stored, $ } = setup(s);
     const empty = s.puzzle.indexOf(0);
     cell(empty).click();
-    expect(status()).toBe('Tap a number to fill the square, or Erase.');
+    expect(status()).toBe('Tap a number to fill the square, or the erase key to clear it.');
     num(s.solution[empty]).click();
     expect(cell(empty).textContent).toBe(String(s.solution[empty]));
     expect(cell(empty).classList.contains('mine')).toBe(true);
@@ -134,5 +134,29 @@ describe('Number place colors', () => {
       expect(contrast(c['np-mine'], bg)).toBeGreaterThanOrEqual(4.5);
       expect(contrast(c['np-clash'], bg)).toBeGreaterThanOrEqual(4.5);
     }
+  });
+});
+
+describe('Number place hints', () => {
+  it('fills the chosen square, or the easiest one, and says what it is', () => {
+    const p = puzzle();
+    const { cell, stored, status, $ } = setup(p);
+    const empty = p.puzzle.findIndex((n) => !n);
+    cell(empty).click();
+    $<HTMLButtonElement>('[data-hint]').click();
+    expect(stored().entries[empty]).toBe(p.solution[empty]);
+    expect(status()).toBe(`Hint: row ${Math.floor(empty / 9) + 1}, column ${(empty % 9) + 1} is ${p.solution[empty]}.`);
+    cell(empty).click();
+    expect(status()).not.toMatch(/^Hint/);
+    $<HTMLButtonElement>('[data-hint]').click(); // that square is right now: another one gets filled
+    expect(stored().entries.filter(Boolean)).toHaveLength(2);
+  });
+
+  it('does nothing once solved', () => {
+    const p = puzzle();
+    const solved = { ...p, entries: p.solution.map((n, i) => (p.puzzle[i] ? 0 : n)), won: true };
+    const { stored, $ } = setup(solved);
+    $<HTMLButtonElement>('[data-hint]').click();
+    expect(stored().won).toBe(true);
   });
 });

@@ -37,6 +37,7 @@ test('the deck turns over one card, or three in Draw 3', async ({ page }) => {
   await page.locator('[data-stock]').click();
   await expect(page.locator('.sol-waste .card')).toHaveCount(1);
   await page.locator('[data-draw="3"]').click();
+  await page.getByRole('button', { name: 'New game' }).click(); // a card was turned: switching asks first
   await page.locator('[data-stock]').click();
   await expect(page.locator('.sol-waste .card')).toHaveCount(3);
   await expectNoHorizontalOverflow(page);
@@ -70,4 +71,11 @@ test('the game is still there after leaving and coming back', async ({ page }) =
   await page.locator('a[href="#/solitaire"]').first().click(); // also under Most played by now
   await expect(page.locator('[data-moves]')).toHaveText('2');
   await expect(page.locator('.sol-waste .card').last()).toHaveAttribute('data-card', waste!);
+});
+
+test('Hint outlines a card or the deck and says what to do', async ({ page }) => {
+  await page.locator('[data-hint]').click();
+  await expect(page.locator('[data-status]')).toHaveText(/^(Hint: move the .+|Turn over the deck.+)$/);
+  await expect(page.locator('.hint')).toHaveCount(1);
+  await expectReadableText(page);
 });

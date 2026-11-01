@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { cardId } from '../../core/cards';
 import { load, save } from '../../core/storage';
-import { makeContainer, track } from '../../test/helpers';
+import { makeContainer, track, answerNewGame } from '../../test/helpers';
 import { AI_DELAY, TRICK_PAUSE, mount } from './index';
 import type { State } from './logic';
 import { cards, position, trick } from './test-fixtures';
@@ -165,6 +165,7 @@ describe('Hearts screen', () => {
   it('starts over with New', () => {
     const { $, stored } = setup(position(['5D', '3C', '4C', 'KC'], { scores: [50, 2, 3, 4], level: 'easy' }));
     $('[data-new]').click();
+    answerNewGame();
     expect(stored().scores).toEqual([0, 0, 0, 0]);
     expect(stored().level).toBe('easy');
   });

@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { confirmNew } from '../../core/ui';
 import { LETTERS, MAX_MISSES, guess, isValidState, misses, newGame, newRound, type State } from './logic';
 import './style.css';
 
@@ -101,7 +102,9 @@ export function mount(container: HTMLElement): () => void {
     if (el.dataset.letter) tryLetter(el.dataset.letter);
     else nextWord();
   });
-  container.querySelector('[data-new]')!.addEventListener('click', nextWord);
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.result === null && state.guessed.length > 0;
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), nextWord));
   // A hardware keyboard works too.
   const onKey = (e: KeyboardEvent) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;

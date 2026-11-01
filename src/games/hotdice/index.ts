@@ -1,5 +1,5 @@
 import { load, save } from '../../core/storage';
-import { showOverlay, hideOverlay } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import { GOAL, bank, computerStep, endBust, isValidState, keep, newGame, roll, scoreDice, winner, type Level, type State } from './logic';
 import './style.css';
 
@@ -122,7 +122,9 @@ export function mount(container: HTMLElement): () => void {
       update(kept && (act === 'keep-roll' ? roll(kept) : bank(kept)));
     }
   });
-  container.querySelector('[data-new]')!.addEventListener('click', () => update(newGame(state.level)));
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.phase !== 'gameOver' && (state.scores.some((n) => n > 0) || state.turnPoints > 0 || state.dice.length > 0);
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   update(state);

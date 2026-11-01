@@ -4,7 +4,7 @@ import appCss from '../../style.css?raw';
 import * as symbols from './symbols';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
-import { makeContainer, pointer, setHidden, tap, track } from '../../test/helpers';
+import { makeContainer, pointer, setHidden, tap, track, answerNewGame } from '../../test/helpers';
 import { LONG_PRESS_MS, mount } from './index';
 import { seededRng } from '../../core/random';
 import { fixture } from './test-fixtures';
@@ -275,6 +275,7 @@ describe('Mines screen', () => {
   it('switches levels and restarts with New', () => {
     const { $, cells, cell, revealed, stored } = setup();
     $('[data-level="hard"]').click();
+    answerNewGame(); // the saved game is partway through, so switching asks first
     expect(cells()).toHaveLength(144);
     expect($('[data-mines]').textContent).toBe('22');
     expect($('[data-level="hard"]').getAttribute('aria-pressed')).toBe('true');
@@ -284,6 +285,7 @@ describe('Mines screen', () => {
     tap(cell(70));
     expect(revealed()).toBeGreaterThan(0);
     $('[data-new]').click();
+    answerNewGame();
     expect(revealed()).toBe(0);
     expect(stored()).toMatchObject({ level: 'hard', status: 'ready' });
   });

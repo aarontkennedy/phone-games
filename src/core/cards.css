@@ -98,6 +98,13 @@ button.card {
   padding: 0;
 }
 
+/* The card (or deck) a Hint suggests moving: dashed, so it's not mistaken for a pick. */
+.card.hint,
+.card-slot.hint {
+  outline: 3px dashed var(--accent);
+  outline-offset: 1px;
+}
+
 /* Highlights the card or pile the player picked. */
 .card.picked {
   outline: 3px solid var(--accent);

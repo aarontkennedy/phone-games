@@ -489,6 +489,34 @@ body {
   background: var(--scrim);
 }
 
+/* "Start a new game?" over the whole screen (confirmNew in src/core/ui.ts). */
+.confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: var(--scrim);
+}
+
+.confirm-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: min(100%, 360px);
+  padding: var(--space-5) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  text-align: center;
+}
+
+.confirm-box h2,
+.confirm-box p {
+  margin: 0;
+}
+
 .overlay h2 {
   margin: 0 0 var(--space-2);
   font-size: var(--text-2xl);

@@ -1,9 +1,9 @@
 import { cardFace, cardSlot, suitSvg } from '../../core/card-view';
-import { SUITS, suitName } from '../../core/cards';
+import { SUITS, cardName, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { showOverlay, hideOverlay } from '../../core/ui';
-import { bestTarget, isValidState, move, newGame, type Source, type State } from './logic';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { bestTarget, cardsAt, findHint, isStuck, isValidState, move, newGame, type Source, type State } from './logic';
 import './style.css';
 
 const STATE_KEY = 'freecells:state';
@@ -17,6 +17,8 @@ export function mount(container: HTMLElement): () => void {
   let best = load<number | null>(BEST_KEY, null);
   let history: State[] = [];
   let message = '';
+  /** The move suggested by Hint, outlined until the next move. */
+  let hint: ReturnType<typeof findHint> = null;
 
   container.innerHTML = `
     <div class="screen cards fc">
@@ -28,6 +30,7 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame fc-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
+        <button class="btn secondary" data-hint>Hint</button>
         <button class="btn secondary" data-undo>Undo</button>
       </div>
     </div>`;
@@ -56,6 +59,7 @@ export function mount(container: HTMLElement): () => void {
 
   function commit(next: State | null, fail = '') {
     message = next ? '' : fail;
+    hint = null;
     if (next) {
       stopClock();
       history = [...history.slice(-199), state];
@@ -86,7 +90,14 @@ export function mount(container: HTMLElement): () => void {
     const bestText = best !== null ? ` Best: ${formatTime(best * 1000)}.` : '';
     statusEl.textContent = state.won
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} move${state.moves === 1 ? '' : 's'}!${bestText}`
-      : message || `Tap a card to move it. The four spaces on the left hold one card each.${bestText}`;
+      : message ||
+        (isStuck(state)
+          ? 'No moves left. Tap Undo to try another way, or New for a new deal.'
+          : `Tap a card to move it. The four spaces on the left hold one card each.${bestText}`);
+    if (hint) {
+      const src = hint.src;
+      boardEl.querySelector(src.from === 'cell' ? `[data-src="cell:${src.i}"]` : `[data-src="col:${src.col}:${src.index}"]`)?.classList.add('hint');
+    }
     if (state.won) showOverlay(boardEl, 'You win!', [['New game', startNew]]);
     else hideOverlay(boardEl);
     fitColumns();
@@ -108,11 +119,33 @@ export function mount(container: HTMLElement): () => void {
     });
   }
 
+  /** What Hint suggests, in words; the card is outlined on the board. */
+  function showHint() {
+    hint = findHint(state);
+    if (!hint) message = 'No moves left. Tap Undo to try another way, or New for a new deal.';
+    else {
+      const cards = cardsAt(state, hint.src);
+      const what = `the ${cardName(cards[0]).toLowerCase()}${cards.length > 1 ? ` and the ${cards.length - 1} below it` : ''}`;
+      const tgt = hint.tgt;
+      const onto = tgt.to === 'col' ? state.columns[tgt.col].at(-1) : undefined;
+      message =
+        tgt.to === 'foundation'
+          ? `Hint: move ${what} up to its pile.`
+          : tgt.to === 'cell'
+            ? `Hint: move ${what} to a free space.`
+            : onto
+              ? `Hint: move ${what} onto the ${cardName(onto).toLowerCase()}.`
+              : `Hint: move ${what} to the empty column.`;
+    }
+    render();
+  }
+
   function startNew() {
     stopClock();
     state = newGame();
     history = [];
     message = '';
+    hint = null;
     persist();
     render();
   }
@@ -129,11 +162,15 @@ export function mount(container: HTMLElement): () => void {
     stopClock();
     state = { ...history.pop()!, elapsed: state.elapsed };
     message = '';
+    hint = null;
     startClock();
     persist();
     render();
   });
-  container.querySelector('[data-new]')!.addEventListener('click', startNew);
+  container.querySelector('[data-hint]')!.addEventListener('click', showHint);
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.moves > 0 && !state.won;
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), startNew));
   const onVisibility = () => (document.hidden ? (stopClock(), persist()) : startClock());
   const onResize = () => fitColumns();
   document.addEventListener('visibilitychange', onVisibility);

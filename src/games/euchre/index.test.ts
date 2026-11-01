@@ -3,7 +3,7 @@ import css from './style.css?raw';
 import appCss from '../../style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
-import { makeContainer, track } from '../../test/helpers';
+import { makeContainer, track, answerNewGame } from '../../test/helpers';
 import { AI_DELAY, TRICK_PAUSE, mount } from './index';
 import type { HandResult, State } from './logic';
 import { bidding, position, trick } from './test-fixtures';
@@ -167,6 +167,7 @@ describe('Euchre screen', () => {
     expect(stored().level).toBe('easy');
     expect(stored().scores).toEqual([5, 3]);
     $('[data-new]').click();
+    answerNewGame();
     expect(stored().scores).toEqual([0, 0]);
   });
 

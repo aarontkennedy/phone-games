@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { load, save } from '../../core/storage';
-import { makeContainer, setHidden, track } from '../../test/helpers';
+import { makeContainer, setHidden, track, answerNewGame } from '../../test/helpers';
 import { formatTime, mount } from './index';
 import type { State } from './logic';
 import { blank, cards, complete, oneMoveFromWinning, upTo } from './test-fixtures';
@@ -177,6 +177,7 @@ describe('Solitaire screen', () => {
     const { $, stored } = setup({ ...position(), draw: 3 });
     $('[data-src="waste"]').click();
     $('[data-new]').click();
+    answerNewGame();
     expect(stored().moves).toBe(0);
     expect(stored().draw).toBe(3);
     expect($<HTMLButtonElement>('[data-undo]').disabled).toBe(true);
@@ -226,5 +227,45 @@ describe('formatTime', () => {
     expect(formatTime(0)).toBe('0:00');
     expect(formatTime(125_000)).toBe('2:05');
     expect(formatTime(10 * 60 * 60 * 1000)).toBe('99:59');
+  });
+});
+
+describe('Solitaire hints', () => {
+  it('outlines a good card and says where it goes, until the next move', () => {
+    const s = blank();
+    s.foundations[0] = upTo('S', 3);
+    s.waste = cards('4S');
+    const { $, status } = setup(complete(s));
+    $<HTMLButtonElement>('[data-hint]').click();
+    expect(status()).toBe('Hint: move the 4 of spades up to its pile.');
+    expect($('[data-src="waste"]').classList.contains('hint')).toBe(true);
+    $<HTMLElement>('[data-src="waste"]').click();
+    expect(status()).not.toMatch(/^Hint/);
+    expect($('.hint')).toBeNull();
+  });
+
+  it('names the card to stack onto, an empty column, or the deck', () => {
+    const onto = blank();
+    onto.tableau[0] = { down: cards('2C'), up: cards('6H') };
+    onto.tableau[1].up = cards('7S');
+    const a = setup(complete(onto));
+    a.$<HTMLButtonElement>('[data-hint]').click();
+    expect(a.status()).toBe('Hint: move the 6 of hearts onto the 7 of spades.');
+    expect(a.$('[data-src="0:0"]').classList.contains('hint')).toBe(true);
+    a.unmount();
+
+    const king = blank();
+    king.tableau[0] = { down: cards('2C'), up: cards('KH') };
+    const b = setup(complete(king));
+    b.$<HTMLButtonElement>('[data-hint]').click();
+    expect(b.status()).toBe('Hint: move the king of hearts to the empty column.');
+    b.unmount();
+
+    const deck = blank();
+    deck.tableau[0].up = cards('KH');
+    const c = setup(complete(deck));
+    c.$<HTMLButtonElement>('[data-hint]').click();
+    expect(c.status()).toBe('Turn over the deck: a card in it can be played.');
+    expect(c.$('[data-stock]').classList.contains('hint')).toBe(true);
   });
 });

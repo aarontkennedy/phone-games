@@ -3,7 +3,7 @@ import css from './style.css?raw';
 import appCss from '../../style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
-import { makeContainer, track } from '../../test/helpers';
+import { makeContainer, track, answerNewGame } from '../../test/helpers';
 import { AI_DELAY, holeAt, mount } from './index';
 import { nextStep, play, type State } from './logic';
 import { card, cards, pegging, pile } from './test-fixtures';
@@ -152,6 +152,7 @@ describe('Cribbage screen', () => {
     expect(stored().level).toBe('easy');
     expect(stored().scores).toEqual([60, 30]);
     $('[data-new]').click();
+    answerNewGame();
     expect(stored().scores).toEqual([0, 0]);
   });
 

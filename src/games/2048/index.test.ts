@@ -3,7 +3,7 @@ import css from './style.css?raw';
 import rootCss from '../../style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
-import { makeContainer, pointer, press, track } from '../../test/helpers';
+import { makeContainer, pointer, press, track, answerNewGame } from '../../test/helpers';
 import { mount } from './index';
 import type { State } from './logic';
 
@@ -114,6 +114,10 @@ describe('2048 screen', () => {
     saveState(withTiles({ 0: 64, 1: 32, 2: 16 }), { score: 500 });
     const { values, $, button } = setup();
     button('New').click();
+    answerNewGame('keep'); // a game partway through: New asks first
+    expect($('[data-score]').textContent).toBe('500');
+    button('New').click();
+    answerNewGame();
     expect(values().filter(Boolean)).toHaveLength(2);
     expect($('[data-score]').textContent).toBe('0');
     expect($('[data-best]').textContent).toBe('500');

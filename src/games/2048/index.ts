@@ -1,6 +1,6 @@
 import { load, save } from '../../core/storage';
 import { onArrowKeys, onSwipe, type Direction } from '../../core/input';
-import { showOverlay, hideOverlay } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import { SIZE, WIN_TILE, applyMove, isValidState, newState, type State } from './logic';
 import './style.css';
 
@@ -79,7 +79,9 @@ export function mount(container: HTMLElement): () => void {
     if (turn) update(turn.state, turn.fresh, turn.merged);
   }
 
-  container.querySelector('[data-new]')!.addEventListener('click', restart);
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.score > 0 && !state.over;
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), restart));
   const stopSwipe = onSwipe(root, handle);
   const stopKeys = onArrowKeys(handle);
   render();

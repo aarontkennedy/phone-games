@@ -2,7 +2,7 @@ import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { cardId, sameCard, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { handHtml } from '../../core/trick-view';
-import { showOverlay, hideOverlay } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import {
   GAME_POINTS,
   PLAYER_NAMES,
@@ -211,7 +211,9 @@ export function mount(container: HTMLElement): () => void {
   });
   cribBtn.addEventListener('click', () => update(discard(state, picked)));
   nextBtn.addEventListener('click', () => update(nextStep(state)));
-  container.querySelector('[data-new]')!.addEventListener('click', () => update(newGame(state.level)));
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.phase !== 'gameOver' && (state.scores.some((n) => n > 0) || state.pegged.length > 0);
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   render();

@@ -2,7 +2,7 @@ import { load, save } from '../../core/storage';
 import { cardId } from '../../core/cards';
 import { SEAT_NAMES, trickWinner, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
-import { showOverlay, hideOverlay } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import {
   bid,
   chooseBid,
@@ -173,7 +173,9 @@ export function mount(container: HTMLElement): () => void {
       render();
     } else update(bid(state, 0, myBid));
   });
-  container.querySelector('[data-new]')!.addEventListener('click', () => update(newGame(state.level)));
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.phase !== 'gameOver' && (state.round > 0 || state.played.length > 0);
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   if (myBidTurn()) myBid = suggestion();

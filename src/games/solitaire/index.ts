@@ -1,17 +1,21 @@
 import { cardBack, cardFace, cardSlot, suitSvg } from '../../core/card-view';
-import { SUITS, suitName } from '../../core/cards';
+import { SUITS, cardName, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { showOverlay, hideOverlay } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import {
   autoFinish,
   bestTarget,
   canAutoFinish,
+  cardsAt,
   draw,
+  findHint,
+  isStuck,
   isValidState,
   move,
   newState,
   type DrawCount,
+  type Hint,
   type Source,
   type State,
 } from './logic';
@@ -31,6 +35,8 @@ export function mount(container: HTMLElement): () => void {
   const best = load<Partial<Record<DrawCount, number>>>(BEST_KEY, {});
   let history: State[] = [];
   let message = '';
+  /** The move suggested by Hint, outlined until the next move. */
+  let hint: Hint | null = null;
 
   container.innerHTML = `
     <div class="screen cards sol">
@@ -46,6 +52,7 @@ export function mount(container: HTMLElement): () => void {
           <button data-draw="1">Draw 1</button>
           <button data-draw="3">Draw 3</button>
         </div>
+        <button class="btn secondary" data-hint>Hint</button>
         <button class="btn secondary" data-undo>Undo</button>
       </div>
     </div>`;
@@ -88,6 +95,7 @@ export function mount(container: HTMLElement): () => void {
 
   /** Applies a move's result, keeping Undo, the clock, records, storage and screen in sync. */
   function commit(next: State | null, failMessage = '') {
+    hint = null;
     if (!next) {
       message = failMessage;
       render();
@@ -118,6 +126,7 @@ export function mount(container: HTMLElement): () => void {
     state = newState(drawCount);
     history = [];
     message = '';
+    hint = null;
     persist();
     render();
   }
@@ -129,6 +138,7 @@ export function mount(container: HTMLElement): () => void {
     prev.elapsed = state.elapsed;
     state = prev;
     message = '';
+    hint = null;
     startClock();
     persist();
     render();
@@ -144,6 +154,33 @@ export function mount(container: HTMLElement): () => void {
     const src = parseSource(el);
     const tgt = bestTarget(state, src);
     commit(tgt && move(state, src, tgt), "That card can't move right now.");
+  }
+
+  /** What Hint suggests, in words; the card (or the deck) is outlined on the board. */
+  function showHint() {
+    hint = findHint(state);
+    if (!hint) message = 'No moves left. Tap Undo to try another way, or New for a new deal.';
+    else if ('draw' in hint) message = 'Turn over the deck: a card in it can be played.';
+    else {
+      const card = cardName(cardsAt(state, hint.src)[0]).toLowerCase(); // "queen of hearts"
+      const tgt = hint.tgt;
+      const onto = tgt.to === 'tableau' ? state.tableau[tgt.col].up.at(-1) : undefined;
+      message =
+        tgt.to === 'foundation'
+          ? `Hint: move the ${card} up to its pile.`
+          : onto
+            ? `Hint: move the ${card} onto the ${cardName(onto).toLowerCase()}.`
+            : `Hint: move the ${card} to the empty column.`;
+    }
+    render();
+  }
+
+  /** Outlines the hinted card, or the deck. */
+  function markHint() {
+    if (!hint) return;
+    const src = 'draw' in hint ? null : hint.src;
+    const sel = !src ? '[data-stock]' : src.from === 'tableau' ? `[data-src="${src.col}:${src.index}"]` : '[data-src="waste"]';
+    boardEl.querySelector(sel)?.classList.add('hint');
   }
 
   // --- Rendering ---
@@ -216,7 +253,11 @@ export function mount(container: HTMLElement): () => void {
     const bestText = bestTime !== undefined ? ` Best: ${formatTime(bestTime * 1000)}.` : '';
     statusEl.textContent = state.won
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} moves!${bestText}`
-      : message || `Tap a card to move it. Tap the deck to turn cards over.${bestText}`;
+      : message ||
+        (isStuck(state)
+          ? 'No moves left. Tap Undo to try another way, or New for a new deal.'
+          : `Tap a card to move it. Tap the deck to turn cards over.${bestText}`);
+    markHint();
 
     if (state.won) showOverlay(boardEl, 'You win!', [['New game', () => newGame(state.draw)]]);
     else hideOverlay(boardEl);
@@ -229,9 +270,12 @@ export function mount(container: HTMLElement): () => void {
     if (el.hasAttribute('data-stock')) commit(draw(state));
     else tapCard(el);
   });
-  container.querySelector('[data-new]')!.addEventListener('click', () => newGame(state.draw));
-  drawBtns.forEach((b) => b.addEventListener('click', () => newGame(Number(b.dataset.draw) as DrawCount)));
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.moves > 0 && !state.won;
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => newGame(state.draw)));
+  drawBtns.forEach((b) => b.addEventListener('click', () => confirmNew(inProgress(), () => newGame(Number(b.dataset.draw) as DrawCount))));
   undoBtn.addEventListener('click', undo);
+  container.querySelector('[data-hint]')!.addEventListener('click', showHint);
 
   const onVisibility = () => {
     if (document.hidden) {

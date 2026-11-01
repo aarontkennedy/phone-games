@@ -2,7 +2,7 @@ import { cardId, cardName, sameCard, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { SEATS, SEAT_NAMES, nextSeat, trickWinner, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
-import { showOverlay, hideOverlay } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import {
   chooseCard,
   collect,
@@ -172,7 +172,9 @@ export function mount(container: HTMLElement): () => void {
     picked = [];
     update(next);
   });
-  container.querySelector('[data-new]')!.addEventListener('click', startGame);
+  // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
+  const inProgress = () => state.phase !== 'gameOver' && (state.round > 0 || state.played.length > 0);
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), startGame));
   levelBtns.forEach((b) =>
     b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })),
   );

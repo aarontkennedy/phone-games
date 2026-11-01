@@ -49,8 +49,17 @@
   }
 }
 
-/* Sideways, the extra deck row would push the table past the screen: smaller pile cards. */
+/* Sideways, the extra deck row would push the table past the screen: smaller pile cards,
+   and smaller cards in the seats, so a two-row hand still fits on the smallest phones. */
 @media (orientation: landscape) and (max-height: 560px) {
+  .ce .tt-table {
+    gap: var(--space-2);
+  }
+
+  .ce .tt-play {
+    max-width: 38px;
+  }
+
   .ce-pile {
     gap: 0;
   }

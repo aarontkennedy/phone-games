@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { seededRng } from '../../core/random';
-import { LEVELS, PEERS, clashes, countSolutions, enter, isValidState, makePuzzle, newGame, shown, type State } from './logic';
+import { LEVELS, PEERS, clashes, countSolutions, enter, hintSquare, isValidState, makePuzzle, newGame, shown, type State } from './logic';
 
 const validGrid = (g: number[]) =>
   g.every((n, i) => n >= 1 && n <= 9 && PEERS[i].every((j) => g[j] !== n));
@@ -80,5 +80,29 @@ describe('number place', () => {
     expect(isValidState({ ...s, solution: Array(81).fill(0) })).toBe(false);
     expect(isValidState({ ...s, puzzle: s.puzzle.map((n) => (n ? (n % 9) + 1 : 0)) })).toBe(false);
     expect(isValidState({ ...s, won: 'no' })).toBe(false);
+  });
+});
+
+describe('hints', () => {
+  const p = newGame('easy', seededRng(5));
+  const empties = p.puzzle.flatMap((n, i) => (n ? [] : [i]));
+
+  it('fills the chosen square if it’s empty or wrong', () => {
+    expect(hintSquare(p, empties[3])).toBe(empties[3]);
+    const wrong = { ...p, entries: p.entries.map((_, i) => (i === empties[3] ? (p.solution[i] % 9) + 1 : 0)) };
+    expect(hintSquare(wrong, empties[3])).toBe(empties[3]);
+  });
+
+  it('otherwise fixes a wrong entry first, then picks the square with the fewest options', () => {
+    const wrong = { ...p, entries: p.entries.map((_, i) => (i === empties[5] ? (p.solution[i] % 9) + 1 : 0)) };
+    expect(hintSquare(wrong, p.puzzle.findIndex(Boolean))).toBe(empties[5]); // a given square was chosen
+    const i = hintSquare(p);
+    expect(empties).toContain(i);
+  });
+
+  it('has nothing to fill once solved', () => {
+    expect(hintSquare({ ...p, won: true })).toBe(-1);
+    const full = { ...p, entries: p.solution.map((n, i) => (p.puzzle[i] ? 0 : n)) };
+    expect(hintSquare(full)).toBe(-1);
   });
 });

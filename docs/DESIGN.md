@@ -98,7 +98,9 @@ topbar        [‹]      Title       [i]          (app shell: back, centered tit
   the board is short. Put the markup in this order too, so screen readers and the Tab
   key follow what's on screen.
 - **New stays at the top.** New lives in `.stats`, away from the thumb, so a stray tap
-  doesn't throw away a game. A button tapped every round, like Blackjack's Deal, goes
+  doesn't throw away a game. And when a game is partway through, New (and switching
+  difficulty when that restarts) asks first, using `confirmNew()` from `src/core/ui.ts`
+  with the game's own `inProgress()` test. A fresh or finished game starts at once. A button tapped every round, like Blackjack's Deal, goes
   in `.controls` instead.
 - **Leave slack in every row.** CI runs on Linux, whose fallback font is wider than the
   phones' system fonts, so a row that just fits on a Mac can overflow there (and on a

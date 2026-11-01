@@ -128,3 +128,21 @@ describe('Free cells screen', () => {
     expect(setup({ cells: 1 }).$$('.fc-col .card')).toHaveLength(52);
   });
 });
+
+describe('Free cells hints', () => {
+  it('outlines the card and says where it goes', () => {
+    const { $, status } = setup(nearlyWon());
+    $<HTMLButtonElement>('[data-hint]').click();
+    expect(status()).toBe('Hint: move the king of clubs up to its pile.');
+    expect($('[data-src="col:0:0"]').classList.contains('hint')).toBe(true);
+    $<HTMLElement>('[data-src="col:0:0"]').click();
+    expect($('.hint')).toBeNull();
+  });
+
+  it('describes moves onto a card, with the run below it, and to a free space', () => {
+    const { $, status } = setup();
+    $<HTMLButtonElement>('[data-hint]').click();
+    expect(status()).toMatch(/^Hint: move the .+ (onto the .+|to a free space|up to its pile|to the empty column)\.$/);
+    expect($('.hint')).not.toBeNull();
+  });
+});

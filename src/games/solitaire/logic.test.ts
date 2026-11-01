@@ -9,13 +9,15 @@ import {
   canStack,
   cardsAt,
   draw,
+  findHint,
   isLegal,
+  isStuck,
   isValidState,
   move,
   newState,
   type State,
 } from './logic';
-import { blank, card, cards, upTo } from './test-fixtures';
+import { blank, card, cards, oneMoveFromWinning, upTo } from './test-fixtures';
 
 const allCards = (s: State) => [
   ...s.stock,
@@ -276,5 +278,53 @@ describe('isValidState', () => {
     expect(isValidState({ ...s, foundations: [[ace], [], [], []] })).toBe(false); // hearts on spades
     expect(isValidState({ ...s, foundations: [[], [ace], [], []] })).toBe(true);
     expect(isValidState({ ...s, foundations: [[], [card('2H')], [], []] })).toBe(false); // not from the ace
+  });
+});
+
+describe('hints', () => {
+  it('suggests a card up to its pile first', () => {
+    const s = blank();
+    s.foundations[0] = upTo('S', 3);
+    s.tableau[0].up = cards('4S');
+    s.waste = cards('9H');
+    expect(findHint(s)).toEqual({ src: { from: 'tableau', col: 0, index: 0 }, tgt: { to: 'foundation' } });
+  });
+
+  it('then a move that turns over a face-down card, before one from the turned-over pile', () => {
+    const s = blank();
+    s.tableau[0] = { down: cards('2C'), up: cards('6H') };
+    s.tableau[1].up = cards('7S');
+    s.tableau[2].up = cards('7C');
+    s.waste = cards('6D');
+    expect(findHint(s)).toEqual({ src: { from: 'tableau', col: 0, index: 0 }, tgt: { to: 'tableau', col: 1 } });
+    s.tableau[0] = { down: [], up: cards('2C') };
+    expect(findHint(s)).toEqual({ src: { from: 'waste' }, tgt: { to: 'tableau', col: 1 } });
+  });
+
+  it('then turning the deck, if a card in it could be played', () => {
+    const s = blank();
+    s.tableau[0].up = cards('KH');
+    s.stock = cards('QS 2D');
+    expect(findHint(s)).toEqual({ draw: true });
+    expect(isStuck(s)).toBe(false);
+  });
+
+  it('then any other legal move, rather than calling the game stuck', () => {
+    const s = blank();
+    s.tableau[0].up = cards('8S 7H');
+    s.tableau[1].up = cards('8C');
+    s.stock = cards('2D');
+    expect(findHint(s)).toEqual({ src: { from: 'tableau', col: 0, index: 1 }, tgt: { to: 'tableau', col: 1 } });
+  });
+
+  it('says stuck when nothing can move and the deck holds nothing playable', () => {
+    const s = blank();
+    s.tableau[0].up = cards('KH');
+    s.tableau[1].up = cards('5C');
+    s.stock = cards('2D 9S');
+    expect(findHint(s)).toBeNull();
+    expect(isStuck(s)).toBe(true);
+    expect(isStuck({ ...oneMoveFromWinning(), won: true, waste: [] })).toBe(false);
+    expect(findHint({ ...s, won: true })).toBeNull();
   });
 });

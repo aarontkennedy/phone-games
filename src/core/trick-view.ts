@@ -43,21 +43,27 @@ export interface HandView {
   keepOrder?: boolean;
 }
 
+/** Cards per row: 7, or more for a long hand (Crazy Eights) so it stays in two rows up to 20 cards. */
+export const handColumns = (cards: number): number => Math.min(10, Math.max(7, Math.ceil(cards / 2)));
+
 /** Your hand, sorted. Playable cards lift when some aren't; the rest are disabled, never dimmed. */
 export function handHtml(hand: Card[], { playable, picked = [], received = [], marked = {}, keepOrder = false }: HandView): string {
+  const columns = handColumns(hand.length);
   const has = (list: Card[], c: Card) => list.some((x) => sameCard(x, c));
   const someIllegal = playable !== 'all' && playable.length < hand.length;
-  const cards = (keepOrder ? hand : sortHand(hand)).map((c) => {
+  const cards = (keepOrder ? hand : sortHand(hand)).map((c, i) => {
     const canPlay = playable === 'all' || has(playable, c);
     const className = [
       has(picked, c) ? 'picked' : '',
       has(picked, c) || (canPlay && someIllegal) ? 'lift' : '',
       has(received, c) ? 'received' : '',
+      i >= columns ? 'next-row' : '',
       ...Object.entries(marked).flatMap(([name, list]) => (has(list, c) ? [name] : [])),
     ]
       .filter(Boolean)
       .join(' ');
     return cardFace(c, { button: true, className, attrs: `data-hand${canPlay ? '' : ' disabled'}` });
   });
-  return `<div class="tt-hand" aria-label="Your cards">${cards.join('')}</div>`;
+  const style = columns === 7 ? '' : ` style="--hand-cols:${columns}"`;
+  return `<div class="tt-hand" aria-label="Your cards"${style}>${cards.join('')}</div>`;
 }
