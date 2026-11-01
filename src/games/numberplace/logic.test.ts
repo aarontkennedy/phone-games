@@ -23,6 +23,13 @@ describe('number place', () => {
     expect(givens).toBeLessThanOrEqual(LEVELS[level].givens + 8);
   });
 
+  it('tries a new grid when the first one gets stuck above the target', () => {
+    // With this seed the first hard grid stops at 27 givens; another try reaches 26.
+    const { puzzle } = makePuzzle('hard', seededRng(6));
+    expect(puzzle.filter(Boolean)).toHaveLength(LEVELS.hard.givens);
+    expect(countSolutions(puzzle)).toBe(1);
+  });
+
   it('counts several solutions, and none for a broken grid', () => {
     expect(countSolutions(Array(81).fill(0))).toBe(2);
     const broken = Array(81).fill(0);

@@ -68,7 +68,22 @@ export function countSolutions(grid: number[], limit = 2): number {
   return solve(grid.slice(), limit);
 }
 
+/** Tries to reach the level's number of givens. One pass can get stuck a square or two
+ *  short, when every remaining square is needed for a single answer: then a new grid is
+ *  tried, keeping the closest. */
 export function makePuzzle(level: Level, rng: Rng = Math.random): { puzzle: number[]; solution: number[] } {
+  const givens = (p: number[]) => p.filter(Boolean).length;
+  let best = carve(level, rng);
+  for (let tries = 1; tries < PUZZLE_TRIES && givens(best.puzzle) > LEVELS[level].givens; tries++) {
+    const next = carve(level, rng);
+    if (givens(next.puzzle) < givens(best.puzzle)) best = next;
+  }
+  return best;
+}
+
+export const PUZZLE_TRIES = 5;
+
+function carve(level: Level, rng: Rng): { puzzle: number[]; solution: number[] } {
   const solution = Array(81).fill(0);
   solve(solution, 1, rng);
   const puzzle = solution.slice();

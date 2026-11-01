@@ -133,11 +133,12 @@ export function legalPlays(s: State, p: Player): Card[] {
   return s.hands[p].filter((c) => pileCount(s) + value(c) <= 31);
 }
 
-/** Adds points, ending the game the moment someone reaches 121. */
+/** Adds points, ending the game the moment someone reaches 121. The back peg marks the
+ *  score before the whole move, even when one move scores twice (a fifteen, then a go). */
 function award(n: State, player: Player, items: ScoreItem[]): boolean {
   if (!items.length) return false;
   n.back = [...(n.back ?? n.scores)];
-  n.back[player] = n.scores[player];
+  if (!n.events.some((e) => e.player === player)) n.back[player] = n.scores[player];
   n.scores[player] = Math.min(GAME_POINTS, n.scores[player] + total(items));
   n.events.push({ player, items });
   if (n.scores[player] >= GAME_POINTS) {

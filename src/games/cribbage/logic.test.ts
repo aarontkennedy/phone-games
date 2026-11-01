@@ -159,6 +159,20 @@ describe('pegging', () => {
     expect(old.back).toEqual([10, 7]); // a save from before back pegs
   });
 
+  it('keeps the back peg at the start of a move that scores twice', () => {
+    // The 5 makes fifteen (2) and is the last card of the hand (1): one jump of 3.
+    const s = pegging(['5S', 'QH'], {
+      pile: pile(1, 'KC'),
+      scores: [10, 7],
+      back: [4, 3],
+      hands: [cards('5S'), []],
+      kept: [cards('AC 3D 7H 9S'), cards('2D 4D 6D 8D')], // your show hand scores 0 with the KD starter
+    });
+    const n = play(s, 0, card('5S'))!;
+    expect(n.scores[0]).toBeGreaterThanOrEqual(13);
+    expect(n.back![0]).toBe(10);
+  });
+
   it('keeps playing when the other player says go', () => {
     const s = pegging(['AH 2D', 'KS'], { pile: pile(1, 'QC JC 5C') }); // 25: the king won't fit
     const n = play(s, 0, card('AH'))!; // 26

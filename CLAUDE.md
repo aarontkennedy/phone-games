@@ -4,7 +4,7 @@ Offline PWA of personal games (no server, no ads, no accounts). Vite + TypeScrip
 
 ## Standards (read before changing anything)
 
-- docs/TESTING.md: 95% coverage on every metric, enforced. Never lower thresholds. Pure `logic.ts` + thin `index.ts` per game; inject `rng`; fake timers.
+- docs/TESTING.md: 95% coverage on every metric, enforced. Every game also has a `simulate.test.ts` that plays many whole games. Never lower thresholds. Pure `logic.ts` + thin `index.ts` per game; inject `rng`; fake timers.
 - docs/DESIGN.md: use tokens and shared components in src/style.css and src/core/ui.ts; light and dark; 44px targets; 26px min grid cells; 18px min text; contrast tests for every text color pair.
 - **Flat design (required):** a minimalist style that uses two-dimensional (2D) shapes, solid colors and clean lines, with zero realistic textures, shadows or gradients. It contrasts directly with realistic styles. In practice:
   - No gradients, `box-shadow`, `text-shadow`, `filter`, `backdrop-filter`, bevels, glows, 3D effects or `url()` textures.
@@ -19,6 +19,7 @@ Offline PWA of personal games (no server, no ads, no accounts). Vite + TypeScrip
 
 - `npm test`: vitest with coverage thresholds
 - `npm run test:e2e`: Playwright, iPhone (WebKit) and Android (Chromium) projects, including offline
+- `npm run test:sim`: simulation tests (many whole games per game, no coverage)
 - `npm run licenses`: dependency license allowlist
 - `npm run deps`: outdated packages and security advisories
 - `npm run check`: all of the above plus tsc
