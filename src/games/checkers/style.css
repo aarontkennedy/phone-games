@@ -1,0 +1,72 @@
+/* An 8x8 board. Pieces sit on the dark squares: yours purple, the computer's orange.
+   Kings have a ring inside. Moves are marked with a dot; the last move is outlined. */
+.ck-board {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  aspect-ratio: 1;
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.ck-sq {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: var(--ck-dark);
+}
+
+.ck-sq.light {
+  background: var(--ck-light);
+}
+
+button.ck-sq:not(:disabled) {
+  cursor: pointer;
+}
+
+.ck-sq.last {
+  outline: 2px solid var(--ck-light);
+  outline-offset: -2px;
+}
+
+.ck-sq.selected {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
+}
+
+.ck-sq.target::after {
+  content: '';
+  width: 32%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--ck-light);
+}
+
+.ck-piece {
+  width: 78%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.ck-piece.p0 {
+  background: var(--ck-you);
+}
+
+.ck-piece.p1 {
+  background: var(--ck-computer);
+}
+
+.ck-piece.king {
+  outline: 3px solid var(--ck-dark);
+  outline-offset: -9px;
+}
+
+/* The board looks the same in light and dark mode. */
+.ck {
+  --ck-dark: #4a4560;
+  --ck-light: #f4f1fb;
+  --ck-you: #9d94ff;
+  --ck-computer: #ffb347;
+}

@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, chipIcon, discsIcon, gridIcon, heartIcon, mineIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, discsIcon, gridIcon, heartIcon, mineIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -256,5 +256,29 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./fourinarow'),
+  },
+  {
+    id: 'checkers',
+    title: 'Checkers',
+    description: 'Jump and capture to clear the board',
+    icon: checkersIcon,
+    howToPlay: {
+      goal: 'Capture all of the computer’s pieces, or leave it with no moves.',
+      steps: [
+        'Your pieces are <b>purple</b>, at the bottom. The computer’s are <b>orange</b>. Pieces only use the dark squares.',
+        'Tap one of your pieces, then tap a marked square to move it. Pieces move one square diagonally forward.',
+        '<b>Jump</b> over an opponent’s piece diagonally into the empty square behind it to capture it. If you can jump, you <b>must</b>.',
+        'After a jump, if the same piece can jump again, it keeps going. Tap the final square and the whole jump is made.',
+        'Reach the far row and your piece becomes a <b>king</b> (it gets a dark ring). Kings move and jump backward too.',
+        'You win when the computer has no pieces or no moves left. Fifty moves each with no capture is a draw.',
+        'The computer’s last move is outlined so you can see what changed.',
+      ],
+      tips: [
+        '<b>Easy</b> plays at random. <b>Strong</b> looks ahead. You can switch at any time.',
+        'Keep your back row filled as long as you can: it stops the computer from making kings.',
+        'Trading pieces when you’re ahead brings you closer to winning.',
+      ],
+    },
+    load: () => import('./checkers'),
   },
 ];

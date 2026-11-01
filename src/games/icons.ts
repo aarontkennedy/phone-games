@@ -89,3 +89,10 @@ export const discsIcon = svg(
       .map(({ r, c }) => `<circle cx="${10.5 + c * 9}" cy="${13 + r * 7.5}" r="3" fill="${r === 3 - c ? '#ef5f58' : '#ffffff'}"/>`)
       .join(''),
 );
+
+/** Part of a checkerboard with a purple and an orange piece. */
+export const checkersIcon = svg(
+  '<rect x="4" y="4" width="40" height="40" rx="4" fill="#f4f1fb" stroke="#4a4560" stroke-width="2"/>' +
+    '<rect x="24" y="4" width="20" height="20" fill="#4a4560"/><rect x="4" y="24" width="20" height="20" fill="#4a4560"/>' +
+    '<circle cx="34" cy="14" r="7" fill="#9d94ff"/><circle cx="14" cy="34" r="7" fill="#ffb347"/>',
+);
