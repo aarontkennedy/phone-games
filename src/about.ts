@@ -1,5 +1,6 @@
 // The About page: what the app is, how to install it, privacy, and copyright.
 // Keep it in step with LICENSE, docs/LEGAL.md and public/THIRD_PARTY_NOTICES.txt.
+import { FEEDBACK_EMAIL, feedbackLink } from './report';
 
 /** Copyright holder, as named in LICENSE. */
 export const OWNER = 'aarontkennedy';
@@ -40,10 +41,18 @@ const html = `
   <p>To send Games to someone else, tap <b>Share</b> on the home screen. You can send it
   by text or email.</p>
 
+  <h2>Feedback</h2>
+  <p>Found a bug, or have an idea or a game you'd like to see? Send an email.</p>
+  <p><a class="btn feedback-link" data-feedback>Email feedback</a></p>
+  <p>Or write to <b>${FEEDBACK_EMAIL}</b>.</p>
+
   <h2>Privacy</h2>
   <p>Your games, scores and settings are saved only on this device. The app doesn't
-  collect, send or share anything. Its files are delivered by GitHub Pages, like any
+  collect or send anything by itself. Its files are delivered by GitHub Pages, like any
   website.</p>
+  <p>If something goes wrong, the app keeps a short note of the error on this device and
+  offers to put it in an email to ${OWNER}. You see the email first, and nothing is sent
+  unless you send it.</p>
 
   <h2>Copyright</h2>
   <p>&copy; ${YEAR} ${OWNER}. All rights reserved.</p>
@@ -62,6 +71,7 @@ const html = `
 /** Renders the About page into `main`. The license notices load when first opened. */
 export function mountAbout(main: HTMLElement): void {
   main.innerHTML = html;
+  main.querySelector<HTMLAnchorElement>('[data-feedback]')!.href = feedbackLink();
   const details = main.querySelector('details')!;
   const notices = main.querySelector<HTMLElement>('[data-notices]')!;
 

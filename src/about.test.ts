@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { mountAbout, OWNER, YEAR } from './about';
+import { FEEDBACK_EMAIL } from './report';
 import { flush } from './test/helpers';
 
 function setup() {
@@ -39,6 +40,14 @@ describe('About page', () => {
   it('says what happens to your data', () => {
     const { main } = setup();
     expect(main.textContent).toContain('saved only on this device');
+  });
+
+  it('offers an email for bugs and ideas, with the address shown too', () => {
+    const { main } = setup();
+    const link = main.querySelector<HTMLAnchorElement>('[data-feedback]')!;
+    expect(link.href).toMatch(new RegExp(`^mailto:${FEEDBACK_EMAIL}\\?subject=Games%20feedback`));
+    expect(main.textContent).toContain(FEEDBACK_EMAIL);
+    expect(main.textContent).toContain('nothing is sent');
   });
 
   it('loads the license notices the first time they are opened', async () => {

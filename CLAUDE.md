@@ -29,3 +29,4 @@ Offline PWA of personal games (no server, no ads, no accounts). Vite + TypeScrip
 - Every game needs `howToPlay` rules in src/games/index.ts, written for a first-time player (docs/DESIGN.md, "How to play"). They open only from the Rules button, never by themselves.
 - Card games use the shared card model and drawings (src/core/cards.ts, src/core/card-view.ts, and src/core/tricks.ts for trick-taking) and follow docs/DESIGN.md, "Playing cards".
 - The About page (src/about.ts, `#/about`) must match LICENSE and public/THIRD_PARTY_NOTICES.txt (docs/LEGAL.md).
+- Crashes and feedback: src/report.ts shows a "something went wrong" banner with an Email a report link, and About has Email feedback. Email only, opened in the player's own app; never add automatic reporting (docs/LEGAL.md, "Privacy").

@@ -79,3 +79,9 @@ If `LICENSE` changes, update `OWNER`, `YEAR` and the Copyright section there too
 
 The app makes no network requests besides loading itself, and has no analytics or
 tracking. Everything stays in the phone's local storage.
+
+Problem reports and feedback go by email only (`src/report.ts`). When something goes
+wrong, the app notes the error, screen and browser in local storage (the last five) and
+offers an **Email a report** link. The About page has an **Email feedback** link. Both
+open the player's own email app with the message filled in, so they see it before
+anything is sent, and the app itself still sends nothing. Never add automatic reporting.

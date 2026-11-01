@@ -1,4 +1,5 @@
 import { mountAbout } from './about';
+import { reportProblem } from './report';
 import { openShareSheet, shareLinks } from './share';
 import type { GameMeta } from './core/game';
 
@@ -108,13 +109,20 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
     const main = root.querySelector<HTMLElement>('.game')!;
     setUpHelp(root, meta);
 
+    let module: Awaited<ReturnType<GameMeta['load']>>;
     try {
-      const module = await meta.load();
-      if (current !== navigation) return; // user navigated away while loading
-      cleanup = module.mount(main);
+      module = await meta.load();
     } catch {
       if (current !== navigation) return;
       main.innerHTML = `<p class="status-line">Couldn't load this game. Connect to the internet once and try again.</p>`;
+      return;
+    }
+    if (current !== navigation) return; // user navigated away while loading
+    try {
+      cleanup = module.mount(main);
+    } catch (error) {
+      main.innerHTML = `<p class="status-line">This game couldn't start. Go back to Games and try again.</p>`;
+      reportProblem(error);
     }
   }
 

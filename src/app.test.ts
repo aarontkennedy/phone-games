@@ -207,6 +207,19 @@ describe('startApp', () => {
     stop();
   });
 
+  it('offers a problem report if a game crashes while starting', async () => {
+    const mount = () => {
+      throw new Error('bad save');
+    };
+    const { root, stop, go } = setup([game('a', async () => ({ mount }))]);
+    await go('#/a');
+    expect(root.querySelector('.game')!.textContent).toContain("This game couldn't start");
+    const report = document.querySelector<HTMLAnchorElement>('.problem-banner [data-report]')!;
+    expect(decodeURIComponent(report.href)).toContain('Error: bad save');
+    expect(decodeURIComponent(report.href)).toContain('Screen: #/a');
+    stop();
+  });
+
   it('ignores a load failure after the user navigated away', async () => {
     const slow = deferred<GameModule>();
     const { root, stop, go } = setup([game('a', () => slow.promise)]);
