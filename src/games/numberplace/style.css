@@ -1,0 +1,80 @@
+/* A 9x9 grid with heavier lines between the 3x3 boxes. Given numbers are bold; yours
+   are purple. Clashing numbers are red and underlined. */
+.np-board {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 1px;
+  padding: var(--space-2);
+  aspect-ratio: 1;
+  touch-action: manipulation;
+}
+
+.np-cell {
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-lg);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.np-cell.edge-r {
+  margin-right: 2px;
+}
+
+.np-cell.edge-b {
+  margin-bottom: 2px;
+}
+
+.np-cell.given {
+  font-weight: 800;
+}
+
+.np-cell.mine {
+  color: var(--np-mine);
+  font-weight: 600;
+}
+
+.np-cell.same {
+  background: var(--np-same);
+}
+
+.np-cell.selected {
+  outline: 3px solid var(--text);
+  outline-offset: -3px;
+}
+
+.np-cell.clash {
+  color: var(--np-clash);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* Numbers 1 to 9 and Erase, five to a row so they fit a narrow side bar. */
+.np-pad {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(44px, 1fr));
+  gap: var(--space-2);
+  flex: 1 1 100%;
+}
+
+.np-pad .btn {
+  padding-inline: 0;
+}
+
+.np {
+  --np-mine: #4a3fc0;
+  --np-clash: #b3141b;
+  --np-same: #e6e1f5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .np {
+    --np-mine: #b3acff;
+    --np-clash: #ff8a80;
+    --np-same: #34304a;
+  }
+}

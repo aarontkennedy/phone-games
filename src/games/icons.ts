@@ -96,3 +96,11 @@ export const checkersIcon = svg(
     '<rect x="24" y="4" width="20" height="20" fill="#4a4560"/><rect x="4" y="24" width="20" height="20" fill="#4a4560"/>' +
     '<circle cx="34" cy="14" r="7" fill="#9d94ff"/><circle cx="14" cy="34" r="7" fill="#ffb347"/>',
 );
+
+/** A 3x3 block of a number grid, three squares filled in purple. */
+export const numberGridIcon = svg(
+  '<rect x="5" y="5" width="38" height="38" rx="4" fill="#ffffff" stroke="#6c63ff" stroke-width="3"/>' +
+    '<path d="M17.7 5v38M30.3 5v38M5 17.7h38M5 30.3h38" stroke="#6c63ff" stroke-width="1.5"/>' +
+    '<rect x="8" y="8" width="7" height="7" rx="1.5" fill="#6c63ff"/><rect x="20.5" y="20.5" width="7" height="7" rx="1.5" fill="#ef5f58"/>' +
+    '<rect x="33" y="33" width="7" height="7" rx="1.5" fill="#6c63ff"/>',
+);

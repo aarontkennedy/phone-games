@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, discsIcon, gridIcon, heartIcon, mineIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, discsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -280,5 +280,28 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./checkers'),
+  },
+  {
+    id: 'numberplace',
+    title: 'Number Place',
+    description: 'Fill the grid with 1 to 9',
+    icon: numberGridIcon,
+    howToPlay: {
+      goal: 'Fill every empty square so that each row, each column and each 3 by 3 box has the numbers 1 to 9 exactly once.',
+      steps: [
+        'Some numbers are given at the start, in bold. You can’t change those.',
+        'Tap an empty square, then tap a number on the pad to put it there. Tap <b>Erase</b> to clear it.',
+        'Your numbers are purple. When you pick a square, the same number is shaded everywhere else, to help you spot where it can’t go.',
+        'If a number repeats in a row, column or box, both copies turn red and get underlined.',
+        'Every puzzle has exactly one answer. Fill the whole grid correctly to solve it.',
+        'Choose <b>Easy</b>, <b>Medium</b> or <b>Hard</b>: harder puzzles start with fewer numbers. The clock pauses when you leave, and your best time is kept for each level.',
+      ],
+      tips: [
+        'Look for a row, column or box that’s nearly full: the missing number is often easy to see.',
+        'Pick a number and check each box: if there’s only one square in a box where it can go, it goes there.',
+        'There’s no need to guess. Every puzzle can be solved by reasoning.',
+      ],
+    },
+    load: () => import('./numberplace'),
   },
 ];

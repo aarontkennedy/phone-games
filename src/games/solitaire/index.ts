@@ -1,6 +1,7 @@
 import { cardBack, cardFace, cardSlot, suitSvg } from '../../core/card-view';
 import { SUITS, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
+import { formatTime } from '../../core/time';
 import { showOverlay, hideOverlay } from '../../core/ui';
 import {
   autoFinish,
@@ -22,11 +23,7 @@ const UNDO_LIMIT = 200;
 /** Smallest gap between face-up cards in a column: enough to read the rank. */
 const MIN_PEEK_PX = 24;
 
-/** 125000 ms -> "2:05". */
-export function formatTime(ms: number): string {
-  const total = Math.min(99 * 60 + 59, Math.floor(ms / 1000));
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
-}
+export { formatTime };
 
 export function mount(container: HTMLElement): () => void {
   const saved = load<unknown>(STATE_KEY, null);
