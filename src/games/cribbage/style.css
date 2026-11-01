@@ -1,0 +1,97 @@
+/* The table, top to bottom: the score track, the computer's hand, then the starter, crib
+   and pegging count, then your hand. Sized to fit beside the side bar when sideways. */
+.cb-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.cb-track {
+  display: grid;
+  grid-template-columns: 5.5em minmax(0, 1fr) 2.2em;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cb-bar {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--cb-track);
+  overflow: hidden;
+}
+
+.cb-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--cb-you);
+}
+
+[data-player='1'] .cb-bar > span {
+  background: var(--cb-them);
+}
+
+.cb-pts {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-opponent {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.cb-opponent .cb-fan > * {
+  width: 36px;
+}
+
+.cb-middle {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.cb-spot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.cb-spot > .card,
+.cb-spot > .card-slot,
+.cb-fan > * {
+  flex: none;
+  width: 48px;
+}
+
+/* Overlapping cards, leaving each rank in view. Backs can overlap more. */
+.cb-fan {
+  display: flex;
+}
+
+.cb-fan > * + * {
+  margin-left: -24px;
+}
+
+.cb-crib .cb-fan > * + *,
+.cb-opponent .cb-fan > * + * {
+  margin-left: -28px;
+}
+
+.cb {
+  --cb-you: #5b4fd6;
+  --cb-them: #9a4100;
+  --cb-track: #f4f1fb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .cb {
+    --cb-you: #9d94ff;
+    --cb-them: #ffb347;
+    --cb-track: #221f33;
+  }
+}

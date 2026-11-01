@@ -106,6 +106,11 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
+    test('Cribbage: side bar on the left, score track and cards on the right', async ({ page }) => {
+      await page.goto('./#/cribbage');
+      await expectSideBarLayout(page);
+    });
+
     test('home and About still fit the width', async ({ page }) => {
       await page.goto('./');
       await expectNoHorizontalOverflow(page);

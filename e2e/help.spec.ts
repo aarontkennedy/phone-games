@@ -9,6 +9,7 @@ const GAMES = [
   { id: 'hearts', title: 'Hearts' },
   { id: 'spades', title: 'Spades' },
   { id: 'euchre', title: 'Euchre' },
+  { id: 'cribbage', title: 'Cribbage' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));

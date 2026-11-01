@@ -64,3 +64,12 @@ export const pairIcon = svg(
     '<circle cx="35" cy="18.5" r="3.6" fill="#ffffff"/><circle cx="31" cy="24" r="3.6" fill="#ffffff"/>' +
     '<circle cx="39" cy="24" r="3.6" fill="#ffffff"/><path d="M33.6 24 32.5 31h5l-1.1-7Z" fill="#ffffff"/>',
 );
+
+/** A cribbage board: two rows of holes, with a purple and an orange peg. */
+export const pegboardIcon = svg(
+  '<rect x="3" y="12" width="42" height="24" rx="5" fill="#c9a26b"/>' +
+    [9, 16, 23, 30, 37]
+      .map((x) => `<circle cx="${x}" cy="19" r="2" fill="#6b4a1f"/><circle cx="${x}" cy="29" r="2" fill="#6b4a1f"/>`)
+      .join('') +
+    '<circle cx="30" cy="19" r="3.4" fill="#6c63ff"/><circle cx="16" cy="29" r="3.4" fill="#ef5f58"/>',
+);

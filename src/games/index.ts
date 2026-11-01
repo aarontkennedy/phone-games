@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, chipIcon, heartIcon, mineIcon, pairIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, chipIcon, heartIcon, mineIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -187,5 +187,31 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./euchre'),
+  },
+  {
+    id: 'cribbage',
+    title: 'Cribbage',
+    description: 'Count fifteens, pairs and runs to 121',
+    icon: pegboardIcon,
+    howToPlay: {
+      goal: 'Be the first to score 121 points, playing against the computer.',
+      steps: [
+        'Each hand, you both get 6 cards. Pick 2 to put in the <b>crib</b>, an extra hand that scores for the dealer, then tap <b>Send to crib</b>. The dealer changes every hand.',
+        'Then a <b>starter</b> card is turned up. It counts as part of every hand. If it’s a jack, the dealer scores 2.',
+        '<b>Pegging:</b> you take turns laying a card, adding its value to the count. Aces are 1, court cards 10, others their number. The count can’t go over 31.',
+        'While pegging, score 2 for making the count exactly <b>15</b> or <b>31</b>, 2 for a <b>pair</b> with the last card (6 for three, 12 for four), and 1 per card for a <b>run</b> of 3 or more in a row, in any order.',
+        'If you can’t play without going over 31, the other player keeps going. The last player to lay a card scores 1 for the <b>go</b>, and the count starts again. The very last card of all scores 1 too.',
+        '<b>The show:</b> each hand is counted with the starter. The non-dealer counts first, then the dealer, then the crib. Tap <b>Next</b> to move on.',
+        'Hands score 2 for each set of cards adding to 15, 2 for each pair, 1 per card in each run, 4 for four cards of one suit (5 with the starter), and 1 for <b>nobs</b>: the jack of the starter’s suit.',
+        'The line under the table always tells you what just scored and why.',
+      ],
+      tips: [
+        '<b>Easy</b> plays at random. <b>Strong</b> picks the best cards to keep and pegs carefully. You can switch at any time.',
+        'Keep cards that add up to 15, pairs, and cards in a row. Fives are valuable: so many cards are worth 10.',
+        'When it’s not your crib, don’t give it fives or pairs.',
+        'Try not to make the count 5 or 21: a 10-point card lets the other player make 15 or 31.',
+      ],
+    },
+    load: () => import('./cribbage'),
   },
 ];
