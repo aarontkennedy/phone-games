@@ -100,6 +100,12 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
+    test('Euchre: side bar with the bidding buttons, table on the right', async ({ page }) => {
+      await page.goto('./#/euchre');
+      await expect(page.locator('[data-bidding]')).toBeVisible();
+      await expectSideBarLayout(page);
+    });
+
     test('home and About still fit the width', async ({ page }) => {
       await page.goto('./');
       await expectNoHorizontalOverflow(page);

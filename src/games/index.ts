@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, chipIcon, heartIcon, mineIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, chipIcon, heartIcon, mineIcon, pairIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -160,5 +160,32 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./spades'),
+  },
+  {
+    id: 'euchre',
+    title: 'Euchre',
+    description: 'Call trump and take three tricks',
+    icon: pairIcon,
+    howToPlay: {
+      goal: 'With your partner, win at least 3 of the 5 tricks when your team picks trump. The first team to 10 points wins.',
+      steps: [
+        'You and North are a team, against West and East. Only the 9s, 10s, jacks, queens, kings and aces are used. Everyone gets 5 cards, and one card is turned up.',
+        '<b>Picking trump, round one:</b> in turn, each player can tell the dealer to pick up the turned-up card. Its suit becomes trump. Tap <b>Order up</b> (or <b>Pick it up</b> if you’re the dealer), or <b>Pass</b>.',
+        'If the dealer picks up the card, they put one card back. If you’re the dealer, tap the card to put back.',
+        '<b>Round two:</b> if everyone passes, the card is turned down and each player can name any other suit as trump by tapping it. If it gets back to the dealer, the dealer must choose.',
+        'Whoever picks trump can tap <b>Alone</b> first to play without their partner, for more points.',
+        '<b>Trump order:</b> the jack of the trump suit is highest. Next is the other jack of the same color: it counts as a trump card. Then the ace, king, queen, 10 and 9 of trump.',
+        'Each trick, play the same suit as the first card if you can (remember that the second jack counts as trump). The highest trump wins, or the highest card of the suit led if there’s no trump.',
+        'The team that picked trump scores <b>1 point</b> for 3 or 4 tricks, <b>2</b> for all 5, or <b>4</b> for all 5 alone. If they win fewer than 3, they’re <b>euchred</b> and the other team scores 2.',
+        'The strip above the seats shows the turned-up card, then the trump suit and who picked it.',
+      ],
+      tips: [
+        '<b>Easy</b> computer players pick trump loosely and play at random. <b>Strong</b> ones weigh their hands and play as a team. You can switch at any time.',
+        'Three trump cards, or two with a side ace, is usually enough to pick trump.',
+        'If your partner is already winning a trick, play your lowest card.',
+        'When your team picked trump, lead your highest trump to pull out the others’ trumps.',
+      ],
+    },
+    load: () => import('./euchre'),
   },
 ];

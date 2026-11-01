@@ -55,3 +55,12 @@ export const heartIcon = svg(
 export const spadeIcon = svg(
   '<path d="M24 4C34 14 43 21 43 29a8.5 8.5 0 0 1-15.5 4.8L30 44H18l2.5-10.2A8.5 8.5 0 0 1 5 29C5 21 14 14 24 4Z" fill="#6c63ff"/>',
 );
+
+/** Two cards side by side: a red diamond and a purple club, for a partners' game. */
+export const pairIcon = svg(
+  '<rect x="3" y="8" width="20" height="30" rx="3" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<path d="M13 15 19 23 13 31 7 23Z" fill="#ef5f58"/>' +
+    '<rect x="25" y="8" width="20" height="30" rx="3" fill="#6c63ff"/>' +
+    '<circle cx="35" cy="18.5" r="3.6" fill="#ffffff"/><circle cx="31" cy="24" r="3.6" fill="#ffffff"/>' +
+    '<circle cx="39" cy="24" r="3.6" fill="#ffffff"/><path d="M33.6 24 32.5 31h5l-1.1-7Z" fill="#ffffff"/>',
+);
