@@ -135,3 +135,12 @@ export const fanIcon = svg(
     '<rect x="22" y="10" width="20" height="28" rx="3" fill="#6c63ff" transform="rotate(14 32 24)"/>' +
     '<path d="M18 16h12M18 22h12M18 28h8" stroke="#ef5f58" stroke-width="3" stroke-linecap="round"/>',
 );
+
+/** A domino tile: a 6 and a 3. */
+export const dominoIcon = svg(
+  '<rect x="4" y="13" width="40" height="22" rx="4" fill="#ffffff" stroke="#6c63ff" stroke-width="2.5"/>' +
+    '<path d="M24 16v16" stroke="#6c63ff" stroke-width="2"/>' +
+    [[10, 19], [18, 19], [10, 24], [18, 24], [10, 29], [18, 29], [29, 19], [34, 24], [39, 29]]
+      .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" fill="#ef5f58"/>`)
+      .join(''),
+);

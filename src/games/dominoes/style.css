@@ -1,0 +1,111 @@
+/* Tiles are flat: two halves with solid pips and a bar between. The line of play wraps
+   onto new rows; its two open ends are outlined. */
+.dom-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.dom-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.dom-count {
+  color: var(--muted);
+}
+
+.dom-line,
+.dom-hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.dom-line {
+  min-height: 34px;
+}
+
+.dom-hand {
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+}
+
+.dom-tile {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px;
+  border: 2px solid var(--dom-edge);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}
+
+.dom-tile svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+  fill: var(--text);
+}
+
+.dom-bar {
+  align-self: stretch;
+  width: 2px;
+  margin: 3px 0;
+  background: var(--dom-edge);
+}
+
+.dom-hand .dom-tile svg {
+  width: 34px;
+  height: 34px;
+}
+
+.dom-tile.small svg {
+  width: 22px;
+  height: 22px;
+}
+
+.dom-tile.end {
+  outline: 3px solid var(--text);
+  outline-offset: 1px;
+}
+
+button.dom-tile {
+  cursor: pointer;
+}
+
+button.dom-tile:disabled {
+  cursor: default;
+}
+
+.dom-tile.lift {
+  transform: translateY(-6px);
+}
+
+.dom-tile.picked {
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.dom-empty {
+  color: var(--muted);
+}
+
+.dom-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.dom {
+  --dom-edge: #6e6690;
+}
+
+@media (prefers-color-scheme: dark) {
+  .dom {
+    --dom-edge: #a29fb8;
+  }
+}

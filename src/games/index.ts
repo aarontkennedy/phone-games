@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -399,5 +399,29 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./gin'),
+  },
+  {
+    id: 'dominoes',
+    title: 'Dominoes',
+    description: 'Match ends and play out your tiles',
+    icon: dominoIcon,
+    howToPlay: {
+      goal: 'Be first to play all your tiles. The first to 100 points wins the game.',
+      steps: [
+        'You and the computer each take 7 tiles. The rest stay face down in the <b>boneyard</b>.',
+        'The first player puts down any tile. After that, each tile must match a number at one of the two open ends of the line. The open ends are outlined.',
+        'Tiles you can play sit a little higher. Tap one to play it. If it fits both ends, you’re asked which end to use.',
+        'If nothing matches, tap <b>Draw</b> to take a tile from the boneyard. Keep drawing until you can play. If the boneyard is empty, tap <b>Pass</b>.',
+        'Play your last tile and you win the round, scoring the total pips (dots) on the computer’s tiles.',
+        'If neither of you can play, the player with fewer pips wins the round and scores the other’s pips.',
+        'The winner of a round starts the next one.',
+      ],
+      tips: [
+        '<b>Easy</b> plays any tile that fits. <b>Strong</b> plays heavy tiles first and tries to block you. You can switch at any time.',
+        'Play heavy tiles early: they cost you if the computer goes out first.',
+        'Keep a mix of numbers in your hand so you can match more ends.',
+      ],
+    },
+    load: () => import('./dominoes'),
   },
 ];
