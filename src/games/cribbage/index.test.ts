@@ -4,7 +4,7 @@ import appCss from '../../style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
 import { makeContainer, track } from '../../test/helpers';
-import { AI_DELAY, mount } from './index';
+import { AI_DELAY, holeAt, mount } from './index';
 import { nextStep, play, type State } from './logic';
 import { card, cards, pegging, pile } from './test-fixtures';
 
@@ -39,7 +39,8 @@ describe('Cribbage screen', () => {
   it('starts by asking for two cards for the crib', () => {
     const { $, $$, status } = setup(discarding());
     expect($$('[data-hand]:not([disabled])')).toHaveLength(6);
-    expect($$('.cb-who').map((w) => w.textContent)).toEqual(['You', 'Computer']);
+    expect($$('.stat small').map((w) => w.textContent)).toEqual(['You', 'Computer']); // each with its peg color
+    expect($$('.stat .cb-key')).toHaveLength(2);
     expect($('.cb-opponent').textContent).toContain('Computer · dealer');
     expect($$('.cb-opponent .card.back')).toHaveLength(6);
     expect($('[data-crib]').hidden).toBe(false);
@@ -122,11 +123,27 @@ describe('Cribbage screen', () => {
     expect(stored().phase).toBe('discard');
   });
 
-  it('shows scores on the track', () => {
-    const { $ } = setup(pegging(['5H', 'KS'], { scores: [60, 30] }));
-    expect($('[data-player="0"] .cb-bar').getAttribute('aria-label')).toBe('60 of 121');
-    expect($<HTMLElement>('[data-player="0"] .cb-bar > span').style.width).toMatch(/^49\.5/);
+  it('pegs the scores on the board, with a hollow back peg after each move', () => {
+    const { $, $$ } = setup(pegging(['5H', 'KS'], { scores: [60, 30], back: [52, 30] }));
+    expect($('.cb-board').getAttribute('aria-label')).toBe('Cribbage board. You 60, up from 52. Computer 30.');
+    expect($$('.cb-hole')).toHaveLength(2 * 122);
+    expect($$('.cb-peg.p0')).toHaveLength(2);
+    expect($$('.cb-peg.p1')).toHaveLength(1); // no move yet: one peg
+    const [back, front] = $$('.cb-peg.p0');
+    expect(back.classList.contains('back')).toBe(true);
+    expect([front.getAttribute('cx'), front.getAttribute('cy')]).toEqual(holeAt(60, 45).map(String));
     expect($('[data-score="1"]').textContent).toBe('30');
+    expect(setup(pegging(['5H', 'KS'], { scores: [3, 0], back: undefined })).$$('.cb-peg')).toHaveLength(2);
+  });
+
+  it('runs the holes back and forth from start to finish', () => {
+    expect(holeAt(0, 9)).toEqual([8, 9]);
+    expect(holeAt(1, 9)).toEqual([22, 9]);
+    expect(holeAt(40, 9)[1]).toBe(9);
+    expect(holeAt(41, 9)).toEqual([holeAt(40, 9)[0], 18]); // turns the corner
+    expect(holeAt(80, 9)).toEqual([22, 18]);
+    expect(holeAt(120, 9)).toEqual([holeAt(40, 9)[0], 27]);
+    expect(holeAt(121, 9)).toEqual([395, 27]);
   });
 
   it('switches Easy and Strong without restarting, and New starts over', () => {
@@ -163,10 +180,11 @@ describe('Cribbage colors', () => {
   it.each([
     ['light', cb.light, app.light],
     ['dark', cb.dark, app.dark],
-  ])('score bars stand out in the %s theme (3:1)', (_name, t, a) => {
+  ])('pegs and holes stand out in the %s theme (3:1)', (_name, t, a) => {
     for (const fill of ['cb-you', 'cb-them']) {
       expect(contrast(t[fill], a.board), `${fill} on the table`).toBeGreaterThanOrEqual(3);
-      expect(contrast(t[fill], t['cb-track']), `${fill} on its track`).toBeGreaterThanOrEqual(3);
+      expect(contrast(t[fill], t['cb-track']), `${fill} on the peg board`).toBeGreaterThanOrEqual(3);
     }
+    expect(contrast(t['cb-hole'], t['cb-track']), 'holes on the peg board').toBeGreaterThanOrEqual(3);
   });
 });

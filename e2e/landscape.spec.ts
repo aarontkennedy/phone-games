@@ -108,7 +108,7 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
-    test('Cribbage: score track and cards on the left, side bar on the right', async ({ page }) => {
+    test('Cribbage: peg board and cards on the left, side bar on the right', async ({ page }) => {
       await page.goto('./#/cribbage');
       await expectSideBarLayout(page);
     });

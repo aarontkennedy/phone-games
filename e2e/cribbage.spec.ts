@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 
 test('the table fits the phone and reads without glasses', async ({ page }) => {
   await expect(page.locator('[data-hand]')).toHaveCount(6);
-  await expect(page.locator('.cb-track')).toHaveCount(2);
+  await expect(page.locator('.cb-board')).toBeVisible();
   await expectNoHorizontalOverflow(page);
   await expectTouchTargets(page);
   await expectReadableText(page);

@@ -151,6 +151,14 @@ describe('pegging', () => {
     expect(n.turn).toBe(1);
   });
 
+  it('moves the back peg to where the score was, like a real board', () => {
+    const n = play(pegging(['KH 2D', '5S 9S'], { pile: pile(1, '5C'), scores: [10, 7], back: [4, 3] }), 0, card('KH'))!;
+    expect(n.scores).toEqual([12, 7]);
+    expect(n.back).toEqual([10, 3]); // only the scorer's pegs move
+    const old = play(pegging(['KH 2D', '5S 9S'], { pile: pile(1, '5C'), scores: [10, 7], back: undefined }), 0, card('KH'))!;
+    expect(old.back).toEqual([10, 7]); // a save from before back pegs
+  });
+
   it('keeps playing when the other player says go', () => {
     const s = pegging(['AH 2D', 'KS'], { pile: pile(1, 'QC JC 5C') }); // 25: the king won't fit
     const n = play(s, 0, card('AH'))!; // 26

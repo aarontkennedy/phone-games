@@ -46,6 +46,9 @@ export interface State {
   /** In the show: 0 is the non-dealer's hand, 1 the dealer's, 2 the crib. */
   showStep: number;
   scores: [number, number];
+  /** The back pegs: each player's score before their latest points, like the trailing
+   *  peg on a real board. Missing in saves from before the board had two pegs. */
+  back?: [number, number];
   /** What scored most recently. */
   events: Event[];
 }
@@ -133,6 +136,8 @@ export function legalPlays(s: State, p: Player): Card[] {
 /** Adds points, ending the game the moment someone reaches 121. */
 function award(n: State, player: Player, items: ScoreItem[]): boolean {
   if (!items.length) return false;
+  n.back = [...(n.back ?? n.scores)];
+  n.back[player] = n.scores[player];
   n.scores[player] = Math.min(GAME_POINTS, n.scores[player] + total(items));
   n.events.push({ player, items });
   if (n.scores[player] >= GAME_POINTS) {
@@ -145,10 +150,10 @@ function award(n: State, player: Player, items: ScoreItem[]): boolean {
 // --- The hand ---
 
 export function newGame(level: Level = 'strong', rng: Rng = Math.random): State {
-  return deal({ level, dealer: 1, scores: [0, 0] }, rng);
+  return deal({ level, dealer: 1, scores: [0, 0], back: [0, 0] }, rng);
 }
 
-function deal(base: Pick<State, 'level' | 'dealer' | 'scores'>, rng: Rng): State {
+function deal(base: Pick<State, 'level' | 'dealer' | 'scores' | 'back'>, rng: Rng): State {
   const deck = shuffledDeck(rng);
   return {
     ...base,
@@ -234,7 +239,7 @@ function scoreShowStep(n: State) {
 /** Moves the show on to the next hand, then deals again with the other dealer. */
 export function nextStep(s: State, rng: Rng = Math.random): State | null {
   if (s.phase !== 'show') return null;
-  if (s.showStep === 2) return deal({ level: s.level, dealer: other(s.dealer), scores: s.scores }, rng);
+  if (s.showStep === 2) return deal({ level: s.level, dealer: other(s.dealer), scores: s.scores, back: s.back }, rng);
   const n = clone(s);
   n.showStep++;
   scoreShowStep(n);
@@ -323,6 +328,7 @@ export function isValidState(s: unknown): s is State {
     Number.isInteger(st.showStep) &&
     Array.isArray(st.scores) &&
     st.scores.length === 2 &&
+    (st.back === undefined || (Array.isArray(st.back) && st.back.length === 2 && st.back.every(Number.isInteger))) &&
     Array.isArray(st.events) &&
     isFullDeck([
       ...st.hands.flat(),

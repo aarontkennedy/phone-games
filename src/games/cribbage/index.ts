@@ -36,6 +36,32 @@ function describe(items: ScoreItem[]): string {
 
 const whose = (p: Player) => (p === 0 ? 'Your' : 'The computer’s');
 
+// The peg board. Each player's track is three rows of 40 holes in fives, snaking back
+// and forth from a start hole on the left to the finish hole (121). Computer on top.
+const HOLE = 8.5;
+const GROUP = 4;
+const ROW = 9;
+const BOARD_W = 402;
+const BOARD_H = 72;
+const BOARD_TOPS = [45, 9]; // you, computer
+const holeX = (col: number) => 22 + col * HOLE + Math.floor(col / 5) * GROUP;
+
+/** Where a peg sits for a score: 0 is the start hole, 121 the finish. */
+export function holeAt(score: number, top: number): [number, number] {
+  if (score <= 0) return [8, top];
+  if (score >= GAME_POINTS) return [BOARD_W - 7, top + 2 * ROW];
+  const row = Math.floor((score - 1) / 40);
+  const col = (score - 1) % 40;
+  return [holeX(row % 2 ? 39 - col : col), top + row * ROW];
+}
+
+const HOLES = BOARD_TOPS.map((top) =>
+  Array.from({ length: GAME_POINTS + 1 }, (_, score) => {
+    const [x, y] = holeAt(score, top);
+    return `<circle class="cb-hole" cx="${x}" cy="${y}" r="${score === 0 || score === GAME_POINTS ? 2 : 1.3}"/>`;
+  }).join(''),
+).join('');
+
 export function mount(container: HTMLElement): () => void {
   const saved = load<unknown>(STATE_KEY, null);
   let state: State = isValidState(saved) ? saved : newGame();
@@ -45,9 +71,9 @@ export function mount(container: HTMLElement): () => void {
   container.innerHTML = `
     <div class="screen cards cb">
       <div class="stats">
-        <div class="stat"><small>You</small><b data-score="0"></b></div>
+        <div class="stat"><small><i class="cb-key p0" aria-hidden="true"></i>You</small><b data-score="0"></b></div>
         <button class="btn" data-new>New</button>
-        <div class="stat"><small>Computer</small><b data-score="1"></b></div>
+        <div class="stat"><small><i class="cb-key p1" aria-hidden="true"></i>Computer</small><b data-score="1"></b></div>
       </div>
       <div class="board-frame cb-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
@@ -87,17 +113,25 @@ export function mount(container: HTMLElement): () => void {
 
   // --- Rendering ---
 
-  function scoreTrack(): string {
-    return [0, 1]
+  /** The peg board: each player's two pegs, the back one hollow, so you see every move. */
+  function pegBoard(): string {
+    const pegs = ([1, 0] as const).map((p) => {
+      const front = state.scores[p];
+      const back = state.back?.[p] ?? front;
+      const top = BOARD_TOPS[p];
+      const [fx, fy] = holeAt(front, top);
+      const [bx, by] = holeAt(back, top);
+      return (back === front ? '' : `<circle class="cb-peg back p${p}" cx="${bx}" cy="${by}" r="3"/>`) +
+        `<circle class="cb-peg p${p}" cx="${fx}" cy="${fy}" r="3.6"/>`;
+    });
+    const label = ([0, 1] as const)
       .map((p) => {
-        const pts = state.scores[p];
-        return `<div class="cb-track" data-player="${p}">
-          <span class="cb-who">${PLAYER_NAMES[p]}</span>
-          <span class="cb-bar" role="img" aria-label="${pts} of ${GAME_POINTS}"><span style="width:${(pts / GAME_POINTS) * 100}%"></span></span>
-          <b class="cb-pts">${pts}</b>
-        </div>`;
+        const back = state.back?.[p] ?? state.scores[p];
+        return `${PLAYER_NAMES[p]} ${state.scores[p]}${back !== state.scores[p] ? `, up from ${back}` : ''}`;
       })
-      .join('');
+      .join('. ');
+    return `<svg class="cb-board" viewBox="0 0 ${BOARD_W} ${BOARD_H}" role="img" aria-label="Cribbage board. ${label}.">
+      <path class="cb-divider" d="M4 ${BOARD_H / 2}H${BOARD_W - 4}"/>${HOLES}${pegs.join('')}</svg>`;
   }
 
   function middle(): string {
@@ -147,7 +181,7 @@ export function mount(container: HTMLElement): () => void {
     const playable = state.phase === 'discard' ? ('all' as const) : state.phase === 'pegging' && state.turn === 0 ? legalPlays(state, 0) : [];
     const hand = state.phase === 'show' || state.phase === 'gameOver' ? state.kept[0] : state.hands[0];
     boardEl.innerHTML = `
-      <div class="cb-scores">${scoreTrack()}</div>
+      ${pegBoard()}
       ${opponent()}
       <div class="cb-middle">${middle()}</div>
       ${hand.length ? handHtml(hand, { playable: state.phase === 'show' ? [] : playable, picked }) : `<div class="tt-hand">${cardSlot()}</div>`}`;

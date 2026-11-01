@@ -1,4 +1,4 @@
-/* The table, top to bottom: the score track, the computer's hand, then the starter, crib
+/* The table, top to bottom: the peg board, the computer's hand, then the starter, crib
    and pegging count, then your hand. Sized to fit beside the side bar when sideways. */
 .cb-table {
   display: flex;
@@ -8,33 +8,61 @@
   touch-action: manipulation;
 }
 
-.cb-track {
-  display: grid;
-  grid-template-columns: 5.5em minmax(0, 1fr) 2.2em;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.cb-bar {
-  height: 12px;
-  border-radius: 6px;
-  background: var(--cb-track);
-  overflow: hidden;
-}
-
-.cb-bar > span {
+/* The peg board: flat holes in fives, solid pegs for the scores, hollow back pegs. */
+.cb-board {
   display: block;
-  height: 100%;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  background: var(--cb-track);
+}
+
+.cb-hole {
+  fill: var(--cb-hole);
+}
+
+.cb-divider {
+  stroke: var(--cb-hole);
+  stroke-width: 1;
+}
+
+.cb-peg.p0 {
+  fill: var(--cb-you);
+}
+
+.cb-peg.p1 {
+  fill: var(--cb-them);
+}
+
+.cb-peg.back {
+  fill: var(--cb-track);
+  stroke-width: 1.6;
+}
+
+.cb-peg.back.p0 {
+  stroke: var(--cb-you);
+}
+
+.cb-peg.back.p1 {
+  stroke: var(--cb-them);
+}
+
+/* A peg-colored dot by each name in the score row: the board's key. */
+.cb-key {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 50%;
+  vertical-align: 0;
+}
+
+.cb-key.p0 {
   background: var(--cb-you);
 }
 
-[data-player='1'] .cb-bar > span {
+.cb-key.p1 {
   background: var(--cb-them);
-}
-
-.cb-pts {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
 .cb-opponent {
@@ -86,6 +114,7 @@
   --cb-you: #5b4fd6;
   --cb-them: #9a4100;
   --cb-track: #f4f1fb;
+  --cb-hole: #7d7796;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -93,5 +122,6 @@
     --cb-you: #9d94ff;
     --cb-them: #ffb347;
     --cb-track: #221f33;
+    --cb-hole: #8a84a6;
   }
 }

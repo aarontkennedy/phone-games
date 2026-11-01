@@ -204,6 +204,7 @@ export const games: GameMeta[] = [
         '<b>The show:</b> each hand is counted with the starter. The non-dealer counts first, then the dealer, then the crib. Tap <b>Next</b> to move on.',
         'Hands score 2 for each set of cards adding to 15, 2 for each pair, 1 per card in each run, 4 for four cards of one suit (5 with the starter), and 1 for <b>nobs</b>: the jack of the starter’s suit.',
         'The line under the table always tells you what just scored and why.',
+        'Scores are pegged on the <b>board</b> at the top: your track is the lower one, in purple; the computer’s is above, in orange. Each player has two pegs. The solid peg is the score, and the hollow peg shows where it was before the last points, so you can see each move. The first peg to reach the last hole wins.',
       ],
       tips: [
         '<b>Easy</b> plays at random. <b>Strong</b> picks the best cards to keep and pegs carefully. You can switch at any time.',
