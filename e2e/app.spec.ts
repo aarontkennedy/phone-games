@@ -32,7 +32,7 @@ test.beforeEach(({ page }) => failOnErrors(page));
 test('home groups the games, and shows the most played once you’ve played', async ({ page }) => {
   await page.goto('./');
   const groups = page.locator('.home-group h2');
-  await expect(groups).toHaveText(['Card games', 'Solitaire and puzzles', 'Board games', 'Dice and tiles']);
+  await expect(groups).toHaveText(['Card games', 'Puzzles', 'Board games', 'Dice and tiles']);
   await expectNoHorizontalOverflow(page);
   await expectReadableText(page);
 

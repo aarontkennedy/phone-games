@@ -59,7 +59,7 @@ export const games: GameMeta[] = [
     title: 'Solitaire',
     description: 'Sort the deck into four suit piles',
     icon: cardsIcon,
-    category: 'puzzles',
+    category: 'cards',
     howToPlay: {
       goal: 'Move all 52 cards onto the four piles at the top right, one pile per suit, from ace up to king.',
       steps: [
@@ -324,7 +324,7 @@ export const games: GameMeta[] = [
     title: 'Free Cells',
     description: 'Solitaire with every card face up',
     icon: freeCellsIcon,
-    category: 'puzzles',
+    category: 'cards',
     howToPlay: {
       goal: 'Move all 52 cards onto the four piles at the top right, one pile per suit, from ace up to king.',
       steps: [
@@ -546,7 +546,7 @@ export const games: GameMeta[] = [
     title: 'Spider Solitaire',
     description: 'Build King-to-Ace runs in ten columns',
     icon: spiderIcon,
-    category: 'puzzles',
+    category: 'cards',
     howToPlay: {
       goal: 'Clear the table by building eight runs from King down to Ace, each all one suit.',
       steps: [
