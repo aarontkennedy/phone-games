@@ -1,0 +1,60 @@
+/* Seven columns of six round spaces. Your discs are purple, the computer's orange. */
+.fir-board {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.fir-col {
+  display: grid;
+  grid-template-rows: repeat(6, auto);
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  cursor: pointer;
+}
+
+.fir-col:disabled {
+  cursor: default;
+}
+
+.fir-space {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.fir-space.p0 {
+  background: var(--fir-you);
+}
+
+.fir-space.p1 {
+  background: var(--fir-computer);
+}
+
+/* The winning four, and the last disc dropped: marked by a ring, not color alone. */
+.fir-space.win {
+  outline: 4px solid var(--text);
+  outline-offset: -4px;
+}
+
+.fir-space.last:not(.win) {
+  outline: 3px solid var(--surface);
+  outline-offset: -7px;
+}
+
+.fir {
+  --fir-you: #5b4fd6;
+  --fir-computer: #9a4100;
+}
+
+@media (prefers-color-scheme: dark) {
+  .fir {
+    --fir-you: #9d94ff;
+    --fir-computer: #ffb347;
+  }
+}

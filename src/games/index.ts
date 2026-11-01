@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, chipIcon, gridIcon, heartIcon, mineIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, chipIcon, discsIcon, gridIcon, heartIcon, mineIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -234,5 +234,27 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./tictactoe'),
+  },
+  {
+    id: 'fourinarow',
+    title: 'Four in a Row',
+    description: 'Drop discs to line up four',
+    icon: discsIcon,
+    howToPlay: {
+      goal: 'Get four of your discs in a line: across, up and down, or diagonally.',
+      steps: [
+        'Your discs are <b>purple</b>. The computer’s are <b>orange</b>. You take turns.',
+        'Tap a column to drop a disc. It falls to the lowest empty space in that column.',
+        'The first to make a line of four wins. If the board fills up with no line, it’s a draw.',
+        'The last disc dropped has a ring, so you can see the computer’s move. A winning line gets a thick outline.',
+        'Tap <b>New</b> for another round. Who goes first switches each round.',
+      ],
+      tips: [
+        '<b>Easy</b> plays loosely. <b>Strong</b> looks several moves ahead. You can switch at any time.',
+        'The middle column is part of the most possible lines. Start there.',
+        'Watch for three in a row with an open space at either end, and block it.',
+      ],
+    },
+    load: () => import('./fourinarow'),
   },
 ];

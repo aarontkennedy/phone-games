@@ -80,3 +80,12 @@ export const gridIcon = svg(
     '<path d="M8 8l6 6M14 8l-6 6" stroke="#ef5f58" stroke-width="3" stroke-linecap="round"/>' +
     '<circle cx="36" cy="36" r="4" fill="none" stroke="#ef5f58" stroke-width="3"/>',
 );
+
+/** A four-in-a-row board: a purple line of four among orange discs. */
+export const discsIcon = svg(
+  '<rect x="3" y="7" width="42" height="34" rx="5" fill="#6c63ff"/>' +
+    [0, 1, 2, 3]
+      .flatMap((r) => [0, 1, 2, 3].map((c) => ({ r, c })))
+      .map(({ r, c }) => `<circle cx="${10.5 + c * 9}" cy="${13 + r * 7.5}" r="3" fill="${r === 3 - c ? '#ef5f58' : '#ffffff'}"/>`)
+      .join(''),
+);
