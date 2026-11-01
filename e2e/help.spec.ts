@@ -21,6 +21,8 @@ const GAMES = [
   { id: 'dominoes', title: 'Dominoes' },
   { id: 'yacht', title: 'Yacht' },
   { id: 'reversi', title: 'Reversi' },
+  { id: 'mancala', title: 'Mancala' },
+  { id: 'hangman', title: 'Hangman' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));

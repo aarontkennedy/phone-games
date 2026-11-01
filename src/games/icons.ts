@@ -161,3 +161,21 @@ export const reversiIcon = svg(
     '<circle cx="14" cy="14" r="7" fill="#9d94ff"/><circle cx="34" cy="34" r="7" fill="#9d94ff"/>' +
     '<circle cx="34" cy="14" r="7" fill="#ffb347"/><circle cx="14" cy="34" r="7" fill="#ffb347"/>',
 );
+
+/** A mancala board: two rows of pits between two long stores, a few seeds showing. */
+export const mancalaIcon = svg(
+  '<rect x="2" y="12" width="44" height="24" rx="12" fill="#6c63ff"/>' +
+    '<rect x="5" y="16" width="6" height="16" rx="3" fill="#ffffff"/><rect x="37" y="16" width="6" height="16" rx="3" fill="#ffffff"/>' +
+    [14, 20.5, 27, 33.5]
+      .flatMap((x) => [`<circle cx="${x}" cy="19.5" r="2.6" fill="#ffffff"/>`, `<circle cx="${x}" cy="28.5" r="2.6" fill="#ffffff"/>`])
+      .join('') +
+    '<circle cx="20.5" cy="28.5" r="1.2" fill="#ef5f58"/><circle cx="33.5" cy="19.5" r="1.2" fill="#ef5f58"/>',
+);
+
+/** A gallows with a figure, and two letter blanks below. */
+export const hangmanIcon = svg(
+  '<path d="M6 38H24M11 38V6H30V11" fill="none" stroke="#6c63ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<circle cx="30" cy="15" r="4" fill="none" stroke="#ef5f58" stroke-width="2.5"/>' +
+    '<path d="M30 19V29M30 22L25 26M30 22L35 26M30 29L26 35M30 29L34 35" fill="none" stroke="#ef5f58" stroke-width="2.5" stroke-linecap="round"/>' +
+    '<path d="M30 43H36M39 43H45" stroke="#6c63ff" stroke-width="3" stroke-linecap="round"/>',
+);

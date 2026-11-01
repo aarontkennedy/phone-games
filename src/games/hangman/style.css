@@ -1,0 +1,88 @@
+/* The gallows above the word. Letters you've found sit on a line; when a round is lost,
+   the missing letters appear with a dashed box. The A-Z keys sit in the controls, under
+   your thumb: right guesses turn orange, wrong ones are crossed out. */
+.hm-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.hm-art {
+  width: min(160px, 45%);
+  height: auto;
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hm-word {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hm-letter {
+  display: grid;
+  place-items: center;
+  width: 1.3em;
+  height: 1.5em;
+  border-bottom: 3px solid var(--text);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.hm-letter.missed {
+  border: 2px dashed var(--text);
+  border-radius: var(--radius-sm);
+}
+
+.controls > .hm-keys {
+  flex-basis: 100%;
+}
+
+.hm-keys {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.hm-keys .btn {
+  padding: 0;
+}
+
+.hm-keys .btn.hm-right {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.hm-keys .btn.hm-wrong {
+  background: var(--surface-2);
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.hm-keys .btn:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+.hm-keys .hm-next {
+  grid-column: 1 / -1;
+}
+
+/* Sideways, nine keys a row keeps the side bar short enough to fit. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .hm-keys {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+
+  .hm-art {
+    width: min(140px, 40%);
+  }
+}

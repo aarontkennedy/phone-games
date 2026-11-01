@@ -29,6 +29,8 @@ protected list. Add to that list when you learn of a new one.
 | Connect Four | Four in a Row | Connect Four |
 | Farkle | Hot Dice | Farkle (possibly a trademark; kept off to be safe) |
 | Othello | Reversi | Othello |
+| Kalah (a mancala game) | Mancala | Kalah (an old trade name) |
+| UNO | Don't build one; Crazy Eights covers it | UNO, and its card design |
 | Chess, Checkers, Cribbage, Blackjack, Spades, Hearts, Euchre, Dominoes, Gin Rummy | Same. These are generic. | Brand names of specific apps |
 | Falling-block puzzles | Don't build one | Tetris (its owners actively enforce its look and name) |
 

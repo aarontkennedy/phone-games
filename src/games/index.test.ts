@@ -25,6 +25,7 @@ const PROTECTED_NAMES = [
   'othello',
   'yatzy',
   'yatz',
+  'kalah',
 ];
 
 describe('game registry', () => {

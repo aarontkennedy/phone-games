@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -471,5 +471,50 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./reversi'),
+  },
+  {
+    id: 'mancala',
+    title: 'Mancala',
+    description: 'Sow seeds around the board and fill your store',
+    icon: mancalaIcon,
+    howToPlay: {
+      goal: 'Finish with more seeds in your store than the computer has in its store.',
+      steps: [
+        'The board has two rows of six pits. The <b>bottom row is yours</b>, and your <b>store</b> is the long pit on the right. The computer has the top row and the store on the left. Every pit starts with 4 seeds.',
+        'On your turn, tap one of your pits. All its seeds are picked up and dropped one at a time into the pits that follow, going right along your row, into your store, then left along the computer’s row. The computer’s store is skipped.',
+        'If your last seed lands in <b>your store</b>, you get another turn.',
+        'If your last seed lands in an <b>empty pit on your side</b>, and the computer’s pit straight across has seeds, you <b>capture</b> them: both go into your store.',
+        'The game ends when either row is empty. The seeds still in the other row go to that player’s store. The most seeds wins.',
+        'The pit just played has a dashed ring, and where its last seed landed has a solid ring. Tap <b>New</b> for another round. Who goes first switches each round.',
+      ],
+      tips: [
+        '<b>Easy</b> often plays at random. <b>Strong</b> looks several moves ahead. You can switch at any time.',
+        'A pit with exactly the right number of seeds to reach your store gives you a free turn. Count before you tap.',
+        'Watch for empty pits on the computer’s side across from your full ones: they’re at risk of capture.',
+      ],
+    },
+    load: () => import('./mancala'),
+  },
+  {
+    id: 'hangman',
+    title: 'Hangman',
+    description: 'Guess the word one letter at a time',
+    icon: hangmanIcon,
+    howToPlay: {
+      goal: 'Find the hidden word before the figure is finished.',
+      steps: [
+        'Each blank line is one letter of a hidden word.',
+        'Tap a letter at the bottom to guess it. If it’s in the word, it appears in every place it belongs, and the key turns orange.',
+        'If it isn’t, the key is crossed out and another part of the figure is drawn.',
+        'Fill in the whole word to win. Six wrong guesses complete the figure and end the round, and the word is shown.',
+        'Tap <b>Next word</b> or <b>New</b> for another word. <b>Streak</b> counts the words you’ve found in a row.',
+      ],
+      tips: [
+        'Start with common letters: E, A, R, I, O, T, N and S.',
+        'Once a few letters show, think of words that fit the pattern.',
+        'Words are everyday things: food, animals, places and objects.',
+      ],
+    },
+    load: () => import('./hangman'),
   },
 ];

@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, seedRandom } from './helpers';
 
 // Browser checks for Tic-Tac-Toe, Four in a Row, Checkers, Number Place, Free Cells,
-// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht and Reversi: each fits the phone, reads without
+// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala and Hangman: each fits the phone, reads without
 // glasses, and plays a first move.
 
 test.beforeEach(async ({ page }) => {
@@ -126,4 +126,20 @@ test('Reversi: place a disc, the computer answers', async ({ page }) => {
   await expect(page.locator('[data-you]')).toHaveText('4');
   await expect(status(page)).toHaveText(/^Your turn/, { timeout: 5000 });
   await expect(page.locator('.rv-sq.last')).toHaveCount(1);
+});
+
+test('Mancala: sow from a pit, the computer answers', async ({ page }) => {
+  await page.goto('./#/mancala');
+  await expectGoodLayout(page);
+  await page.locator('[data-pit="0"]').click(); // 4 seeds: lands short of the store
+  await expect(status(page)).toHaveText(/^Your turn/, { timeout: 10_000 });
+  await expect(page.locator('.mc-pit.played, .mc-store.landed')).not.toHaveCount(0);
+});
+
+test('Hangman: right and wrong guesses mark the keys', async ({ page }) => {
+  await page.goto('./#/hangman');
+  await expectGoodLayout(page);
+  for (const letter of 'EAIOU') await page.locator(`[data-letter="${letter}"]`).click();
+  await expect(page.locator('.hm-right, .hm-wrong')).toHaveCount(5);
+  await expectGoodLayout(page);
 });
