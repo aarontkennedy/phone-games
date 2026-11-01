@@ -35,6 +35,7 @@ describe('About page', () => {
     expect(headings).toEqual(['iPhone or iPad', 'Android']);
     expect(main.textContent).toContain('Add to Home Screen');
     expect(main.textContent).toContain('Install app');
+    expect(main.textContent).toContain('Safari may clear them after a week'); // why installing matters
   });
 
   it('says what happens to your data', () => {

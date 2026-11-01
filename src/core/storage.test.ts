@@ -44,3 +44,15 @@ describe('storage', () => {
     expect(() => remove('x')).not.toThrow();
   });
 });
+
+describe('storageWorks', () => {
+  it('is true when saving works, and false when the browser refuses', async () => {
+    const { storageWorks } = await import('./storage');
+    expect(storageWorks()).toBe(true);
+    const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    expect(storageWorks()).toBe(false);
+    spy.mockRestore();
+  });
+});

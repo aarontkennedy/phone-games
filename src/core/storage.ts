@@ -27,3 +27,14 @@ export function remove(key: string): void {
     // Ignore.
   }
 }
+
+/** True if this browser keeps what we save (it may not in private mode, or with storage blocked). */
+export function storageWorks(): boolean {
+  try {
+    localStorage.setItem(`${PREFIX}test`, '1');
+    localStorage.removeItem(`${PREFIX}test`);
+    return true;
+  } catch {
+    return false;
+  }
+}

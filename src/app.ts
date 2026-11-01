@@ -1,4 +1,5 @@
 import { mountAbout } from './about';
+import { storageWorks } from './core/storage';
 import { closeConfirm } from './core/ui';
 import { reportProblem } from './report';
 import { openShareSheet, shareLinks } from './share';
@@ -37,6 +38,9 @@ export function homeGroups(games: GameMeta[]): string {
   });
   return (top.length ? group('most-played', 'Most played', top) : '') + sections.join('');
 }
+
+/** Shown on the home screen when the browser won't keep saved games. */
+const NOT_SAVING = `<p class="notice" role="status">This browser isn’t saving your games, so they’ll be lost when you close it. Turning off private browsing, or allowing website data in your browser’s settings, usually fixes this.</p>`;
 
 const list = (tag: string, items: string[]) => `<${tag}>${items.map((s) => `<li>${s}</li>`).join('')}</${tag}>`;
 
@@ -87,7 +91,7 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
         <a class="btn" href="${links.text}">Send a text</a>
         <a class="btn secondary" href="${links.email}">Send an email</a>
       </div>
-      <main class="home">${homeGroups(games)}</main>`;
+      <main class="home">${storageWorks() ? '' : NOT_SAVING}${homeGroups(games)}</main>`;
     const shareBtn = root.querySelector<HTMLButtonElement>('[data-share]')!;
     const menu = root.querySelector<HTMLElement>('[data-share-menu]')!;
     shareBtn.addEventListener('click', async () => {

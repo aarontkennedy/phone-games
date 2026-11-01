@@ -37,6 +37,8 @@ const html = `
 
   <p>From then on, open Games from its icon on your home screen. Open it once while
   you're online, and after that it works anywhere.</p>
+  <p>Adding it also keeps your saved games safe. If you only play in a Safari tab,
+  Safari may clear them after a week without a visit.</p>
 
   <p>To send Games to someone else, tap the <b>Share</b> button at the top of the home
   screen: three dots joined by lines. You can send it by text or email.</p>

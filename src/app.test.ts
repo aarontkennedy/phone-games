@@ -47,6 +47,19 @@ describe('startApp', () => {
     stop();
   });
 
+  it('warns on the home screen when the browser won’t save games', () => {
+    const ok = setup([game('a', vi.fn())]);
+    expect(ok.root.querySelector('.notice')).toBeNull();
+    ok.stop();
+    const spy = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+    const blocked = setup([game('a', vi.fn())]);
+    expect(blocked.root.querySelector('.notice')!.textContent).toContain('isn’t saving your games');
+    spy.mockRestore();
+    blocked.stop();
+  });
+
   it('groups games by kind, A to Z within each group', () => {
     const { root, stop } = setup([
       game('z', vi.fn(), 'board', 'Zebra'),

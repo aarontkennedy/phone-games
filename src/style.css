@@ -311,6 +311,15 @@ body {
   padding: var(--space-2) var(--space-4) var(--space-5);
 }
 
+/* A message at the top of the home screen, e.g. when games can't be saved. */
+.notice {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
 /* A group of games under a heading: Most played, then each kind of game. */
 .home-group + .home-group {
   margin-top: var(--space-5);
