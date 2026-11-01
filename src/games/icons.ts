@@ -112,3 +112,10 @@ export const freeCellsIcon = svg(
     '<rect x="14" y="27" width="20" height="16" rx="2.5" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
     '<path d="M24 31 28 35 24 39 20 35Z" fill="#ef5f58"/>',
 );
+
+/** A card showing an 8, drawn as two stacked rings. */
+export const eightIcon = svg(
+  '<rect x="10" y="4" width="28" height="40" rx="4" fill="#ffffff" stroke="#6c63ff" stroke-width="2.5"/>' +
+    '<circle cx="24" cy="17.5" r="5.5" fill="none" stroke="#ef5f58" stroke-width="3.5"/>' +
+    '<circle cx="24" cy="30" r="7" fill="none" stroke="#ef5f58" stroke-width="3.5"/>',
+);

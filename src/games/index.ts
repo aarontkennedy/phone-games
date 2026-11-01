@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, discsIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, discsIcon, eightIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -328,5 +328,28 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./freecells'),
+  },
+  {
+    id: 'crazyeights',
+    title: 'Crazy Eights',
+    description: 'Match suits or numbers; 8s are wild',
+    icon: eightIcon,
+    howToPlay: {
+      goal: 'Be the first to play all your cards. The first to 100 points wins the game.',
+      steps: [
+        'You play against three computer players: West, North and East. Everyone gets 5 cards, and one card is turned up to start the pile.',
+        'On your turn, play a card that matches the top card’s <b>suit</b> or its <b>number</b> (or picture). Cards you can play sit a little higher.',
+        '<b>8s are wild.</b> Play one at any time, then tap the suit everyone must play next.',
+        'If you can’t play, tap <b>Draw</b> (or the deck) to take a card. Keep drawing until you can play. If the deck runs out, tap <b>Pass</b>.',
+        'When someone plays their last card, they win the round and score points for every card left in the other hands: 50 for each 8, 10 for picture cards, 1 for aces, and the number for the rest.',
+        'Each seat shows how many cards it has left, its score and the last card it played.',
+      ],
+      tips: [
+        '<b>Easy</b> plays any card it can. <b>Strong</b> saves its 8s and picks suits it holds. You can switch at any time.',
+        'Save your 8s for when you have no other play, or to change the suit when someone is about to go out.',
+        'Get rid of high cards early: they count against you if someone else goes out.',
+      ],
+    },
+    load: () => import('./crazyeights'),
   },
 ];

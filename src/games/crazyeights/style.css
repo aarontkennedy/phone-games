@@ -1,0 +1,50 @@
+/* The deck, the top card, and the suit named by the last 8, between the seats and your hand. */
+.ce-middle {
+  display: flex;
+  align-items: end;
+  gap: var(--space-4);
+}
+
+.ce-pile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.ce-pile > .card {
+  width: 52px;
+}
+
+.ce-suit .suit,
+.ce-pick .suit {
+  width: 32px;
+  height: 32px;
+  fill: var(--text);
+}
+
+.ce-suit.red .suit,
+.ce-pick.red .suit {
+  fill: var(--ce-red);
+}
+
+.ce-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.ce-pick {
+  width: var(--tap);
+  padding: var(--space-1);
+}
+
+.ce {
+  --ce-red: #c62828;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ce {
+    --ce-red: #ff7070;
+  }
+}
