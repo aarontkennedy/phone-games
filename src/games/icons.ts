@@ -119,3 +119,11 @@ export const eightIcon = svg(
     '<circle cx="24" cy="17.5" r="5.5" fill="none" stroke="#ef5f58" stroke-width="3.5"/>' +
     '<circle cx="24" cy="30" r="7" fill="none" stroke="#ef5f58" stroke-width="3.5"/>',
 );
+
+/** Two flat dice. */
+export const diceIcon = svg(
+  '<rect x="4" y="12" width="22" height="22" rx="4" fill="#6c63ff"/>' +
+    '<circle cx="10" cy="18" r="2.2" fill="#ffffff"/><circle cx="15" cy="23" r="2.2" fill="#ffffff"/><circle cx="20" cy="28" r="2.2" fill="#ffffff"/>' +
+    '<rect x="22" y="20" width="22" height="22" rx="4" fill="#ef5f58"/>' +
+    '<circle cx="28" cy="26" r="2.2" fill="#ffffff"/><circle cx="38" cy="26" r="2.2" fill="#ffffff"/><circle cx="28" cy="36" r="2.2" fill="#ffffff"/><circle cx="38" cy="36" r="2.2" fill="#ffffff"/>',
+);

@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, discsIcon, eightIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, eightIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -351,5 +351,28 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./crazyeights'),
+  },
+  {
+    id: 'hotdice',
+    title: 'Hot Dice',
+    description: 'Roll, keep and bank to 10,000',
+    icon: diceIcon,
+    howToPlay: {
+      goal: 'Be the first to score 10,000 points, playing against the computer.',
+      steps: [
+        'On your turn, tap <b>Roll</b> to roll six dice.',
+        'Tap the dice you want to keep. You must keep at least one scoring die each roll.',
+        'Scoring: each <b>1</b> is 100 and each <b>5</b> is 50. Three of a kind is 100 times the number (three 1s are 1,000). Four, five or six of a kind are 1,000, 2,000 or 3,000. A 1 to 6 straight, or three pairs, is 1,500.',
+        'Then tap <b>Keep &amp; roll</b> to roll the dice you didn’t keep, or <b>Keep &amp; bank</b> to add this turn’s points to your score.',
+        'If a roll has nothing that scores, it’s a <b>bust</b>: you lose this turn’s points and the dice pass to the computer.',
+        'Keep all six dice and you get to roll all six again, still adding to this turn.',
+      ],
+      tips: [
+        '<b>Easy</b> plays loosely. <b>Strong</b> banks at good moments and keeps fewer dice to roll more. You can switch at any time.',
+        'The fewer dice you roll, the more likely a bust. With one or two dice left, banking is usually wise.',
+        'With a 1 and a 5, keeping just the 1 and rolling five dice often pays off.',
+      ],
+    },
+    load: () => import('./hotdice'),
   },
 ];
