@@ -179,3 +179,10 @@ export const hangmanIcon = svg(
     '<path d="M30 19V29M30 22L25 26M30 22L35 26M30 29L26 35M30 29L34 35" fill="none" stroke="#ef5f58" stroke-width="2.5" stroke-linecap="round"/>' +
     '<path d="M30 43H36M39 43H45" stroke="#6c63ff" stroke-width="3" stroke-linecap="round"/>',
 );
+
+/** Three overlapping columns of cards, like a spider solitaire table. */
+export const spiderIcon = svg(
+  [6, 18, 30]
+    .map((x, i) => [0, 1, 2].map((r) => `<rect x="${x}" y="${6 + r * 7 + i * 3}" width="12" height="17" rx="2" fill="${r === 2 ? '#6c63ff' : '#ffffff'}" stroke="#6c63ff" stroke-width="1.5"/>`).join(''))
+    .join('') + '<path d="M9 40h30" stroke="#ef5f58" stroke-width="3" stroke-linecap="round"/>',
+);

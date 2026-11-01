@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -540,5 +540,30 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./hangman'),
+  },
+  {
+    id: 'spider',
+    title: 'Spider Solitaire',
+    description: 'Build King-to-Ace runs in ten columns',
+    icon: spiderIcon,
+    category: 'puzzles',
+    howToPlay: {
+      goal: 'Clear the table by building eight runs from King down to Ace, each all one suit.',
+      steps: [
+        'Pick <b>1 suit</b> (easiest), <b>2 suits</b> or <b>4 suits</b> (hardest). Two decks are dealt into ten columns.',
+        'Tap a face-up card to move it onto a card one rank higher, in any column. A 7 can go on any 8. Tap a card in the middle of a column to move it with the cards below it, but only if they’re all one suit, counting down.',
+        'Any card, or run, can go into an empty column.',
+        'When a column’s face-up cards are gone, its next card turns over.',
+        'A complete King-to-Ace run of one suit leaves the table by itself. Finish all eight to win.',
+        'Out of moves? Tap the <b>deck</b> (top left) to deal one more card onto every column. You can’t deal while a column is empty.',
+        'Tap <b>Hint</b> for a suggested move, and <b>Undo</b> to take one back.',
+      ],
+      tips: [
+        'Build on cards of the same suit when you can: mixed-suit piles can’t be moved together.',
+        'An empty column is valuable. Use it to rearrange, rather than filling it with a single card.',
+        'Turn over face-down cards early, before dealing again.',
+      ],
+    },
+    load: () => import('./spider'),
   },
 ];

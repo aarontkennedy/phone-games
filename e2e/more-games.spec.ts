@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, seedRandom } from './helpers';
 
 // Browser checks for Tic-Tac-Toe, Four in a Row, Checkers, Number Place, Free Cells,
-// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala and Hangman: each fits the phone, reads without
+// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala, Hangman and Spider: each fits the phone, reads without
 // glasses, and plays a first move.
 
 test.beforeEach(async ({ page }) => {
@@ -141,5 +141,14 @@ test('Hangman: right and wrong guesses mark the keys', async ({ page }) => {
   await expectGoodLayout(page);
   for (const letter of 'EAIOU') await page.locator(`[data-letter="${letter}"]`).click();
   await expect(page.locator('.hm-right, .hm-wrong')).toHaveCount(5);
+  await expectGoodLayout(page);
+});
+
+test('Spider Solitaire: ten columns fit, the deck deals a card onto each', async ({ page }) => {
+  await page.goto('./#/spider');
+  await expectGoodLayout(page);
+  const faceUp = () => page.locator('.sp-col .card:not(.back)').count();
+  await page.locator('[data-deal]').click();
+  expect(await faceUp()).toBe(20);
   await expectGoodLayout(page);
 });

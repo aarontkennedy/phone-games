@@ -1,0 +1,55 @@
+/* Ten columns. Above them: the deck on the left and the eight finished runs on the right. */
+.sp {
+  --sp-gap: 3px;
+}
+
+.sp-board {
+  padding: var(--space-2);
+  container-type: inline-size;
+  touch-action: manipulation;
+}
+
+.sp-top,
+.sp-tableau {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: var(--sp-gap);
+  /* Card height from the board width, for overlapping cards in a column. */
+  --card-h: calc((100cqw - 9 * var(--sp-gap)) / 10 * 1.4);
+}
+
+.sp-done {
+  grid-column: 3 / -1;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: var(--sp-gap);
+}
+
+.sp-tableau {
+  margin-top: var(--space-3);
+  align-items: start;
+}
+
+.sp-col {
+  /* Face-up cards show the rank; fitColumns() can squeeze this for long columns. */
+  --peek-up: 9cqw;
+  display: flex;
+  flex-direction: column;
+}
+
+.sp-col > .card + .card {
+  margin-top: calc(var(--peek-up) - var(--card-h));
+}
+
+.sp-col > .card.back + .card {
+  margin-top: calc(3cqw - var(--card-h));
+}
+
+/* Ten columns make narrow cards: a tighter corner keeps "10" and its suit in view. */
+.sp .card {
+  padding: 1px 2px;
+}
+
+.sp .card-corner {
+  gap: 0;
+}
