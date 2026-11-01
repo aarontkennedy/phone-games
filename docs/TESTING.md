@@ -56,6 +56,24 @@ finishing with the right winner. A game that never finishes fails.
 They have already found real bugs: a Cribbage back peg that marked only the last part
 of a two-part score, and Hard number puzzles that sometimes had one extra given.
 
+## Reference tests
+
+`src/games/reference.test.ts` checks the rules against answers published elsewhere,
+because the other tests encode our own reading of the rules and would agree with a
+misunderstanding. It includes:
+
+- **Move counts ("perft")** from the start position for Checkers (7, 49, 302, 1,469,
+  7,361, 36,768) and Reversi (OEIS A124004: 4, 12, 56, 244, 1,396, 8,200). An exact
+  match means moves, forced jumps and flips follow the real rules.
+- **Cribbage:** the 29 and 28 hands, flush rules for hands and cribs, pegging, and the
+  known fact that no hand scores 19, 25, 26 or 27 (checked on 20,000 random hands).
+- **Number Place:** Wikipedia's example puzzle has exactly one answer, the published one.
+- **Scoring tables** for Hot Dice, Yacht, Spades and Blackjack hand values, and the 2048
+  merge rules.
+
+When a rule has common variants, the test names the one we chose. Add a reference test
+whenever a game has published numbers to check against.
+
 ## Rules
 
 1. **Separate logic from UI.** Each game has a `logic.ts` with no DOM access and a thin
