@@ -1,0 +1,107 @@
+/* The score card: upper boxes and the bonus on the left, lower boxes on the right. Filled
+   boxes are shaded; boxes you can pick show what they'd score. Dice sit in the controls,
+   under your thumb, and held dice lift with an outline. */
+.ya-card {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1);
+  padding: 6px;
+  touch-action: manipulation;
+}
+
+.ya-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.ya-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  min-height: var(--tap);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+  line-height: 1.15;
+  text-align: left;
+}
+
+.ya-box b {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.ya-box.open {
+  border: 2px solid var(--accent);
+  cursor: pointer;
+}
+
+.ya-box.open b {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.ya-box.filled {
+  background: var(--surface-2);
+}
+
+.ya-bonus {
+  border-style: dashed;
+}
+
+.controls > .ya-dice {
+  flex-basis: 100%;
+}
+
+.ya-dice {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+  max-width: 320px;
+}
+
+.ya-die {
+  aspect-ratio: 1;
+  padding: 6%;
+  border: 2px solid var(--ya-edge);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.ya-die:disabled {
+  cursor: default;
+}
+
+.ya-die svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--text);
+}
+
+.ya-die.held {
+  transform: translateY(-6px);
+  outline: 3px solid var(--text);
+  outline-offset: 2px;
+}
+
+.ya-roll {
+  flex: 1;
+}
+
+.ya {
+  --ya-edge: #6e6690;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ya {
+    --ya-edge: #a29fb8;
+  }
+}

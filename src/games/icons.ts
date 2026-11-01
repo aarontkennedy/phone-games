@@ -144,3 +144,20 @@ export const dominoIcon = svg(
       .map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2" fill="#ef5f58"/>`)
       .join(''),
 );
+
+/** Three dice in a row, the middle one held up with an outline. */
+export const yachtIcon = svg(
+  '<rect x="3" y="20" width="13" height="13" rx="3" fill="#6c63ff"/><circle cx="9.5" cy="26.5" r="1.8" fill="#ffffff"/>' +
+    '<rect x="17.5" y="12" width="13" height="13" rx="3" fill="#ef5f58"/>' +
+    '<circle cx="21" cy="15.5" r="1.8" fill="#ffffff"/><circle cx="24" cy="18.5" r="1.8" fill="#ffffff"/><circle cx="27" cy="21.5" r="1.8" fill="#ffffff"/>' +
+    '<rect x="32" y="20" width="13" height="13" rx="3" fill="#6c63ff"/><circle cx="35.5" cy="23.5" r="1.8" fill="#ffffff"/><circle cx="41.5" cy="29.5" r="1.8" fill="#ffffff"/>' +
+    '<path d="M8 40h32" stroke="#6c63ff" stroke-width="3" stroke-linecap="round"/>',
+);
+
+/** A 2x2 block of a reversi board: two purple and two orange discs. */
+export const reversiIcon = svg(
+  '<rect x="4" y="4" width="40" height="40" rx="4" fill="#4a4560"/>' +
+    '<path d="M24 4v40M4 24h40" stroke="#2b283a" stroke-width="2"/>' +
+    '<circle cx="14" cy="14" r="7" fill="#9d94ff"/><circle cx="34" cy="34" r="7" fill="#9d94ff"/>' +
+    '<circle cx="34" cy="14" r="7" fill="#ffb347"/><circle cx="14" cy="34" r="7" fill="#ffb347"/>',
+);

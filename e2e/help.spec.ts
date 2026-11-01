@@ -19,6 +19,8 @@ const GAMES = [
   { id: 'hotdice', title: 'Hot Dice' },
   { id: 'gin', title: 'Gin Rummy' },
   { id: 'dominoes', title: 'Dominoes' },
+  { id: 'yacht', title: 'Yacht' },
+  { id: 'reversi', title: 'Reversi' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));

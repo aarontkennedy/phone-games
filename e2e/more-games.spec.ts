@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, seedRandom } from './helpers';
 
 // Browser checks for Tic-Tac-Toe, Four in a Row, Checkers, Number Place, Free Cells,
-// Crazy Eights, Hot Dice, Gin Rummy and Dominoes: each fits the phone, reads without
+// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht and Reversi: each fits the phone, reads without
 // glasses, and plays a first move.
 
 test.beforeEach(async ({ page }) => {
@@ -103,4 +103,27 @@ test('Dominoes: lead a tile, the computer answers', async ({ page }) => {
   await expect(page.locator('.dom-line .dom-tile')).not.toHaveCount(0);
   await expect(status(page)).toHaveText(/Your turn|Nothing matches|wins|tie/, { timeout: 8000 });
   await expectGoodLayout(page);
+});
+
+test('Yacht: roll, hold a die, roll again and score a box', async ({ page }) => {
+  await page.goto('./#/yacht');
+  await expectGoodLayout(page);
+  await page.locator('[data-roll]').click();
+  await expect(page.locator('[data-roll]')).toHaveText('Roll (2 left)');
+  await page.locator('[data-die="0"]').click();
+  await expect(page.locator('[data-die="0"]')).toHaveAttribute('aria-pressed', 'true');
+  await expectGoodLayout(page);
+  await page.locator('[data-roll]').click();
+  await page.locator('[data-box="chance"]').click();
+  await expect(page.locator('[data-box="chance"]')).toHaveClass(/filled/);
+  await expect(status(page)).toHaveText('Turn 2 of 13. Tap Roll.');
+});
+
+test('Reversi: place a disc, the computer answers', async ({ page }) => {
+  await page.goto('./#/reversi');
+  await expectGoodLayout(page);
+  await page.locator('.rv-sq.target').first().click();
+  await expect(page.locator('[data-you]')).toHaveText('4');
+  await expect(status(page)).toHaveText(/^Your turn/, { timeout: 5000 });
+  await expect(page.locator('.rv-sq.last')).toHaveCount(1);
 });

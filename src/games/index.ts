@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -423,5 +423,52 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./dominoes'),
+  },
+  {
+    id: 'yacht',
+    title: 'Yacht',
+    description: 'Roll five dice to fill a score card',
+    icon: yachtIcon,
+    howToPlay: {
+      goal: 'Score as many points as you can by filling all 13 boxes on the score card.',
+      steps: [
+        'Each turn, tap <b>Roll</b> to roll five dice. You get up to three rolls.',
+        'Between rolls, tap any dice you want to keep. Held dice lift up with an outline and stay put when you roll again. Tap one again to let it go.',
+        'When you’re happy, or out of rolls, tap a box on the score card. Each empty box shows what your dice would score there. Every box is used once, so 13 turns fill the card.',
+        'Left column: <b>Ones</b> to <b>Sixes</b> score the dice showing that number (three 4s in Fours is 12). Reach 63 or more there for a <b>35 point bonus</b>.',
+        'Right column: <b>3 of a kind</b> and <b>4 of a kind</b> score all five dice. <b>Full house</b> (three of one number and two of another) is 25. <b>Small straight</b> (four in a row, like 2 3 4 5) is 30. <b>Large straight</b> (five in a row) is 40. <b>Yacht</b> (all five the same) is 50. <b>Chance</b> scores all five dice, whatever they are.',
+        'If no box suits your dice, you must still pick one, even if it scores 0.',
+      ],
+      tips: [
+        'Each extra yacht after a 50 in Yacht earns 100 bonus points. It must go in the matching box on the left if that’s empty; otherwise use any box on the right, where it counts as a full house or straight.',
+        'Aim for three of each number on the left: that’s exactly 63, enough for the bonus.',
+        'Save Chance for a bad turn, and use 0 in Yacht or Ones when you have to give something up.',
+      ],
+    },
+    load: () => import('./yacht'),
+  },
+  {
+    id: 'reversi',
+    title: 'Reversi',
+    description: 'Trap and flip discs to own the board',
+    icon: reversiIcon,
+    howToPlay: {
+      goal: 'Have more discs of your color on the board than the computer when the game ends.',
+      steps: [
+        'Your discs are <b>purple</b>. The computer’s are <b>orange</b>. The board starts with two of each in the middle.',
+        'On your turn, place a disc so that one or more orange discs sit in a straight line between it and another purple disc: across, up and down, or diagonally.',
+        'Every orange disc trapped that way flips to purple. One move can flip several lines at once.',
+        'Squares where you can play have a light ring. Tap one to play there. The computer’s last move is outlined.',
+        'If you can’t trap anything, you pass and the computer plays again. The game ends when neither side can move.',
+        'Tap <b>New</b> for another round. Who goes first switches each round.',
+      ],
+      tips: [
+        '<b>Easy</b> takes corners and otherwise plays at random. <b>Strong</b> looks several moves ahead and plays perfectly near the end. You can switch at any time.',
+        'Corners can never be flipped. Try to take them.',
+        'Avoid the squares right next to an empty corner: they often hand the corner to the computer.',
+        'Flipping lots of discs early isn’t always good. Having more places to play matters more.',
+      ],
+    },
+    load: () => import('./reversi'),
   },
 ];

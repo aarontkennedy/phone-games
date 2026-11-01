@@ -22,6 +22,9 @@ const PROTECTED_NAMES = [
   'sudoku',
   'connect four',
   'farkle',
+  'othello',
+  'yatzy',
+  'yatz',
 ];
 
 describe('game registry', () => {

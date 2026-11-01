@@ -1,0 +1,61 @@
+/* An 8x8 board of dark squares with light grid lines. Your discs are purple, the
+   computer's orange. Squares you can play have a light ring; the last move is outlined. */
+.rv-board {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 2px;
+  aspect-ratio: 1;
+  padding: var(--space-2);
+  background: var(--rv-line);
+  touch-action: manipulation;
+}
+
+.rv-sq {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: var(--rv-square);
+}
+
+.rv-sq:not(:disabled) {
+  cursor: pointer;
+}
+
+.rv-sq.last {
+  outline: 3px solid var(--rv-mark);
+  outline-offset: -3px;
+}
+
+.rv-sq.target::after {
+  content: '';
+  width: 36%;
+  aspect-ratio: 1;
+  border: 3px solid var(--rv-mark);
+  border-radius: 50%;
+}
+
+.rv-disc {
+  width: 80%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.rv-disc.p0 {
+  background: var(--rv-you);
+}
+
+.rv-disc.p1 {
+  background: var(--rv-computer);
+}
+
+/* The board looks the same in light and dark mode. */
+.rv {
+  --rv-square: #4a4560;
+  --rv-line: #2b283a;
+  --rv-mark: #f4f1fb;
+  --rv-you: #9d94ff;
+  --rv-computer: #ffb347;
+}

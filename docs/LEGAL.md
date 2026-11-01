@@ -24,10 +24,11 @@ protected list. Add to that list when you learn of a new one.
 | Minesweeper | Mines | Minesweeper |
 | Klondike solitaire | Solitaire, Klondike | Microsoft Solitaire |
 | FreeCell | Free Cells | FreeCell |
-| Yahtzee | Yacht, Five Dice | Yahtzee |
+| Yahtzee | Yacht, Five Dice | Yahtzee, and sound-alikes like Yatzy or Yatz |
 | Sudoku | Number Place | Sudoku |
 | Connect Four | Four in a Row | Connect Four |
 | Farkle | Hot Dice | Farkle (possibly a trademark; kept off to be safe) |
+| Othello | Reversi | Othello |
 | Chess, Checkers, Cribbage, Blackjack, Spades, Hearts, Euchre, Dominoes, Gin Rummy | Same. These are generic. | Brand names of specific apps |
 | Falling-block puzzles | Don't build one | Tetris (its owners actively enforce its look and name) |
 
