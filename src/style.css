@@ -147,6 +147,27 @@ body {
   cursor: pointer;
 }
 
+/* An icon-only top bar action (Share, About), named by its aria-label. */
+.top-icon {
+  justify-content: center;
+  min-width: var(--tap);
+  padding: 0;
+}
+
+.top-icon svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.top-icon .dot {
+  fill: currentColor;
+  stroke-width: 2.4;
+}
+
 /* Two actions side by side: only the first is pushed to the right. */
 .top-action + .top-action {
   margin-left: 0;

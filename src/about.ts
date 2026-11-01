@@ -38,8 +38,8 @@ const html = `
   <p>From then on, open Games from its icon on your home screen. Open it once while
   you're online, and after that it works anywhere.</p>
 
-  <p>To send Games to someone else, tap <b>Share</b> on the home screen. You can send it
-  by text or email.</p>
+  <p>To send Games to someone else, tap the <b>Share</b> button at the top of the home
+  screen: three dots joined by lines. You can send it by text or email.</p>
 
   <h2>Feedback</h2>
   <p>Found a bug, or have an idea or a game you'd like to see? Send an email.</p>

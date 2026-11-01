@@ -3,6 +3,13 @@ import { reportProblem } from './report';
 import { openShareSheet, shareLinks } from './share';
 import type { GameMeta } from './core/game';
 
+// Top bar icons: flat line drawings in the link color. Share is three joined dots, not
+// a square with an arrow, so it isn't confused with Safari's own Share button.
+const SHARE_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>';
+const INFO_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 11v6"/><circle class="dot" cx="12" cy="7.5" r="0.6"/></svg>';
+
 const list = (tag: string, items: string[]) => `<${tag}>${items.map((s) => `<li>${s}</li>`).join('')}</${tag}>`;
 
 /** Full-screen How to play page, opened by the Rules button. */
@@ -45,8 +52,8 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
     root.innerHTML = `
       <header class="topbar">
         <h1>Games</h1>
-        <button class="top-action" data-share aria-expanded="false">Share</button>
-        <a class="top-action" href="#/about">About</a>
+        <button class="top-action top-icon" data-share aria-label="Share" aria-expanded="false">${SHARE_ICON}</button>
+        <a class="top-action top-icon" href="#/about" aria-label="About">${INFO_ICON}</a>
       </header>
       <div class="share-menu" data-share-menu hidden>
         <a class="btn" href="${links.text}">Send a text</a>

@@ -152,7 +152,10 @@ describe('startApp', () => {
   describe('about', () => {
     it('is linked from the home screen', () => {
       const { root, stop } = setup([game('a', vi.fn())]);
-      expect(root.querySelector('.topbar a[href="#/about"]')!.textContent).toBe('About');
+      const about = root.querySelector('.topbar a[href="#/about"]')!;
+      expect(about.getAttribute('aria-label')).toBe('About');
+      expect(about.querySelector('svg')).not.toBeNull();
+      expect(root.querySelector('[data-share]')!.getAttribute('aria-label')).toBe('Share');
       stop();
     });
 
