@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, chipIcon, heartIcon, mineIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, chipIcon, gridIcon, heartIcon, mineIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -213,5 +213,26 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./cribbage'),
+  },
+  {
+    id: 'tictactoe',
+    title: 'Tic-Tac-Toe',
+    description: 'Three in a row on a 3 by 3 grid',
+    icon: gridIcon,
+    howToPlay: {
+      goal: 'Get three of your X marks in a row: across, down or diagonally.',
+      steps: [
+        'You are <b>X</b>. The computer is <b>O</b>. You take turns.',
+        'Tap an empty square to put your X there.',
+        'The first to get three in a row wins. If all nine squares fill up with no line, it’s a draw.',
+        'Tap <b>New</b> for another round. Who goes first switches each round.',
+      ],
+      tips: [
+        '<b>Easy</b> mostly plays at random. <b>Strong</b> never loses: the best you can do is a draw.',
+        'Taking the middle square first gives you the most ways to win.',
+        'Watch for two Os in a row and block the third square.',
+      ],
+    },
+    load: () => import('./tictactoe'),
   },
 ];

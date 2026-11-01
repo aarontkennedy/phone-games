@@ -73,3 +73,10 @@ export const pegboardIcon = svg(
       .join('') +
     '<circle cx="30" cy="19" r="3.4" fill="#6c63ff"/><circle cx="16" cy="29" r="3.4" fill="#ef5f58"/>',
 );
+
+/** A tic-tac-toe grid with an X and an O. */
+export const gridIcon = svg(
+  '<g stroke="#6c63ff" stroke-width="3" stroke-linecap="round"><path d="M18 6v36M30 6v36M6 18h36M6 30h36"/></g>' +
+    '<path d="M8 8l6 6M14 8l-6 6" stroke="#ef5f58" stroke-width="3" stroke-linecap="round"/>' +
+    '<circle cx="36" cy="36" r="4" fill="none" stroke="#ef5f58" stroke-width="3"/>',
+);
