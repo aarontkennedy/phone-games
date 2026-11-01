@@ -1,0 +1,49 @@
+/* Free cells and foundations on top, eight columns below. Cards are narrow here, so the
+   corner rank uses the smallest readable size. */
+.fc-board {
+  padding: var(--space-2);
+  container-type: inline-size;
+  touch-action: manipulation;
+}
+
+.fc-top,
+.fc-cols {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 3px;
+  --card-h: calc((100cqw - 21px) / 8 * 1.4);
+}
+
+.fc-cols {
+  margin-top: var(--space-3);
+  align-items: start;
+}
+
+.fc .card-corner {
+  font-size: var(--text-sm);
+}
+
+.fc .card-slot {
+  display: grid;
+  place-items: center;
+}
+
+.fc .card-slot .suit {
+  width: 55%;
+  fill: var(--card-slot);
+}
+
+/* The free cells get a solid outline; the foundations show their suit. */
+.fc-top > .card-slot:nth-child(-n + 4) {
+  border-style: solid;
+}
+
+.fc-col {
+  --peek: 7.5cqw;
+  display: flex;
+  flex-direction: column;
+}
+
+.fc-col > .card + .card {
+  margin-top: calc(var(--peek) - var(--card-h));
+}

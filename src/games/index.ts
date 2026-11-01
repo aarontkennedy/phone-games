@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, discsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, discsIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, spadeIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -303,5 +303,30 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./numberplace'),
+  },
+  {
+    id: 'freecells',
+    title: 'Free Cells',
+    description: 'Solitaire with every card face up',
+    icon: freeCellsIcon,
+    howToPlay: {
+      goal: 'Move all 52 cards onto the four piles at the top right, one pile per suit, from ace up to king.',
+      steps: [
+        'Every card is dealt face up into eight columns. Only the bottom card of a column (the one fully showing) can move by itself.',
+        'In a column, put a card on one that is <b>one higher</b> and the <b>other color</b>: a red 6 on a black 7.',
+        'The four spaces at the top left are <b>free cells</b>. Each holds any one card while you work.',
+        'Any card can go in an empty column.',
+        'You can move several cards at once if they run down in alternating colors and you have enough free cells and empty columns to have moved them one by one.',
+        '<b>Tap a card to move it.</b> It goes to the best place: its suit pile first, then a column, then a free cell.',
+        'Cards that are safe to put up go to the suit piles by themselves.',
+        'Made a mistake? Tap <b>Undo</b>. Your game is saved after every move.',
+      ],
+      tips: [
+        'Almost every deal can be won, so take your time.',
+        'Free cells fill up fast. Try to keep at least one empty.',
+        'An empty column is worth more than a free cell: it lets you move longer runs.',
+      ],
+    },
+    load: () => import('./freecells'),
   },
 ];

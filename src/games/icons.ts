@@ -104,3 +104,11 @@ export const numberGridIcon = svg(
     '<rect x="8" y="8" width="7" height="7" rx="1.5" fill="#6c63ff"/><rect x="20.5" y="20.5" width="7" height="7" rx="1.5" fill="#ef5f58"/>' +
     '<rect x="33" y="33" width="7" height="7" rx="1.5" fill="#6c63ff"/>',
 );
+
+/** Four free cells above a column of cards. */
+export const freeCellsIcon = svg(
+  [4, 15, 26, 37].map((x) => `<rect x="${x}" y="5" width="8" height="11" rx="1.5" fill="none" stroke="#6c63ff" stroke-width="2"/>`).join('') +
+    '<rect x="14" y="21" width="20" height="16" rx="2.5" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<rect x="14" y="27" width="20" height="16" rx="2.5" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<path d="M24 31 28 35 24 39 20 35Z" fill="#ef5f58"/>',
+);
