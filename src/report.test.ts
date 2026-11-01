@@ -110,7 +110,8 @@ describe('problem banner', () => {
 
   it('stops watching when asked', () => {
     watchForProblems()();
-    window.dispatchEvent(new ErrorEvent('error', { error: new Error('ignored') }));
+    // A message only: with no listener left, Vitest would treat an error object as a real crash.
+    window.dispatchEvent(new ErrorEvent('error', { message: 'ignored' }));
     expect(banner()).toBeNull();
   });
 
