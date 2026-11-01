@@ -45,6 +45,19 @@ What's left:
 Don't run `npm audit fix --force` blindly. It jumps major versions, which can break the
 build or the tests. Update one major version at a time and run the full check.
 
+## Known and accepted
+
+Recheck these at every dependency check, and remove an entry once it's resolved.
+
+- **Vite stays on 7.** Vite 8 requires lightningcss, which is MPL-2.0 and so not allowed
+  (docs/LEGAL.md). Vite 7 is supported and has no known advisories. Dependabot is told
+  to skip Vite 8.
+- **Workbox build advisories** (checked 2026-11-01): 10 low and moderate advisories in
+  workbox-build 7.4.1 and the packages under it (glob, minimatch, ejs, deepmerge). They
+  run only while the site is built, never on a phone, and 7.4.1 is the newest Workbox.
+  `npm audit` suggests a "fix" that downgrades vite-plugin-pwa; don't apply it. Update
+  when Workbox releases a fixed version.
+
 ## Rules for new dependencies
 
 - Prefer none. Small helpers are easy to write and test ourselves.

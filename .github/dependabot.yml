@@ -11,6 +11,10 @@ updates:
     groups:
       npm:
         patterns: ['*']
+    ignore:
+      # Vite 8 requires lightningcss, which is MPL-2.0 (not allowed: docs/LEGAL.md).
+      - dependency-name: vite
+        versions: ['>=8']
     open-pull-requests-limit: 5
 
   - package-ecosystem: github-actions

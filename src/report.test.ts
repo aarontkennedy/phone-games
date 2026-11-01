@@ -101,7 +101,9 @@ describe('problem banner', () => {
 
   it('closes after reporting or dismissing', () => {
     reportProblem(new Error('x'));
-    banner()!.querySelector<HTMLElement>('[data-report]')!.dispatchEvent(new MouseEvent('click', { cancelable: true }));
+    const link = banner()!.querySelector<HTMLElement>('[data-report]')!;
+    link.addEventListener('click', (e) => e.preventDefault()); // jsdom can't open mail apps
+    link.click();
     expect(banner()).toBeNull();
     reportProblem(new Error('y'));
     banner()!.querySelector<HTMLButtonElement>('[data-dismiss]')!.click();
