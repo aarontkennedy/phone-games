@@ -24,7 +24,8 @@ describe('card view', () => {
   });
 
   it('marks black cards and makes tappable cards buttons', () => {
-    const card = html(cardFace({ suit: 'S', rank: 1 }, { button: true, attrs: 'data-col="3"' }));
+    const card = html(cardFace({ suit: 'S', rank: 1 }, { button: true, attrs: 'data-col="3"', className: 'picked lift' }));
+    expect(card.className).toBe('card picked lift');
     expect(card.tagName).toBe('BUTTON');
     expect(card.hasAttribute('role')).toBe(false);
     expect(card.classList.contains('red')).toBe(false);

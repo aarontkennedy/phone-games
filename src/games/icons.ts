@@ -45,3 +45,8 @@ export const chipIcon = svg(
       .join('') +
     '<circle cx="24" cy="24" r="11" fill="none" stroke="#ffffff" stroke-width="3"/>',
 );
+
+/** A large red heart. */
+export const heartIcon = svg(
+  '<path d="M24 42C12 32.5 4 25.5 4 16.5A10 10 0 0 1 24 12a10 10 0 0 1 20 4.5C44 25.5 36 32.5 24 42Z" fill="#ef5f58"/>',
+);

@@ -1,0 +1,210 @@
+import { cardFace, cardSlot } from '../../core/card-view';
+import { cardId, cardName, sameCard, type Card } from '../../core/cards';
+import { load, save } from '../../core/storage';
+import { SEATS, SEAT_NAMES, nextSeat, sortHand, trickWinner, type Seat } from '../../core/tricks';
+import { showOverlay, hideOverlay } from '../../core/ui';
+import {
+  chooseCard,
+  collect,
+  isValidState,
+  legalPlays,
+  newGame,
+  nextRound,
+  passCards,
+  passDirection,
+  play,
+  winners,
+  type Level,
+  type State,
+} from './logic';
+import './style.css';
+
+const STATE_KEY = 'hearts:state';
+/** Pause before each computer play, so you can follow along. */
+export const AI_DELAY = 600;
+/** How long a finished trick stays on the table. */
+export const TRICK_PAUSE = 1100;
+/** Seats shown left to right: the order cards are played after yours. */
+const SEAT_ORDER: Seat[] = [1, 2, 3, 0];
+const PASS_TO = { left: 'West', right: 'East', across: 'North' } as const;
+
+/** "A, B and C". Always called with at least two items. */
+const listOf = (items: string[]) => `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+const lower = (c: Card) => cardName(c).replace(/^(Ace|Jack|Queen|King)/, (w) => w.toLowerCase());
+
+export function mount(container: HTMLElement): () => void {
+  const saved = load<unknown>(STATE_KEY, null);
+  let state: State = isValidState(saved) ? saved : newGame();
+  let picked: Card[] = [];
+  let timer: number | undefined;
+
+  container.innerHTML = `
+    <div class="screen cards hrt">
+      <div class="stats">
+        <div class="stat"><small>You</small><b data-score></b></div>
+        <button class="btn" data-new>New</button>
+        <div class="stat"><small>Round</small><b data-round></b></div>
+      </div>
+      <div class="controls">
+        <div class="segmented" aria-label="Computer players">
+          <button data-level="easy">Easy</button>
+          <button data-level="strong">Strong</button>
+        </div>
+        <button class="btn" data-pass>Pass</button>
+      </div>
+      <div class="board-frame hrt-table" data-board></div>
+      <p class="status-line" data-status aria-live="polite"></p>
+    </div>`;
+
+  const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
+  const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
+  const scoreEl = container.querySelector<HTMLElement>('[data-score]')!;
+  const roundEl = container.querySelector<HTMLElement>('[data-round]')!;
+  const passBtn = container.querySelector<HTMLButtonElement>('[data-pass]')!;
+  const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+
+  function update(next: State | null) {
+    if (!next) return;
+    state = next;
+    save(STATE_KEY, state);
+    render();
+    schedule();
+  }
+
+  /** Lets the computer players take their turns, and clears finished tricks, one step at a time. */
+  function schedule() {
+    clearTimeout(timer);
+    timer = undefined;
+    if (state.phase !== 'playing') return;
+    if (state.trick.length === 4) timer = window.setTimeout(() => update(collect(state)), TRICK_PAUSE);
+    else if (state.turn !== 0) {
+      timer = window.setTimeout(() => update(play(state, state.turn, chooseCard(state, state.turn))), AI_DELAY);
+    }
+  }
+
+  function startGame() {
+    picked = [];
+    update(newGame(state.level));
+  }
+
+  // --- Rendering ---
+
+  const myTurn = () => state.phase === 'playing' && state.turn === 0 && state.trick.length < 4;
+
+  function renderSeat(seat: Seat): string {
+    const played = state.trick.find((p) => p.seat === seat);
+    const turn = state.phase === 'playing' && state.trick.length < 4 && state.turn === seat;
+    const round = state.points[seat] ? `<span class="hrt-round"> +${state.points[seat]}</span>` : '';
+    return `<div class="hrt-seat${turn ? ' turn' : ''}" data-seat="${seat}">
+      <span class="hrt-name">${SEAT_NAMES[seat]}</span>
+      <span class="hrt-score">${state.scores[seat]}${round}</span>
+      <div class="hrt-play">${played ? cardFace(played.card) : cardSlot()}</div>
+    </div>`;
+  }
+
+  function renderHand(): string {
+    const legal = myTurn() ? legalPlays(state, 0) : [];
+    const someIllegal = legal.length < state.hands[0].length;
+    return sortHand(state.hands[0])
+      .map((c) => {
+        const isPicked = picked.some((p) => sameCard(p, c));
+        const canPlay = legal.some((l) => sameCard(l, c));
+        const className = [
+          isPicked ? 'picked' : '',
+          (canPlay && someIllegal) || isPicked ? 'lift' : '',
+          state.received.some((r) => sameCard(r, c)) ? 'received' : '',
+        ]
+          .filter(Boolean)
+          .join(' ');
+        const enabled = state.phase === 'passing' || canPlay;
+        return cardFace(c, { button: true, className, attrs: `data-hand${enabled ? '' : ' disabled'}` });
+      })
+      .join('');
+  }
+
+  function statusText(): string {
+    const name = (seat: Seat) => SEAT_NAMES[seat];
+    switch (state.phase) {
+      case 'passing': {
+        const dir = passDirection(state) as keyof typeof PASS_TO;
+        return `Pick 3 cards to pass ${dir} to ${PASS_TO[dir]}. ${picked.length} picked.`;
+      }
+      case 'roundOver':
+      case 'gameOver': {
+        const moon = state.moon !== null ? `${state.moon === 0 ? 'You' : name(state.moon)} shot the moon! ` : '';
+        const round = SEATS.map((s) => `${name(s)} ${state.lastRound[s]}`);
+        if (state.phase === 'roundOver') return `${moon}Round points: ${listOf(round)}.`;
+        const won = winners(state);
+        if (won.length > 1) return `${moon}${listOf(won.map(name))} tie for the win with ${state.scores[won[0]]}.`;
+        return won[0] === 0
+          ? `${moon}You win with ${state.scores[0]}!`
+          : `${moon}${name(won[0])} wins with ${state.scores[won[0]]}. You finished with ${state.scores[0]}.`;
+      }
+    }
+    if (state.trick.length === 4) {
+      const winner = trickWinner(state.trick);
+      return winner === 0 ? 'You take the trick.' : `${name(winner)} takes the trick.`;
+    }
+    if (state.turn !== 0) return `${name(state.turn)} is playing…`;
+    const from = state.received.length
+      ? `${name(nextSeat(0, 4 - [1, 3, 2][state.round % 4]))} passed you the ${listOf(state.received.map(lower))}. `
+      : '';
+    if (state.tricksPlayed === 0 && !state.trick.length) return `${from}Your turn: lead the 2 of clubs.`;
+    if (!state.trick.length) return `${from}Your turn to lead.${state.heartsBroken ? '' : ' Hearts aren’t broken yet.'}`;
+    return `${from}Your turn. Follow suit if you can.`;
+  }
+
+  function render() {
+    boardEl.innerHTML = `
+      <div class="hrt-seats">${SEAT_ORDER.map(renderSeat).join('')}</div>
+      <div class="hrt-hand" aria-label="Your cards">${renderHand()}</div>`;
+    scoreEl.textContent = String(state.scores[0]);
+    roundEl.textContent = String(state.round + 1);
+    levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
+    passBtn.hidden = state.phase !== 'passing';
+    passBtn.disabled = picked.length !== 3;
+    if (state.phase === 'passing') passBtn.textContent = `Pass to ${PASS_TO[passDirection(state) as keyof typeof PASS_TO]}`;
+    statusEl.textContent = statusText();
+
+    if (state.phase === 'roundOver') showOverlay(boardEl, 'Round over', [['Next round', () => update(nextRound(state))]]);
+    else if (state.phase === 'gameOver') {
+      const won = winners(state);
+      const title = won.length > 1 ? 'It’s a tie' : won[0] === 0 ? 'You win!' : `${SEAT_NAMES[won[0]]} wins`;
+      showOverlay(boardEl, title, [['New game', startGame]]);
+    } else hideOverlay(boardEl);
+  }
+
+  // --- Input ---
+
+  boardEl.addEventListener('click', (e) => {
+    const el = (e.target as Element).closest<HTMLButtonElement>('[data-hand]');
+    if (!el) return;
+    const c = state.hands[0].find((h) => cardId(h) === el.dataset.card)!;
+    if (state.phase === 'passing') {
+      picked = picked.some((p) => sameCard(p, c))
+        ? picked.filter((p) => !sameCard(p, c))
+        : [...picked, c].slice(-3);
+      render();
+    } else {
+      update(play(state, 0, c));
+    }
+  });
+  passBtn.addEventListener('click', () => {
+    const next = passCards(state, picked);
+    picked = [];
+    update(next);
+  });
+  container.querySelector('[data-new]')!.addEventListener('click', startGame);
+  levelBtns.forEach((b) =>
+    b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })),
+  );
+
+  render();
+  schedule();
+
+  return () => {
+    clearTimeout(timer);
+    save(STATE_KEY, state);
+    container.replaceChildren();
+  };
+}

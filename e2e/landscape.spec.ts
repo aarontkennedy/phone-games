@@ -89,6 +89,11 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
+    test('Hearts: side bar on the left, table and hand on the right', async ({ page }) => {
+      await page.goto('./#/hearts');
+      await expectSideBarLayout(page);
+    });
+
     test('home and About still fit the width', async ({ page }) => {
       await page.goto('./');
       await expectNoHorizontalOverflow(page);

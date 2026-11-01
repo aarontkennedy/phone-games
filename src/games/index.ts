@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, chipIcon, mineIcon, tilesIcon } from './icons';
+import { cardsIcon, chipIcon, heartIcon, mineIcon, tilesIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -105,5 +105,32 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./blackjack'),
+  },
+  {
+    id: 'hearts',
+    title: 'Hearts',
+    description: 'Avoid hearts and the queen of spades',
+    icon: heartIcon,
+    howToPlay: {
+      goal: 'Take as few points as you can. When anyone reaches 100 points, the game ends and the lowest score wins.',
+      steps: [
+        'You play against three computer players: West, North and East. Everyone gets 13 cards.',
+        'First, pick 3 cards to pass, then tap <b>Pass</b>. The direction changes each round: left, right, across, then no passing.',
+        'Whoever has the 2 of clubs plays it to start. Then everyone plays one card in turn. That’s a <b>trick</b>.',
+        'You must play the same suit as the first card of the trick if you can. If you can’t, play anything.',
+        'The highest card of the suit that was led wins the trick. Aces are high. The winner starts the next trick.',
+        'Every heart you win is <b>1 point</b>. The queen of spades is <b>13 points</b>. Points are bad!',
+        'You can’t start a trick with a heart until someone has played a heart. And nobody can play points on the very first trick.',
+        'Win <b>all</b> the hearts and the queen of spades and you <b>shoot the moon</b>: you get 0 and everyone else gets 26.',
+        'Cards you can play right now sit a little higher. Tap one to play it.',
+      ],
+      tips: [
+        '<b>Easy</b> computer players play almost at random. <b>Strong</b> ones dodge points and remember what’s been played. You can switch at any time.',
+        'Pass the queen of spades, and the ace and king of spades unless you have plenty of low spades to protect them.',
+        'Try to run out of a suit early. Then you can throw away hearts or the queen when that suit is led.',
+        'When you can’t win a trick safely, play the highest card that still loses.',
+      ],
+    },
+    load: () => import('./hearts'),
   },
 ];

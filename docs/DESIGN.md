@@ -183,7 +183,16 @@ everywhere.
   needed. If it can't move, the status line says so.
 - **Undo** wherever a game has no hidden information to protect (Solitaire).
 - **Computer players** (Hearts, Spades, Euchre, Cribbage): an **Easy / Strong**
-  segmented control, like the Mines difficulty.
+  segmented control, like the Mines difficulty. Switching it applies at once and never
+  restarts the game.
+- **Their turns are paced** so you can follow along: about 0.6 seconds per computer play,
+  and a finished trick stays on the table about 1 second before it's collected. The
+  status line says whose turn it is, and the current seat is outlined.
+- **Playable cards lift** a few pixels on your turn. Cards you can't play stay put and
+  are disabled, but are never dimmed, so every rank stays readable.
+- **Trick games** share `src/core/tricks.ts`: seats (You, West, North, East, played
+  clockwise), aces-high ranking, trick winners with optional trump, follow-suit rules,
+  hand sorting and dealing.
 
 ## How to play
 

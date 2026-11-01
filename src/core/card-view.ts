@@ -21,13 +21,16 @@ export interface CardOptions {
   attrs?: string;
   /** Spoken label, for backs and slots that do something when tapped. */
   label?: string;
+  /** Extra classes, e.g. "picked". */
+  className?: string;
 }
 
 /** A face-up card: rank and suit in the corner, a large suit in the middle. */
-export function cardFace(card: Card, { button = false, attrs = '' }: CardOptions = {}): string {
+export function cardFace(card: Card, { button = false, attrs = '', className = '' }: CardOptions = {}): string {
   const tag = button ? 'button' : 'div';
   const role = button ? '' : ' role="img"';
-  return `<${tag} class="card${isRed(card) ? ' red' : ''}" data-card="${cardId(card)}" aria-label="${cardName(card)}"${role} ${attrs}>
+  const classes = ['card', isRed(card) ? 'red' : '', className].filter(Boolean).join(' ');
+  return `<${tag} class="${classes}" data-card="${cardId(card)}" aria-label="${cardName(card)}"${role} ${attrs}>
     <span class="card-corner"><span class="card-rank">${rankLabel(card)}</span>${suitSvg(card.suit)}</span>
     <span class="card-pip">${suitSvg(card.suit)}</span>
   </${tag}>`;

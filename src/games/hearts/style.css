@@ -1,0 +1,71 @@
+/* The table: four seats in a row (West, North, East, You) with the card each played,
+   then your hand in two overlapping rows below. */
+.hrt-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.hrt-seats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.hrt-seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-1);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  text-align: center;
+  line-height: 1.25;
+}
+
+/* Whose turn it is. The status line also says it in words. */
+.hrt-seat.turn {
+  border-color: var(--accent);
+}
+
+.hrt-name {
+  font-weight: 700;
+}
+
+.hrt-round {
+  color: var(--muted);
+}
+
+.hrt-play {
+  width: 100%;
+  max-width: 64px;
+  margin-top: var(--space-1);
+}
+
+/* Seven cards per row; the second row overlaps the bottom of the first, leaving ranks in view. */
+.hrt-hand {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  column-gap: 3px;
+  padding-top: var(--space-2);
+}
+
+.hrt-hand > :nth-child(n + 8) {
+  margin-top: -63%; /* of the card's width: 45% of its height */
+}
+
+/* Cards you can play right now, and cards picked to pass, sit a little higher. */
+.hrt-hand .card.lift {
+  transform: translateY(-8px);
+}
+
+.hrt-hand .card.received {
+  outline: 3px dashed var(--accent);
+  outline-offset: -3px;
+}
+
+.hrt-hand .card:disabled {
+  cursor: default;
+}
