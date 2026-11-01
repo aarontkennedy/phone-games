@@ -83,7 +83,7 @@ export async function expectTouchTargets(page: Page, min = 44): Promise<void> {
  * close, because closing it saves the current table and would overwrite this one.
  */
 export async function openBlackjackWith(page: Page, order: string): Promise<void> {
-  const back = page.getByRole('link', { name: '‹ Games' });
+  const back = page.getByRole('link', { name: 'Back to games' });
   if (await back.count()) await back.click();
   // The home screen appears only after the game has closed (and saved), so nothing
   // can overwrite the table below.

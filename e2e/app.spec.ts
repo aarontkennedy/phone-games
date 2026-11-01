@@ -69,7 +69,7 @@ for (const g of GAMES) {
       expect(box.y).toBeGreaterThanOrEqual(board.y + board.height - 1);
     }
 
-    await page.getByRole('link', { name: '‹ Games' }).click();
+    await page.getByRole('link', { name: 'Back to games' }).click();
     await expect(page.getByRole('heading', { name: 'Games' })).toBeVisible();
   });
 }

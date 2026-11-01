@@ -122,6 +122,19 @@ body {
   font-size: var(--text-xl);
 }
 
+/* Game and About pages: back icon, centered title, then an optional action (Rules).
+   The side columns match, so the title stays centered and wraps in the middle. */
+.topbar.sub {
+  display: grid;
+  grid-template-columns: var(--tap) minmax(0, 1fr) var(--tap);
+}
+
+.topbar.sub h1 {
+  grid-column: 2;
+  text-align: center;
+  line-height: 1.15;
+}
+
 .back {
   display: inline-flex;
   align-items: center;
@@ -495,18 +508,12 @@ body {
       calc(env(safe-area-inset-bottom) + var(--pad-y)) calc(env(safe-area-inset-left) + var(--space-4));
   }
 
-  /* The side bar is ~260px on the smallest phones. A one-word title like "Dominoes"
-     must fit beside ‹ Games and Rules; a longer one wraps instead of running off. */
+  /* The side bar is ~260px on the smallest phones: the title wraps between the icons. */
   #app:has(> .game) > .topbar {
     grid-column: 2;
     grid-row: 1;
-    flex-wrap: wrap;
     gap: var(--space-2);
     padding: 0;
-  }
-
-  #app:has(> .game) .top-action {
-    padding-inline: var(--space-1);
   }
 
   .game,

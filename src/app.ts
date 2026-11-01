@@ -7,6 +7,7 @@ import type { GameMeta } from './core/game';
 // a square with an arrow, so it isn't confused with Safari's own Share button.
 const SHARE_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>';
+const BACK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg>';
 const INFO_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 11v6"/><circle class="dot" cx="12" cy="7.5" r="0.6"/></svg>';
 
@@ -82,8 +83,8 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
 
   function renderAbout() {
     root.innerHTML = `
-      <header class="topbar">
-        <a class="back" href="#/">‹ Games</a>
+      <header class="topbar sub">
+        <a class="back top-icon" href="#/" aria-label="Back to games">${BACK_ICON}</a>
         <h1>About</h1>
       </header>
       <main class="about prose"></main>`;
@@ -107,10 +108,10 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
     }
 
     root.innerHTML = `
-      <header class="topbar">
-        <a class="back" href="#/">‹ Games</a>
+      <header class="topbar sub">
+        <a class="back top-icon" href="#/" aria-label="Back to games">${BACK_ICON}</a>
         <h1>${meta.title}</h1>
-        <button class="top-action" data-help aria-haspopup="dialog">Rules</button>
+        <button class="top-action top-icon" data-help aria-haspopup="dialog" aria-label="Rules">${INFO_ICON}</button>
       </header>
       <main class="game"></main>`;
     const main = root.querySelector<HTMLElement>('.game')!;

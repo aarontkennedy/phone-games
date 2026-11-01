@@ -17,6 +17,6 @@ test('About is linked from home, reads without glasses, and goes back', async ({
   await expectReadableText(page);
   await expectNoHorizontalOverflow(page);
 
-  await page.getByRole('link', { name: '‹ Games' }).click();
+  await page.getByRole('link', { name: 'Back to games' }).click();
   await expect(page.getByRole('heading', { name: 'Games' })).toBeVisible();
 });

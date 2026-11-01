@@ -83,7 +83,7 @@ The player needs reading glasses for small text, so this app never uses it.
 Every game screen uses this structure, top to bottom:
 
 ```
-topbar        ‹ Games   Title                    (app shell)
+topbar        [‹]      Title       [i]          (app shell: back, centered title, Rules)
 .screen
   .stats      [stat] [New] [stat]                score/time and the New button
   .board-frame                                   the playing surface; hosts .overlay
@@ -112,7 +112,7 @@ When a phone is turned sideways (landscape and at most 560px tall), every game s
 switches to a side bar layout automatically:
 
 ```
-|                    | ‹ Games  Title   Rules |
+|                    | [‹]    Title      [i]  |
 |      board         | [stat] [New] [stat]    |
 |  (fills the        | status line            |
 |   screen height)   |                        |
@@ -219,7 +219,7 @@ everywhere.
 
 Every game has a **How to play** page, written for someone who has never played it.
 
-- **Where:** the **Rules** button in the top bar opens it. It never opens by itself.
+- **Where:** the **Rules** button (an "i" icon, named Rules for screen readers) in the top bar opens it. It never opens by itself.
 - **Content:** the `howToPlay` field in `src/games/index.ts`: a one-sentence `goal`,
   at least 3 `steps` and optional `tips`.
 - **Steps:** explain a turn in the order a new player needs it. Name the on-screen

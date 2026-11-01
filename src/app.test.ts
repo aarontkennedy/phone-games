@@ -74,7 +74,8 @@ describe('startApp', () => {
       const { root, stop, go } = setup([game('a', noop)]);
       await go('#/a');
       expect(panel(root).hidden).toBe(true);
-      expect(rules(root).textContent).toBe('Rules');
+      expect(rules(root).getAttribute('aria-label')).toBe('Rules');
+      expect(rules(root).querySelector('svg')).not.toBeNull();
       stop();
     });
 

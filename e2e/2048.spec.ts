@@ -38,7 +38,7 @@ test('tile numbers are readable without glasses, even 5 digits', async ({ page }
   const board = [2, 64, 1024, 16384, ...Array(12).fill(0)];
   await page.evaluate((b) => localStorage.setItem('pg:2048:state', JSON.stringify({ board: b, score: 0 })), board);
   // Reopen the game instead of reloading: a reload can interrupt WebKit's service worker install.
-  await page.getByRole('link', { name: '‹ Games' }).click();
+  await page.getByRole('link', { name: 'Back to games' }).click();
   await page.locator('a[href="#/2048"]').click();
   await expect(page.locator('.g2048-cell[data-digits="5"]')).toHaveText('16384');
   await expectReadableText(page);
