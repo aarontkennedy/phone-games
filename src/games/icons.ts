@@ -152,6 +152,14 @@ export const videoPokerIcon = svg(
     '<rect x="8" y="36" width="32" height="4" rx="2" fill="#6c63ff"/>',
 );
 
+/** Two flat cards over a stack of chips. */
+export const holdemIcon = svg(
+  '<rect x="8" y="6" width="16" height="24" rx="2.5" fill="#ffffff" stroke="#6c63ff" stroke-width="2.5"/>' +
+    '<rect x="20" y="9" width="16" height="24" rx="2.5" fill="#ef5f58"/>' +
+    '<ellipse cx="24" cy="38" rx="14" ry="4" fill="#6c63ff"/>' +
+    '<rect x="10" y="33" width="28" height="5" fill="#6c63ff"/>',
+);
+
 /** Two flat dice. */
 export const diceIcon = svg(
   '<rect x="4" y="12" width="22" height="22" rx="4" fill="#6c63ff"/>' +

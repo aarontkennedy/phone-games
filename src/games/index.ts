@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -465,6 +465,31 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./videopoker'),
+  },
+  {
+    id: 'holdem',
+    title: 'Texas Hold’em',
+    description: 'Poker with two cards of your own and five shared',
+    icon: holdemIcon,
+    category: 'cards',
+    howToPlay: {
+      goal: 'Win chips by having the best poker hand, or by making everyone else fold. Win every chip to win the game.',
+      steps: [
+        'You play against three computer players: West, North and East. Everyone starts with 1000 play chips.',
+        'Each hand, the two players after the dealer (marked <b>D</b>) put in the <b>blinds</b>, small forced bets. Then everyone gets two private cards. Yours are face up at your seat.',
+        'Five shared cards are dealt in the middle in three steps: three (the <b>flop</b>), one (the <b>turn</b>) and one more (the <b>river</b>). There’s a round of betting before the flop and after each step.',
+        'On your turn, tap <b>Check</b> (pass, if nobody has bet), <b>Call</b> (match the bet), <b>Bet</b> or <b>Raise</b> (put in more), or <b>Fold</b> (give up the hand). The line under the table says how many chips each choice puts in. Bets are a set size: the big blind before the turn, twice that after.',
+        'Your hand is the best five cards from your two and the five shared ones. Best to worst: straight flush, four of a kind, full house, flush, straight, three of a kind, two pair, pair, high card. The line under the shared cards names your hand.',
+        'If everyone else folds, you win the pot without showing. Otherwise the best hand wins, and ties split it. If you run out of chips mid-hand you’re <b>all in</b>: you can still win what you matched, and the rest makes a side pot for the others.',
+        'Blinds double every 10 hands. The game ends when you have every chip, or none.',
+      ],
+      tips: [
+        '<b>Easy</b> players call a lot and rarely raise. <b>Strong</b> players weigh their chances against the pot and bluff now and then. You can switch at any time.',
+        'Fold most weak starting hands. Pairs, aces and two high cards are worth playing.',
+        'A bet that’s small next to the pot is often worth calling, even with a long shot.',
+      ],
+    },
+    load: () => import('./holdem'),
   },
   {
     id: 'hotdice',

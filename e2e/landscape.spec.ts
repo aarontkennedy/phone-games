@@ -117,7 +117,7 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
-    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman', 'spider', 'backgammon', 'dots', 'gofish', 'rummy', 'chess', 'videopoker']) {
+    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman', 'spider', 'backgammon', 'dots', 'gofish', 'rummy', 'chess', 'videopoker', 'holdem']) {
       test(`${id}: board on the left, side bar on the right`, async ({ page }) => {
         await page.goto(`./#/${id}`);
         await expectSideBarLayout(page);

@@ -213,3 +213,14 @@ test('Video Poker: deal, hold a card, draw', async ({ page }) => {
   await page.locator('[data-draw]').click();
   await expect(status(page)).toHaveText(/: (you win \d+|no win)\./);
 });
+
+test("Texas Hold'em: act on your turn, then the computer players play", async ({ page }) => {
+  await page.goto('./#/holdem');
+  await expectGoodLayout(page);
+  // You're the dealer in the first hand, so the computer players act first.
+  const action = page.locator('[data-action]').first();
+  await expect(action).toBeVisible({ timeout: 10000 });
+  await expectGoodLayout(page);
+  await page.locator('[data-action="call"], [data-action="check"]').first().click();
+  await expect(status(page)).not.toHaveText(/^Before the flop, your turn/);
+});

@@ -1,0 +1,67 @@
+/* The four seats (chips, last action, and cards: yours face up, others face down until a
+   showdown), then the shared cards, and your best hand so far. */
+.he-hole {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--space-1);
+}
+
+.he-hole > * {
+  flex: none;
+  width: 40px;
+}
+
+.he-hole > * + * {
+  margin-left: -16px;
+}
+
+.he-dealer {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.4em;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.he-info {
+  margin: 0;
+  text-align: center;
+}
+
+.he-board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-1);
+  max-width: 320px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.he-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Sideways, the seats, shared cards and two info lines must fit the square beside the
+   side bar: tighter rows and slightly smaller cards. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .he .tt-table {
+    gap: var(--space-1);
+    padding-block: var(--space-1);
+  }
+
+  .he-hole > * {
+    width: 34px;
+  }
+
+  .he-hole > * + * {
+    margin-left: -12px;
+  }
+
+  .he-board {
+    max-width: 250px;
+  }
+}

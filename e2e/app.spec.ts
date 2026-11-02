@@ -30,6 +30,7 @@ const GAMES = [
   { id: 'rummy', title: 'Rummy 500' },
   { id: 'chess', title: 'Chess' },
   { id: 'videopoker', title: 'Video Poker' },
+  { id: 'holdem', title: 'Texas Hold’em' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));
