@@ -100,8 +100,8 @@ topbar        [‹]      Title       [i]          (app shell: back, centered tit
 - **New stays at the top.** New lives in `.stats`, away from the thumb, so a stray tap
   doesn't throw away a game. And when a game is partway through, New (and switching
   difficulty when that restarts) asks first, using `confirmNew()` from `src/core/ui.ts`
-  with the game's own `inProgress()` test. A fresh or finished game starts at once. A button tapped every round, like Blackjack's Deal, goes
-  in `.controls` instead.
+  with the game's own `inProgress()` test. A fresh or finished game starts at once. A button tapped every round, like Blackjack's Deal or
+  Tic-Tac-Toe's New (rounds take seconds), goes in `.controls` instead.
 - **Leave slack in every row.** CI runs on Linux, whose fallback font is wider than the
   phones' system fonts, so a row that just fits on a Mac can overflow there (and on a
   phone with a wider font). Let labels wrap and let rows wrap (`flex-wrap`) rather than

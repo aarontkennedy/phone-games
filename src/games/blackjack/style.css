@@ -145,6 +145,15 @@
     grid-template-rows: auto auto 1fr auto auto;
   }
 
+  /* Three stats in a side bar ~260px wide: tighter spacing, so CI's wider font fits too. */
+  .game .bj > .stats {
+    gap: var(--space-1);
+  }
+
+  .game .bj .stat {
+    padding-inline: var(--space-1);
+  }
+
   .game .bj > .status-line {
     grid-row: 4;
   }

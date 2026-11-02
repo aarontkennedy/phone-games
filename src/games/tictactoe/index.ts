@@ -21,7 +21,7 @@ export function mount(container: HTMLElement): () => void {
     <div class="screen ttt">
       <div class="stats">
         <div class="stat"><small>You</small><b data-you></b></div>
-        <button class="btn" data-new>New</button>
+        <div class="stat"><small>Ties</small><b data-ties></b></div>
         <div class="stat"><small>Computer</small><b data-computer></b></div>
       </div>
       <div class="board-frame ttt-board" data-board></div>
@@ -31,6 +31,8 @@ export function mount(container: HTMLElement): () => void {
           <button data-level="easy">Easy</button>
           <button data-level="strong">Strong</button>
         </div>
+        <!-- Tapped every round, so it's down here under the thumb (docs/DESIGN.md). -->
+        <button class="btn" data-new>New</button>
       </div>
     </div>`;
 
@@ -61,15 +63,15 @@ export function mount(container: HTMLElement): () => void {
       .join('');
     container.querySelector('[data-you]')!.textContent = String(state.tally.you);
     container.querySelector('[data-computer]')!.textContent = String(state.tally.computer);
+    container.querySelector('[data-ties]')!.textContent = String(state.tally.draws);
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
-    const draws = state.tally.draws ? ` Draws so far: ${state.tally.draws}.` : '';
     statusEl.textContent =
       state.result === 'X'
-        ? `You win! Tap New for another round.${draws}`
+        ? 'You win! Tap New for another round.'
         : state.result === 'O'
-          ? `The computer wins. Tap New for another round.${draws}`
+          ? 'The computer wins. Tap New for another round.'
           : state.result === 'draw'
-            ? `It’s a draw. Tap New for another round.${draws}`
+            ? 'It’s a tie. Tap New for another round.'
             : state.turn === 'X'
               ? 'Your turn: you’re X. Get three in a row.'
               : 'The computer is thinking…';

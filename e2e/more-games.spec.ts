@@ -28,6 +28,11 @@ test('Tic-Tac-Toe: you move, the computer answers', async ({ page }) => {
   // Cells stay the same size whether they hold an X, an O or nothing.
   const heights = await page.locator('[data-cell]').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
   expect(new Set(heights).size).toBe(1);
+  // New sits below the board, under the thumb; ties count at the top.
+  const board = (await page.locator('[data-board]').boundingBox())!;
+  const newBtn = (await page.locator('[data-new]').boundingBox())!;
+  expect(newBtn.y).toBeGreaterThan(board.y + board.height);
+  await expect(page.locator('[data-ties]')).toHaveText('0');
 });
 
 test('Four in a Row: drop a disc, the computer answers', async ({ page }) => {

@@ -239,11 +239,11 @@ export const games: GameMeta[] = [
       steps: [
         'You are <b>X</b>. The computer is <b>O</b>. You take turns.',
         'Tap an empty square to put your X there.',
-        'The first to get three in a row wins. If all nine squares fill up with no line, it’s a draw.',
-        'Tap <b>New</b> for another round. Who goes first switches each round.',
+        'The first to get three in a row wins. If all nine squares fill up with no line, it’s a tie.',
+        'Tap <b>New</b>, below the board, for another round. <b>Ties</b> counts the rounds nobody won. Who goes first switches each round.',
       ],
       tips: [
-        '<b>Easy</b> mostly plays at random. <b>Strong</b> never loses: the best you can do is a draw.',
+        '<b>Easy</b> mostly plays at random. <b>Strong</b> never loses: the best you can do is a tie.',
         'Taking the middle square first gives you the most ways to win.',
         'Watch for two Os in a row and block the third square.',
       ],

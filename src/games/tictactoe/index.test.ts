@@ -64,7 +64,8 @@ describe('Tic-tac-toe screen', () => {
 
     const drawn = setup(at('XOXXOOOX.', { tally: { you: 0, computer: 0, draws: 1 } }));
     drawn.cell(8).click();
-    expect(drawn.status()).toBe('It’s a draw. Tap New for another round. Draws so far: 2.');
+    expect(drawn.status()).toBe('It’s a tie. Tap New for another round.');
+    expect(drawn.$('[data-ties]').textContent).toBe('2');
   });
 
   it('switches Easy and Strong without restarting', () => {
