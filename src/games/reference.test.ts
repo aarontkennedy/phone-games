@@ -7,6 +7,7 @@ import { newDeck } from '../core/cards';
 import { move as slide } from './2048/logic';
 import { handValue } from './blackjack/logic';
 import { applyMove, legalMoves as checkersMoves, startBoard, type Piece } from './checkers/logic';
+import { START, fromFen, legalMoves as chessMoves, makeMove, type Position } from './chess/logic';
 import { pegPoints, scoreHand, total } from './cribbage/logic';
 import { cards } from './cribbage/test-fixtures';
 import { scoreDice } from './hotdice/logic';
@@ -30,6 +31,20 @@ describe('Checkers: move counts from the start (published "perft" numbers)', () 
     [6, 36768],
   ])('%i moves deep: %i positions', (depth, expected) => {
     expect(perft(startBoard(), 0, depth)).toBe(expected);
+  });
+});
+
+describe('Chess: move counts (published "perft" numbers, Chess Programming Wiki)', () => {
+  // These positions between them test castling, en passant, promotion, pins and checks.
+  const perft = (p: Position, depth: number): number => (depth === 0 ? 1 : chessMoves(p).reduce((n, m) => n + perft(makeMove(p, m), depth - 1), 0));
+  it.each([
+    ['the start', START, [20, 400, 8902]],
+    ['"Kiwipete"', 'r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0', [48, 2039]],
+    ['position 3', '8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0', [14, 191, 2812]],
+    ['position 4', 'r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0', [6, 264, 9467]],
+    ['position 5', 'rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1', [44, 1486]],
+  ])('%s', (_name, fen, counts) => {
+    counts.forEach((expected, i) => expect(perft(fromFen(fen as string), i + 1)).toBe(expected));
   });
 });
 

@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -268,6 +268,31 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./fourinarow'),
+  },
+  {
+    id: 'chess',
+    title: 'Chess',
+    description: 'The classic battle of kings, against the computer',
+    icon: knightIcon,
+    category: 'board',
+    howToPlay: {
+      goal: 'Checkmate the computer’s king: attack it so it has no way to escape.',
+      steps: [
+        'You play against the computer. You swap colors every game, and white always moves first. Your pieces are always at the bottom.',
+        'Tap one of your pieces, then tap a marked square to move it. A dot marks an empty square; a ring marks a piece you can take. Tap another piece to change your mind.',
+        '<b>Pawns</b> move one square forward (two on their first move) and take one square diagonally forward. <b>Knights</b> jump in an L shape. <b>Bishops</b> move diagonally, <b>rooks</b> straight, the <b>queen</b> both ways, any distance. The <b>king</b> moves one square in any direction.',
+        '<b>Check</b> means your king is attacked: its square turns red and you must get it out of danger. If you can’t, that’s <b>checkmate</b> and the game is over.',
+        'Special moves: <b>castling</b> (move your king two squares toward a rook that hasn’t moved, and the rook jumps over it), <b>en passant</b> (a pawn that steps two squares can be taken as if it had moved one), and <b>promotion</b> (a pawn reaching the far side becomes a queen, rook, bishop or knight: tap the one you want).',
+        'It’s a draw if the player to move has no legal move but isn’t in check (stalemate), the same position comes up three times, 50 moves pass on each side with no capture or pawn move, or neither side has enough pieces left to checkmate.',
+        'Made a mistake? Tap <b>Undo</b> to take back your last move and the computer’s reply.',
+      ],
+      tips: [
+        '<b>Easy</b> looks one move ahead and often blunders. <b>Strong</b> looks three moves ahead. You can switch at any time.',
+        'Bring your knights and bishops out early, castle to keep your king safe, and don’t move your queen out too soon.',
+        'Before every move, check what the computer’s last move attacks.',
+      ],
+    },
+    load: () => import('./chess'),
   },
   {
     id: 'checkers',

@@ -42,6 +42,10 @@ protected list. Add to that list when you learn of a new one.
 - **Never:** GPL, AGPL, LGPL, MPL, SSPL, "non-commercial" (CC-BY-NC), or no license
   at all. For example, the Stockfish chess engine is GPL, so we can't use it. chess.js
   (BSD-2) is fine.
+  Our Chess uses neither: its rules, computer player and piece drawings are our own
+  (src/games/chess). Most chess piece images online, including Wikimedia's, are
+  CC-BY-SA (share-alike), so don't use them. Published perft move counts are facts,
+  not code, and are fine to test against.
 - **Exceptions** go in `EXCEPTIONS` in `scripts/check-licenses.mjs`, with a reason.
   Only build and test tools can be exceptions, never code that ships to the phone.
 - **Code that ships to the phone** (anything bundled into `dist/`) must also be listed,

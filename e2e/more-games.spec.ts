@@ -193,3 +193,12 @@ test('Rummy 500: draw, discard, then the computer plays', async ({ page }) => {
   await page.locator('[data-discard]').click();
   await expect(status(page)).toHaveText(/Your turn/, { timeout: 10000 });
 });
+
+test('Chess: move a pawn, the computer replies', async ({ page }) => {
+  await page.goto('./#/chess');
+  await expectGoodLayout(page);
+  await page.getByRole('button', { name: 'White pawn, e2' }).click();
+  await page.getByRole('button', { name: 'Empty, e4, move here' }).click();
+  await expect(status(page)).toHaveText(/^The computer moved/, { timeout: 10000 });
+  await expect(page.locator('.cs-sq.last')).toHaveCount(2);
+});

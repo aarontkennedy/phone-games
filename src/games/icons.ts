@@ -135,6 +135,13 @@ export const runIcon = svg(
     '<circle cx="36" cy="27" r="4" fill="#ef5f58"/>',
 );
 
+/** A flat chess knight on a board square. */
+export const knightIcon = svg(
+  '<rect x="4" y="4" width="40" height="40" rx="4" fill="#6f66a8"/>' +
+    '<path d="M15 36c1-5 4-8 7-10-3 0-6 1-8 3l-2-4c2-6 6-11 12-13l2-4 2 4c6 3 8 11 8 24Z" fill="#ffffff" stroke="#1f1b2e" stroke-width="1.6" stroke-linejoin="round"/>' +
+    '<rect x="11" y="36" width="25" height="5" rx="1.5" fill="#ffffff" stroke="#1f1b2e" stroke-width="1.6"/>',
+);
+
 /** Two flat dice. */
 export const diceIcon = svg(
   '<rect x="4" y="12" width="22" height="22" rx="4" fill="#6c63ff"/>' +

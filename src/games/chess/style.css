@@ -1,0 +1,126 @@
+/* An 8x8 board, your pieces at the bottom. A move is marked with a dot (a ring around a
+   piece you can take) in the other square color; the last move's squares are tinted, a
+   king in check sits on red, and the piece you picked is outlined. */
+.cs-board {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  aspect-ratio: 1;
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.cs-sq {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  background: var(--cs-light);
+}
+
+.cs-sq.dark {
+  background: var(--cs-dark);
+}
+
+.cs-sq.light.last {
+  background: var(--cs-last-light);
+}
+
+.cs-sq.dark.last {
+  background: var(--cs-last-dark);
+}
+
+.cs-sq.check {
+  background: var(--cs-check);
+}
+
+button.cs-sq:not(:disabled) {
+  cursor: pointer;
+}
+
+.cs-sq.selected {
+  outline: 4px solid var(--cs-edge);
+  outline-offset: -4px;
+}
+
+.cs-sq.target::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--cs-dark);
+}
+
+.cs-sq.dark.target::after {
+  background: var(--cs-light);
+}
+
+.cs-sq.take::after {
+  inset: 3px;
+  width: auto;
+  background: none;
+  border: 4px solid var(--cs-dark);
+}
+
+.cs-sq.dark.take::after {
+  background: none;
+  border-color: var(--cs-light);
+}
+
+.cs-piece {
+  width: 88%;
+  height: 88%;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+}
+
+.cs-piece.w {
+  fill: var(--cs-white);
+  stroke: var(--cs-edge);
+}
+
+.cs-piece.b {
+  fill: var(--cs-edge);
+  stroke: var(--cs-white);
+}
+
+.cs-piece.w .cs-eye {
+  fill: var(--cs-edge);
+  stroke: none;
+}
+
+.cs-piece.b .cs-eye {
+  fill: var(--cs-white);
+  stroke: none;
+}
+
+.cs-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Promotion choices: a piece drawing on a light tile, so both colors read. */
+.cs-promo {
+  width: var(--tap);
+  padding: 2px;
+  background: var(--cs-light);
+}
+
+.cs-promo .cs-piece {
+  width: 100%;
+  height: 100%;
+}
+
+/* The board looks the same in light and dark mode. */
+.cs {
+  --cs-light: #e9e4f5;
+  --cs-dark: #6f66a8;
+  --cs-last-light: #f2d98a;
+  --cs-last-dark: #8f7a2e;
+  --cs-check: #e05050;
+  --cs-white: #ffffff;
+  --cs-edge: #1f1b2e;
+}
