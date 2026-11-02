@@ -1,0 +1,94 @@
+/* The computer's count, the melds on the table, the deck beside the face-up pile (every card
+   showing its rank, newest last), then your hand. */
+.rm-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.rm-info {
+  margin: 0;
+}
+
+/* Each meld is a small fan with 22px of each card showing; melds wrap onto new rows. */
+.rm-melds {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-3);
+}
+
+.rm-meld {
+  display: flex;
+}
+
+.rm-meld > .card {
+  flex: none;
+  width: 42px;
+}
+
+.rm-meld > .card + .card {
+  margin-left: -20px;
+}
+
+.rm-piles {
+  display: flex;
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.rm-deck,
+.rm-pile-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rm-deck .card {
+  width: 46px;
+}
+
+.rm-pile-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.rm-pile {
+  padding-top: 0;
+}
+
+.rm-pile .card:disabled {
+  cursor: default;
+}
+
+.rm-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Sideways, a crowded table (a long hand, many melds, a deep pile) must fit the square
+   beside the side bar: tighter rows and slightly smaller melds and deck. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .rm-table {
+    gap: var(--space-1);
+    padding-block: var(--space-1);
+  }
+
+  .rm-melds {
+    gap: var(--space-1) var(--space-2);
+  }
+
+  .rm-meld > .card {
+    width: 38px;
+  }
+
+  .rm-meld > .card + .card {
+    margin-left: -17px;
+  }
+
+  .rm-deck .card {
+    width: 40px;
+  }
+}

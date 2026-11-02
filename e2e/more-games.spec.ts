@@ -178,8 +178,18 @@ test('Go Fish: ask a player for a rank, then the others play', async ({ page }) 
   await page.goto('./#/gofish');
   await expectGoodLayout(page);
   await page.locator('[data-hand]').first().click();
-  await expect(status(page)).toHaveText(/^Who do you want to ask/);
+  await expect(status(page)).toHaveText(/^Tap West, North or East to ask/);
   await expectGoodLayout(page);
   await page.locator('[data-ask="1"]').click();
   await expect(status(page)).toHaveText(/^You asked West for/);
+});
+
+test('Rummy 500: draw, discard, then the computer plays', async ({ page }) => {
+  await page.goto('./#/rummy');
+  await expectGoodLayout(page);
+  await page.locator('[data-stock]').click();
+  await page.locator('[data-hand]').first().click();
+  await expectGoodLayout(page);
+  await page.locator('[data-discard]').click();
+  await expect(status(page)).toHaveText(/Your turn/, { timeout: 10000 });
 });

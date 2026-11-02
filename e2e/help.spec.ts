@@ -27,6 +27,7 @@ const GAMES = [
   { id: 'backgammon', title: 'Backgammon' },
   { id: 'dots', title: 'Dots and Boxes' },
   { id: 'gofish', title: 'Go Fish' },
+  { id: 'rummy', title: 'Rummy 500' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));

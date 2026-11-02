@@ -19,6 +19,8 @@ const lower = (c: Card) => cardName(c).replace(/^(Ace|Jack|Queen|King)/, (w) => 
 const who = (seat: Seat) => (seat === 0 ? 'You' : SEAT_NAMES[seat]);
 const whom = (seat: Seat) => (seat === 0 ? 'you' : SEAT_NAMES[seat]);
 const list = (ranks: number[]) => ranks.map(plural).join(' and ');
+/** "West, North or East". */
+const and = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(', ')} or ${names.at(-1)}` : names[0]);
 
 /** One sentence (or two) on what the last action did. */
 export function eventText(e: Event): string {
@@ -89,15 +91,22 @@ export function mount(container: HTMLElement): () => void {
     });
     const hand = state.hands[0];
     boardEl.innerHTML = seats + handHtml(hand, { playable: canAsk() ? 'all' : [], picked: hand.filter((c) => c.rank === picked) });
+    // With a rank picked, the players you can ask become buttons.
+    if (picked !== null) {
+      for (const x of targets(state, 0)) {
+        const el = boardEl.querySelector<HTMLElement>(`[data-seat="${x}"]`)!;
+        el.classList.add('gf-target');
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('aria-label', `Ask ${SEAT_NAMES[x]} for ${plural(picked)}`);
+        el.dataset.ask = String(x);
+      }
+    }
 
     container.querySelector('[data-books]')!.textContent = String(bookCount(state, 0));
     container.querySelector('[data-stock]')!.textContent = String(state.stock.length);
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
-    actionsEl.innerHTML = mustDraw(state, 0)
-      ? '<button class="btn" data-draw>Draw</button>'
-      : picked !== null
-        ? targets(state, 0).map((x) => `<button class="btn" data-ask="${x}">Ask ${SEAT_NAMES[x]}</button>`).join('')
-        : '';
+    actionsEl.innerHTML = mustDraw(state, 0) ? '<button class="btn" data-draw>Draw</button>' : '';
     statusEl.textContent = statusText();
 
     if (state.phase === 'over') {
@@ -112,11 +121,13 @@ export function mount(container: HTMLElement): () => void {
     if (state.phase === 'over') return `${before}You won ${state.tally.won} of ${state.tally.played} games.`;
     if (state.turn !== 0) return `${before}${SEAT_NAMES[state.turn]} is asking…`;
     if (mustDraw(state, 0)) return `${before}${state.hands[0].length ? 'No one else has cards' : 'You have no cards'}: draw one.`;
-    if (picked !== null) return `Who do you want to ask for ${plural(picked)}?`;
+    if (picked !== null) return `Tap ${and(targets(state, 0).map((x) => SEAT_NAMES[x]))} to ask for ${plural(picked)}.`;
     return `${before}Your turn: tap a card, then ask a player for that rank.`;
   }
 
   boardEl.addEventListener('click', (e) => {
+    const seat = (e.target as Element).closest<HTMLElement>('[data-ask]');
+    if (seat) return update(ask(state, 0, Number(seat.dataset.ask) as Seat, picked!));
     const el = (e.target as Element).closest<HTMLElement>('[data-hand]');
     if (!el || !canAsk()) return;
     const rank = state.hands[0].find((h) => cardId(h) === el.dataset.card)!.rank;
@@ -124,10 +135,7 @@ export function mount(container: HTMLElement): () => void {
     render();
   });
   actionsEl.addEventListener('click', (e) => {
-    const el = (e.target as Element).closest<HTMLButtonElement>('button');
-    if (!el) return;
-    if (el.hasAttribute('data-draw')) update(draw(state, 0));
-    else update(ask(state, 0, Number(el.dataset.ask) as Seat, picked!));
+    if ((e.target as Element).closest('[data-draw]')) update(draw(state, 0));
   });
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase === 'playing' && state.last !== null;

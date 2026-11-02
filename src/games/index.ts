@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -380,7 +380,7 @@ export const games: GameMeta[] = [
       goal: 'Collect the most <b>books</b>: all four cards of one rank, like four 7s.',
       steps: [
         'You play against three computer players: West, North and East. Everyone gets 5 cards, and the rest make the deck.',
-        'On your turn, tap a card in your hand, then tap <b>Ask West</b>, <b>Ask North</b> or <b>Ask East</b>. You ask that player for every card of the same rank, like all their 7s. You can only ask for a rank you hold.',
+        'On your turn, tap a card in your hand, then tap the player you want to ask: West, North or East (they get a dashed outline). You ask them for every card of the same rank, like all their 7s. You can only ask for a rank you hold.',
         'If they have any, they give them all to you and you go again.',
         'If not, they say <b>go fish</b> and you take a card from the deck. If it’s the rank you asked for, you go again. Otherwise it’s the next player’s turn.',
         'As soon as you hold all four of a rank, the book is laid down. Each seat shows how many cards it holds, how many books it has, and its latest book.',
@@ -393,6 +393,30 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./gofish'),
+  },
+  {
+    id: 'rummy',
+    title: 'Rummy 500',
+    description: 'Meld sets and runs, take from the pile, reach 500',
+    icon: runIcon,
+    category: 'cards',
+    howToPlay: {
+      goal: 'Score points by laying down cards in sets and runs. The first to 500 points wins.',
+      steps: [
+        'You play against the computer. You each get 13 cards. The rest make the deck, and one card starts the face-up pile.',
+        'Start your turn by tapping the <b>deck</b> to draw a card, or by tapping a card in the <b>pile</b>. Taking from the pile gives you that card and every card above it, and you must meld the card you tapped in the same turn. Only pile cards you can meld can be tapped. Changed your mind? Tap <b>Undo</b>.',
+        'A <b>meld</b> is a <b>set</b> of 3 or 4 cards of the same rank (three 7s), or a <b>run</b> of 3 or more in a row in one suit (5, 6, 7 of hearts). Aces go low (A, 2, 3) or high (Q, K, A).',
+        'Tap cards to pick them, then tap <b>Meld</b> to lay them down. You can also <b>lay off</b>: add cards to any meld on the table, yours or the computer’s.',
+        'End your turn by picking one card and tapping <b>Discard</b>.',
+        'The hand ends when someone has no cards left, or the deck runs out. You score the points of every card you melded and lose the points of the cards still in your hand: aces 15 (1 in A, 2, 3), 10s and picture cards 10, others their number.',
+      ],
+      tips: [
+        '<b>Easy</b> only takes the top of the pile and never lays off. <b>Strong</b> looks deep into the pile and lays off whenever it can. You can switch at any time.',
+        'A big pile can be worth taking: every card you meld from it scores. Cards you can’t use count against you if the hand ends.',
+        'Meld early. Points in your hand count against you when someone goes out.',
+      ],
+    },
+    load: () => import('./rummy'),
   },
   {
     id: 'hotdice',

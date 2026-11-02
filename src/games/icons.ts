@@ -127,6 +127,14 @@ export const fishIcon = svg(
     '<circle cx="34" cy="28" r="1.8" fill="#ffffff"/>',
 );
 
+/** A flat run of three cards laid down in a row. */
+export const runIcon = svg(
+  '<rect x="3" y="10" width="18" height="26" rx="3" fill="#ffffff" stroke="#6c63ff" stroke-width="2.5"/>' +
+    '<rect x="15" y="12" width="18" height="26" rx="3" fill="#ffffff" stroke="#6c63ff" stroke-width="2.5"/>' +
+    '<rect x="27" y="14" width="18" height="26" rx="3" fill="#6c63ff"/>' +
+    '<circle cx="36" cy="27" r="4" fill="#ef5f58"/>',
+);
+
 /** Two flat dice. */
 export const diceIcon = svg(
   '<rect x="4" y="12" width="22" height="22" rx="4" fill="#6c63ff"/>' +

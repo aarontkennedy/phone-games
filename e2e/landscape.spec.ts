@@ -10,6 +10,8 @@ import {
 } from './helpers';
 import { newGame as newCrazyEights } from '../src/games/crazyeights/logic';
 import { newGame as newGoFish } from '../src/games/gofish/logic';
+import { newGame as newRummy } from '../src/games/rummy/logic';
+import { newDeck } from '../src/core/cards';
 
 // Phones turned sideways: the board on the left, controls in a side bar on the right,
 // everything on one screen (docs/DESIGN.md, "Landscape").
@@ -115,7 +117,7 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
-    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman', 'spider', 'backgammon', 'dots', 'gofish']) {
+    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman', 'spider', 'backgammon', 'dots', 'gofish', 'rummy']) {
       test(`${id}: board on the left, side bar on the right`, async ({ page }) => {
         await page.goto(`./#/${id}`);
         await expectSideBarLayout(page);
@@ -133,13 +135,24 @@ for (const size of SIZES) {
       });
     }
 
-    test('Go Fish: a 16-card hand and the Ask buttons fit beside the side bar', async ({ page }) => {
+    test('Go Fish: a 16-card hand fits beside the side bar while asking', async ({ page }) => {
       const s = newGoFish('strong');
       s.hands[0].push(...s.stock.splice(0, 16 - s.hands[0].length));
       await page.addInitScript((saved) => localStorage.setItem('pg:gofish:state', saved), JSON.stringify(s));
       await page.goto('./#/gofish');
       await page.locator('[data-hand]').first().click();
       await expect(page.locator('[data-ask]')).toHaveCount(3);
+      await expectSideBarLayout(page);
+    });
+
+    test('Rummy 500: a crowded table still fits beside the side bar', async ({ page }) => {
+      const deck = newDeck();
+      const table = [2, 3, 4, 5, 6].map((rank) => deck.filter((c) => c.rank === rank && c.suit !== 'C'));
+      const rest = deck.filter((c) => !table.flat().includes(c));
+      const s = { ...newRummy('strong'), table, hands: [rest.slice(0, 16), rest.slice(16, 21)], discard: rest.slice(21, 36), stock: rest.slice(36) };
+      await page.addInitScript((saved) => localStorage.setItem('pg:rummy:state', saved), JSON.stringify(s));
+      await page.goto('./#/rummy');
+      await expect(page.locator('[data-hand]')).toHaveCount(16);
       await expectSideBarLayout(page);
     });
 

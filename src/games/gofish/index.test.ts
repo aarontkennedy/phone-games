@@ -32,8 +32,9 @@ describe('Go fish screen', () => {
 
     tap('7H');
     expect($$('.tt-hand .picked').map((c) => c.dataset.card)).toEqual(['7C', '7H']);
-    expect(status()).toBe('Who do you want to ask for 7s?');
-    expect($$('[data-ask]').map((b) => b.textContent)).toEqual(['Ask West', 'Ask North', 'Ask East']);
+    expect(status()).toBe('Tap West, North or East to ask for 7s.');
+    expect($$('[data-ask]').map((b) => b.getAttribute('aria-label'))).toEqual(['Ask West for 7s', 'Ask North for 7s', 'Ask East for 7s']);
+    expect($('[data-seat="0"]').hasAttribute('data-ask')).toBe(false);
     tap('7C'); // tap again to change your mind
     expect($('[data-ask]')).toBeNull();
     tap('7C');
@@ -61,6 +62,10 @@ describe('Go fish screen', () => {
     expect(status()).toMatch(/^You drew the .+\. Your turn/);
     document.body.replaceChildren();
     expect(setup(position(['3C', '', '', ''])).status()).toBe('No one else has cards: draw one.');
+    document.body.replaceChildren();
+    const one = setup(position(['3C 4C', '', '5D', '']));
+    one.tap('3C');
+    expect(one.status()).toBe('Tap North to ask for 3s.');
   });
 
   it('describes every kind of turn', () => {
