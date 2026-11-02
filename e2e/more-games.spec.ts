@@ -224,3 +224,25 @@ test("Texas Hold'em: act on your turn, then the computer players play", async ({
   await page.locator('[data-action="call"], [data-action="check"]').first().click();
   await expect(status(page)).not.toHaveText(/^Before the flop, your turn/);
 });
+
+test('Five-Card Draw: bet, swap cards, and the hand plays on', async ({ page }) => {
+  await page.goto('./#/drawpoker');
+  await expectGoodLayout(page);
+  // You're the dealer in the first hand: the computer players act first.
+  // Check or call (again, if someone raises) until the draw comes round, or everyone else folds.
+  const swapBtn = page.locator('[data-swap]');
+  const passive = page.locator('[data-action="call"], [data-action="check"]').first();
+  const next = swapBtn.or(page.locator('[data-next]')).or(passive);
+  for (let i = 0; i < 6 && !(await swapBtn.isVisible()) && !(await page.locator('[data-next]').isVisible()); i++) {
+    await expect(next).toBeVisible({ timeout: 15000 });
+    if (await passive.isVisible()) await passive.click();
+  }
+  await expect(swapBtn.or(page.locator('[data-next]'))).toBeVisible({ timeout: 15000 });
+  if (await swapBtn.isVisible()) {
+    await page.locator('[data-hand]').first().click();
+    await expect(swapBtn).toHaveText('Swap 1');
+    await expectGoodLayout(page);
+    await swapBtn.click();
+    await expect(status(page)).not.toHaveText(/^The draw: tap/);
+  }
+});

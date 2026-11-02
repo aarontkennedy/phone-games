@@ -160,6 +160,15 @@ export const holdemIcon = svg(
     '<rect x="10" y="33" width="28" height="5" fill="#6c63ff"/>',
 );
 
+/** Five flat cards fanned in a hand. */
+export const drawPokerIcon = svg(
+  '<rect x="6" y="12" width="14" height="22" rx="2.5" fill="#ffffff" stroke="#6c63ff" stroke-width="2.2" transform="rotate(-20 13 34)"/>' +
+    '<rect x="12" y="9" width="14" height="22" rx="2.5" fill="#ffffff" stroke="#6c63ff" stroke-width="2.2" transform="rotate(-10 19 31)"/>' +
+    '<rect x="17" y="8" width="14" height="22" rx="2.5" fill="#ffffff" stroke="#6c63ff" stroke-width="2.2"/>' +
+    '<rect x="22" y="9" width="14" height="22" rx="2.5" fill="#ffffff" stroke="#6c63ff" stroke-width="2.2" transform="rotate(10 29 31)"/>' +
+    '<rect x="28" y="12" width="14" height="22" rx="2.5" fill="#ef5f58" transform="rotate(20 35 34)"/>',
+);
+
 /** Two flat dice. */
 export const diceIcon = svg(
   '<rect x="4" y="12" width="22" height="22" rx="4" fill="#6c63ff"/>' +

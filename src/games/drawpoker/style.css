@@ -1,0 +1,81 @@
+/* The four seats (chips, last action or hand, and the others' cards: face down until a
+   showdown), then your five cards, which lift and say "Swap" when picked in the draw. */
+.dp-fan {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: var(--space-1);
+}
+
+.dp-fan > * {
+  flex: none;
+  width: 30px;
+}
+
+.dp-fan > * + * {
+  margin-left: -18px;
+}
+
+.dp-dealer {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.4em;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.dp-info {
+  margin: 0;
+  text-align: center;
+}
+
+.dp-hand {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-1);
+  max-width: 340px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.dp-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.dp-slot > .card {
+  width: 100%;
+}
+
+.dp-slot > .card.swap {
+  transform: translateY(-6px);
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.dp-mark {
+  min-height: 1.2em;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.dp-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Sideways, the seats and your hand must fit the square beside the side bar. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .dp .tt-table {
+    gap: var(--space-1);
+    padding-block: var(--space-1);
+  }
+
+  .dp-hand {
+    max-width: 260px;
+  }
+}

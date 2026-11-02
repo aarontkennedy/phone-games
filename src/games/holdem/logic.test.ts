@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { isFullDeck } from '../../core/cards';
 import { seededRng } from '../../core/random';
-import { act, betSize, bigBlind, chooseAction, equity, isValidState, makePots, newGame, nextHand, options, pot, raiseCost, toCall, winner, type State } from './logic';
+import { makePots } from '../../core/betting';
+import { act, betSize, bigBlind, chooseAction, equity, isValidState, newGame, nextHand, options, pot, raiseCost, toCall, winner, type State } from './logic';
 import { cards, table } from './test-fixtures';
 
 describe("hold'em hands", () => {

@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -490,6 +490,30 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./holdem'),
+  },
+  {
+    id: 'drawpoker',
+    title: 'Five-Card Draw',
+    description: 'Classic poker: bet, swap up to three cards, bet again',
+    icon: drawPokerIcon,
+    category: 'cards',
+    howToPlay: {
+      goal: 'Win chips by having the best poker hand, or by making everyone else fold. Win every chip to win the game.',
+      steps: [
+        'You play against three computer players: West, North and East. Everyone starts with 1000 play chips.',
+        'Each hand, the two players after the dealer (marked <b>D</b>) put in the <b>blinds</b>, small forced bets. Then everyone gets five private cards. Yours are at the bottom.',
+        'First there’s a round of betting. On your turn, tap <b>Check</b> (pass, if nobody has bet), <b>Call</b> (match the bet), <b>Bet</b> or <b>Raise</b> (put in more), or <b>Fold</b> (give up the hand). The line under the table says how many chips each choice puts in.',
+        'Then comes <b>the draw</b>: tap up to three cards you want to get rid of (they lift and say <b>Swap</b>), then tap <b>Swap</b> to trade them for new ones. Happy with your cards? Tap <b>Stand pat</b>. Each seat shows how many cards the others drew.',
+        'A second round of betting follows, with bets twice the size. Then everyone left shows their cards and the best hand wins. Best to worst: straight flush, four of a kind, full house, flush, straight, three of a kind, two pair, pair, high card.',
+        'If you run out of chips mid-hand you’re <b>all in</b>: you can still win what you matched, and the rest makes a side pot for the others. Blinds double every 10 hands. The game ends when you have every chip, or none.',
+      ],
+      tips: [
+        '<b>Easy</b> players call a lot and swap cards carelessly. <b>Strong</b> players weigh their chances, draw by the book and bluff now and then. You can switch at any time.',
+        'Keep any pair and swap the other three. With four cards of a flush or four in a row, swap just one.',
+        'A player who stands pat probably has a strong hand, or is bluffing.',
+      ],
+    },
+    load: () => import('./drawpoker'),
   },
   {
     id: 'hotdice',
