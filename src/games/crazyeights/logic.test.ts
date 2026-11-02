@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { isFullDeck } from '../../core/cards';
+import { isFullDeck, newDeck } from '../../core/cards';
 import { seededRng } from '../../core/random';
-import { applyTurn, bestSuit, canPlay, cardPoints, chooseTurn, draw, isValidState, newGame, nextRound, pass, play, playable, winner, type State } from './logic';
+import { applyTurn, canPlay, cardPoints, chooseTurn, draw, isValidState, newGame, nextRound, pass, play, playable, winner, type State } from './logic';
 import { card, cards, position } from './test-fixtures';
 
 describe('crazy eights', () => {
@@ -79,18 +79,45 @@ describe('crazy eights', () => {
     expect(winner(position(['7H', '', '', ''], '7S'))).toBeNull();
   });
 
-  it('finds the suit a hand holds most of', () => {
-    expect(bestSuit(cards('2H 3H 4C 8S 8S'))).toBe('H');
+  it('remembers suits a player lacks: they drew or passed on it, until they play it', () => {
+    const drew = draw(position(['2C', '3H', '4H', '5H'], '7S'), 0)!;
+    expect(drew.voids![0]).toEqual(['S']);
+    expect(draw(drew, 0)!.voids![0]).toEqual(['S']); // noted once
+    const played = play({ ...position(['2S 4D', '3H', '4H', '5H'], '7S'), voids: [['S', 'D'], [], [], []] }, 0, card('2S'))!;
+    expect(played.voids![0]).toEqual(['D']);
+    const eight = play({ ...position(['8S 4D', '3H', '4H', '5H'], '7S'), voids: [['S'], [], [], []] }, 0, card('8S'), 'H')!;
+    expect(eight.voids![0]).toEqual(['S']); // an 8 says nothing about spades
+    const rest = newDeck().filter((c) => !(c.rank === 2 && c.suit === 'C') && !(c.rank === 12 && c.suit === 'S') && c.rank !== 8 && c.suit !== 'S');
+    const stuck = { ...position(['2C', '', '', ''], 'QS', { stock: [] }), hands: [cards('2C'), newDeck().filter((c) => c.rank === 8 || (c.suit === 'S' && c.rank !== 12)), rest, []] };
+    expect(pass(stuck, 0)!.voids![0]).toEqual(['S']);
+    // Games saved before this was added have no record, and still play.
+    const { voids: _old, ...before } = position(['2C', '3H', '4H', '5H'], '7S');
+    expect(isValidState(before)).toBe(true);
+    expect(draw(before as State, 0)!.voids).toEqual([['S'], [], [], []]);
+    expect(chooseTurn({ ...(before as State), hands: [cards('7H 2S 3S'), cards('AC'), cards('AH'), cards('3H')] }, 0)).toMatchObject({ action: 'play' });
   });
 
-  it('Strong saves its 8s, plays from its longest suit, and names its best suit', () => {
+  it('Strong keeps its options open and sheds high cards', () => {
     const strong = (hand: string, top = '7S', o: Partial<State> = {}) => chooseTurn(position([hand, 'AC AD', 'AH 2H', '3H 4H'], top, o), 0);
-    expect(strong('8D 7H 2S 3S')).toEqual({ action: 'play', card: card('3S') });
-    expect(strong('8D 2C 3C')).toEqual({ action: 'play', card: card('8D'), suit: 'C' });
+    // Any spade leaves two spades to follow, the 7 of hearts leaves none: shed the king.
+    expect(strong('7H 2S 3S KS')).toEqual({ action: 'play', card: card('KS') });
     expect(strong('2C 3C')).toEqual({ action: 'draw' });
     expect(chooseTurn(position(['2C', '', '', ''], '7S', { stock: [] }), 0)).toEqual({ action: 'pass' });
-    // An opponent about to go out, and only two cards left: use the 8 to change the suit.
-    expect(chooseTurn(position(['8D 7H', 'AC', 'AH 2H', '3H 4H'], '7S'), 0)).toEqual({ action: 'play', card: card('8D'), suit: 'H' });
+  });
+
+  it('Strong keeps its 8s unless they clearly help, and names its best suit', () => {
+    const strong = (hand: string, top = '7S', o: Partial<State> = {}) => chooseTurn(position([hand, 'AC AD', 'AH 2H', '3H 4H'], top, o), 0);
+    expect(strong('8D 7H 2S 3S')).toMatchObject({ card: { suit: 'S' } }); // a spade, keeping the 8
+    expect(strong('8D 2C 3C')).toEqual({ action: 'play', card: card('8D'), suit: 'C' }); // no other play
+  });
+
+  it('Strong switches to a suit the next player lacks, and blocks someone about to go out', () => {
+    // West (next) is known to lack hearts: switch to hearts with the 7 of hearts.
+    const starve = position(['7H 2S 9H', 'AC AD', 'AH 2H', '3H 4H'], '7S', { voids: [[], ['H'], [], []] });
+    expect(chooseTurn(starve, 0)).toEqual({ action: 'play', card: card('7H') });
+    // North has one card and lacks clubs: spend the 8 to name clubs.
+    const block = position(['8D 2S 3S', 'AC AD', 'AH', '3H 4H'], '7S', { voids: [[], [], ['C'], []] });
+    expect(chooseTurn(block, 0)).toEqual({ action: 'play', card: card('8D'), suit: 'C' });
   });
 
   it('Easy plays any card it can', () => {

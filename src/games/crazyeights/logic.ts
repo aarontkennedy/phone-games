@@ -30,6 +30,11 @@ export interface State {
   scores: number[];
   /** Who won the last round, and the points they scored. */
   last: { seat: Seat; points: number } | null;
+  /**
+   * Suits each seat is known to lack: everyone sees a player draw when they can't follow.
+   * Forgotten once they play that suit. Optional, so games saved before it still load.
+   */
+  voids?: Suit[][];
 }
 
 const clone = (s: State): State => JSON.parse(JSON.stringify(s));
@@ -55,6 +60,7 @@ function deal(base: Pick<State, 'level' | 'dealer' | 'scores' | 'last'>, rng: Rn
     suit: first.suit,
     turn: nextSeat(base.dealer),
     lastPlay: [null, null, null, null],
+    voids: [[], [], [], []],
   };
 }
 
@@ -72,6 +78,7 @@ export function play(s: State, seat: Seat, card: Card, named?: Suit): State | nu
   n.discard.push(card);
   n.suit = card.rank === 8 ? named! : card.suit;
   n.lastPlay[seat] = card;
+  if (card.rank !== 8 && n.voids) n.voids[seat] = n.voids[seat].filter((x) => x !== card.suit);
   if (!n.hands[seat].length) return endRound(n, seat);
   n.turn = nextSeat(seat);
   return n;
@@ -81,6 +88,7 @@ export function play(s: State, seat: Seat, card: Card, named?: Suit): State | nu
 export function draw(s: State, seat: Seat, rng: Rng = Math.random): State | null {
   if (s.phase !== 'playing' || s.turn !== seat || playable(s, seat).length || !drawable(s)) return null;
   const n = clone(s);
+  noteVoid(n, seat);
   if (!n.stock.length) n.stock = shuffle(n.discard.splice(0, n.discard.length - 1), rng);
   n.hands[seat].push(n.stock.pop()!);
   return n;
@@ -89,7 +97,15 @@ export function draw(s: State, seat: Seat, rng: Rng = Math.random): State | null
 /** Passes, only when you can't play and there's nothing left to draw. */
 export function pass(s: State, seat: Seat): State | null {
   if (s.phase !== 'playing' || s.turn !== seat || playable(s, seat).length || drawable(s)) return null;
-  return { ...clone(s), turn: nextSeat(seat) };
+  const n = clone(s);
+  noteVoid(n, seat);
+  return { ...n, turn: nextSeat(seat) };
+}
+
+/** A player who can't follow has none of the suit to play. */
+function noteVoid(n: State, seat: Seat) {
+  n.voids ??= [[], [], [], []];
+  if (!n.voids[seat].includes(n.suit)) n.voids[seat].push(n.suit);
 }
 
 function endRound(n: State, winner: Seat): State {
@@ -109,36 +125,46 @@ export const winner = (s: State): Seat | null => (s.phase === 'gameOver' ? s.las
 
 // --- Computer players ---
 
-/** The suit this hand holds most of (not counting 8s). */
-export function bestSuit(hand: Card[]): Suit {
-  const count = (x: Suit) => hand.filter((c) => c.suit === x && c.rank !== 8).length;
-  return [...SUITS].sort((a, b) => count(b) - count(a))[0];
-}
-
 export type Turn = { action: 'play'; card: Card; suit?: Suit } | { action: 'draw' } | { action: 'pass' };
 
 /**
- * Easy plays any card it can and names a random suit. Strong keeps its 8s for when it
- * needs them, sheds high cards, and names its strongest suit.
+ * Easy plays any card it can and names a random suit. Strong keeps its options open: it
+ * plays the card that leaves it the most cards able to follow, sheds high cards, and
+ * switches to a suit the next player is known to lack (or that someone about to go out
+ * lacks). It keeps its 8s until it has no other play, or one clearly helps.
  */
 export function chooseTurn(s: State, seat: Seat, rng: Rng = Math.random): Turn {
   const options = playable(s, seat);
   if (!options.length) return drawable(s) ? { action: 'draw' } : { action: 'pass' };
-  const hand = s.hands[seat];
   if (s.level === 'easy') {
     const card = options[randomInt(options.length, rng)];
     return { action: 'play', card, suit: card.rank === 8 ? SUITS[randomInt(4, rng)] : undefined };
   }
-  const plain = options.filter((c) => c.rank !== 8);
-  const threat = SEATS.some((x) => x !== seat && s.hands[x].length <= 1);
-  if (plain.length && !(threat && plain.length < options.length && hand.length <= 2)) {
-    // Prefer a card in a suit we hold more of, then the higher-scoring card.
-    const count = (x: Suit) => hand.filter((c) => c.suit === x).length;
-    const card = [...plain].sort((a, b) => count(b.suit) - count(a.suit) || cardPoints(b) - cardPoints(a))[0];
-    return { action: 'play', card };
+  const hand = s.hands[seat];
+  const voids = s.voids ?? [[], [], [], []];
+  const next = nextSeat(seat);
+  // Someone with one card left goes out on their turn unless they can't follow.
+  const threat = SEATS.filter((x) => x !== seat && s.hands[x].length === 1);
+  /** How good it is to leave `suit` (and `rank`) on top, with `rest` still in hand. */
+  const worth = (suit: Suit, rank: number, rest: Card[]) =>
+    rest.filter((c) => c.rank === 8 || c.suit === suit || c.rank === rank).length * 10 +
+    (voids[next].includes(suit) ? 12 : 0) +
+    threat.filter((x) => voids[x].includes(suit)).length * 40;
+  let best: Turn | null = null;
+  let bestScore = -Infinity;
+  for (const card of options.filter((c) => c.rank !== 8)) {
+    const score = worth(card.suit, card.rank, hand.filter((c) => !sameCard(c, card))) + cardPoints(card) / 2;
+    if (score > bestScore) [best, bestScore] = [{ action: 'play', card }, score];
   }
-  const eight = options.find((c) => c.rank === 8)!;
-  return { action: 'play', card: eight, suit: bestSuit(hand.filter((c) => !sameCard(c, eight))) };
+  const eight = options.find((c) => c.rank === 8);
+  if (eight) {
+    const rest = hand.filter((c) => !sameCard(c, eight));
+    const suit = [...SUITS].sort((a, b) => worth(b, 0, rest) - worth(a, 0, rest))[0];
+    // An 8 is worth keeping: spend it only if it beats the best plain play by a margin,
+    // a smaller one when someone is about to go out.
+    if (!best || worth(suit, 0, rest) - (threat.length ? 10 : 45) > bestScore) best = { action: 'play', card: eight, suit };
+  }
+  return best!;
 }
 
 export function applyTurn(s: State, seat: Seat, t: Turn, rng: Rng = Math.random): State | null {
