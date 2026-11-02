@@ -9,6 +9,7 @@ import {
   swipe,
 } from './helpers';
 import { newGame as newCrazyEights } from '../src/games/crazyeights/logic';
+import { newGame as newGoFish } from '../src/games/gofish/logic';
 
 // Phones turned sideways: the board on the left, controls in a side bar on the right,
 // everything on one screen (docs/DESIGN.md, "Landscape").
@@ -114,7 +115,7 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
-    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman', 'spider', 'backgammon', 'dots']) {
+    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman', 'spider', 'backgammon', 'dots', 'gofish']) {
       test(`${id}: board on the left, side bar on the right`, async ({ page }) => {
         await page.goto(`./#/${id}`);
         await expectSideBarLayout(page);
@@ -131,6 +132,16 @@ for (const size of SIZES) {
         await expectSideBarLayout(page);
       });
     }
+
+    test('Go Fish: a 16-card hand and the Ask buttons fit beside the side bar', async ({ page }) => {
+      const s = newGoFish('strong');
+      s.hands[0].push(...s.stock.splice(0, 16 - s.hands[0].length));
+      await page.addInitScript((saved) => localStorage.setItem('pg:gofish:state', saved), JSON.stringify(s));
+      await page.goto('./#/gofish');
+      await page.locator('[data-hand]').first().click();
+      await expect(page.locator('[data-ask]')).toHaveCount(3);
+      await expectSideBarLayout(page);
+    });
 
     test('home and About still fit the width', async ({ page }) => {
       await page.goto('./');

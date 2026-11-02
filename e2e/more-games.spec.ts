@@ -173,3 +173,13 @@ test('Dots and Boxes: draw a line, the computer answers', async ({ page }) => {
   await expect(status(page)).toHaveText(/^Your turn/, { timeout: 5000 });
   await expect(page.locator('.db-line.drawn')).toHaveCount(2);
 });
+
+test('Go Fish: ask a player for a rank, then the others play', async ({ page }) => {
+  await page.goto('./#/gofish');
+  await expectGoodLayout(page);
+  await page.locator('[data-hand]').first().click();
+  await expect(status(page)).toHaveText(/^Who do you want to ask/);
+  await expectGoodLayout(page);
+  await page.locator('[data-ask="1"]').click();
+  await expect(status(page)).toHaveText(/^You asked West for/);
+});

@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -369,6 +369,30 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./crazyeights'),
+  },
+  {
+    id: 'gofish',
+    title: 'Go Fish',
+    description: 'Ask for cards and collect sets of four',
+    icon: fishIcon,
+    category: 'cards',
+    howToPlay: {
+      goal: 'Collect the most <b>books</b>: all four cards of one rank, like four 7s.',
+      steps: [
+        'You play against three computer players: West, North and East. Everyone gets 5 cards, and the rest make the deck.',
+        'On your turn, tap a card in your hand, then tap <b>Ask West</b>, <b>Ask North</b> or <b>Ask East</b>. You ask that player for every card of the same rank, like all their 7s. You can only ask for a rank you hold.',
+        'If they have any, they give them all to you and you go again.',
+        'If not, they say <b>go fish</b> and you take a card from the deck. If it’s the rank you asked for, you go again. Otherwise it’s the next player’s turn.',
+        'As soon as you hold all four of a rank, the book is laid down. Each seat shows how many cards it holds, how many books it has, and its latest book.',
+        'If you run out of cards, tap <b>Draw</b> to take one and carry on. When all 13 books are made, the most books wins.',
+      ],
+      tips: [
+        '<b>Easy</b> asks at random. <b>Strong</b> remembers what everyone asked for. You can switch at any time.',
+        'Listen to the others: a player who asks for 9s is holding at least one 9. Ask them for it on your turn.',
+        'Ask for the rank you hold most of: one more card might make a book.',
+      ],
+    },
+    load: () => import('./gofish'),
   },
   {
     id: 'hotdice',

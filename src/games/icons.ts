@@ -120,6 +120,13 @@ export const eightIcon = svg(
     '<circle cx="24" cy="30" r="7" fill="none" stroke="#ef5f58" stroke-width="3.5"/>',
 );
 
+/** A flat fish beside a card. */
+export const fishIcon = svg(
+  '<rect x="6" y="6" width="22" height="32" rx="4" fill="#ffffff" stroke="#6c63ff" stroke-width="2.5"/>' +
+    '<path d="M20 30c4-6 10-8 16-6l6-5v16l-6-5c-6 2-12 0-16-6Z" fill="#ef5f58"/>' +
+    '<circle cx="34" cy="28" r="1.8" fill="#ffffff"/>',
+);
+
 /** Two flat dice. */
 export const diceIcon = svg(
   '<rect x="4" y="12" width="22" height="22" rx="4" fill="#6c63ff"/>' +
