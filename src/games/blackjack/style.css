@@ -78,3 +78,22 @@
     --bj-won: #6cd17a;
   }
 }
+
+/* Hint: an icon button between Chips and Best. */
+.bj-hint {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  padding: 0;
+}
+
+.bj-hint svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

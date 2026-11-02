@@ -142,6 +142,16 @@ export const knightIcon = svg(
     '<rect x="11" y="36" width="25" height="5" rx="1.5" fill="#ffffff" stroke="#1f1b2e" stroke-width="1.6"/>',
 );
 
+/** Five flat cards in a row, the middle one held (raised). */
+export const videoPokerIcon = svg(
+  '<rect x="2" y="16" width="10" height="16" rx="2" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<rect x="11" y="16" width="10" height="16" rx="2" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<rect x="19" y="9" width="10" height="16" rx="2" fill="#ef5f58"/>' +
+    '<rect x="27" y="16" width="10" height="16" rx="2" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<rect x="36" y="16" width="10" height="16" rx="2" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>' +
+    '<rect x="8" y="36" width="32" height="4" rx="2" fill="#6c63ff"/>',
+);
+
 /** Two flat dice. */
 export const diceIcon = svg(
   '<rect x="4" y="12" width="22" height="22" rx="4" fill="#6c63ff"/>' +

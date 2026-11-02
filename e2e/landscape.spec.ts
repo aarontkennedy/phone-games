@@ -117,7 +117,7 @@ for (const size of SIZES) {
       await expectSideBarLayout(page);
     });
 
-    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman', 'spider', 'backgammon', 'dots', 'gofish', 'rummy', 'chess']) {
+    for (const id of ['tictactoe', 'fourinarow', 'checkers', 'numberplace', 'freecells', 'crazyeights', 'hotdice', 'gin', 'dominoes', 'yacht', 'reversi', 'mancala', 'hangman', 'spider', 'backgammon', 'dots', 'gofish', 'rummy', 'chess', 'videopoker']) {
       test(`${id}: board on the left, side bar on the right`, async ({ page }) => {
         await page.goto(`./#/${id}`);
         await expectSideBarLayout(page);
@@ -153,6 +153,14 @@ for (const size of SIZES) {
       await page.addInitScript((saved) => localStorage.setItem('pg:rummy:state', saved), JSON.stringify(s));
       await page.goto('./#/rummy');
       await expect(page.locator('[data-hand]')).toHaveCount(16);
+      await expectSideBarLayout(page);
+    });
+
+    test('Video Poker: the pay table and a held hand fit beside the side bar', async ({ page }) => {
+      await page.goto('./#/videopoker');
+      await page.locator('[data-deal]').click();
+      await page.locator('[data-card-index="0"]').click();
+      await expect(page.locator('.vp-held').first()).toHaveText('Held');
       await expectSideBarLayout(page);
     });
 

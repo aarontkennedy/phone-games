@@ -124,7 +124,7 @@ describe('Blackjack screen', () => {
 
   it('shows a hint only when you ask, for that decision only', () => {
     const { $, press, status } = table('10H 2S 2C 10D 3H');
-    expect($('[data-hint]').hasAttribute('disabled')).toBe(true); // nothing to advise while betting
+    expect($('[data-hint]').hidden).toBe(true); // nothing to advise while betting
     press('[data-deal]');
     expect(status()).toBe('Hit to take a card, or stand to keep your total.');
     press('[data-hint]');

@@ -202,3 +202,14 @@ test('Chess: move a pawn, the computer replies', async ({ page }) => {
   await expect(status(page)).toHaveText(/^The computer moved/, { timeout: 10000 });
   await expect(page.locator('.cs-sq.last')).toHaveCount(2);
 });
+
+test('Video Poker: deal, hold a card, draw', async ({ page }) => {
+  await page.goto('./#/videopoker');
+  await expectGoodLayout(page);
+  await page.locator('[data-deal]').click();
+  await page.locator('[data-card-index="2"]').click();
+  await expect(page.locator('.vp-held').nth(2)).toHaveText('Held');
+  await expectGoodLayout(page);
+  await page.locator('[data-draw]').click();
+  await expect(status(page)).toHaveText(/: (you win \d+|no win)\./);
+});

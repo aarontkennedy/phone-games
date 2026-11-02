@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -103,7 +103,7 @@ export const games: GameMeta[] = [
         'These are play chips, not money. If you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve ever had.',
       ],
       tips: [
-        'Not sure? Tap <b>Hint</b> at the top during a hand, and the line under the table tells you the best play for that moment. It only shows when you ask.',
+        'Not sure? During a hand, tap the light bulb (<b>Hint</b>) at the top, and the line under the table tells you the best play for that moment. It only shows when you ask.',
         'Always split aces and eights. Never split tens or fives.',
         'Stand on 12 to 16 when the dealer shows 2 to 6 (the dealer is likely to bust), and hit when the dealer shows 7 or higher.',
         'Double on 11 unless the dealer shows an ace.',
@@ -442,6 +442,29 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./rummy'),
+  },
+  {
+    id: 'videopoker',
+    title: 'Video Poker',
+    description: 'Keep the best cards, draw once, jacks or better pays',
+    icon: videoPokerIcon,
+    category: 'cards',
+    howToPlay: {
+      goal: 'Make the best poker hand you can from five cards. Better hands pay more credits.',
+      steps: [
+        'Choose a bet of 1 to 5 credits at the bottom and tap <b>Deal</b>. You get five cards.',
+        'Tap the cards you want to keep. Each one says <b>Held</b> underneath. Tap again to let it go.',
+        'Tap <b>Draw</b>. Every card you didn’t hold is replaced, once. Then your hand is paid by the table at the top.',
+        'The table shows what each hand pays for your bet, best first: <b>royal flush</b> (10, J, Q, K, A of one suit), <b>straight flush</b> (five in a row, one suit), <b>four of a kind</b>, <b>full house</b> (three of a kind and a pair), <b>flush</b> (five of one suit), <b>straight</b> (five in a row), <b>three of a kind</b>, <b>two pair</b>, and a <b>pair of jacks or better</b> (jacks, queens, kings or aces). Anything less doesn’t pay.',
+        'These are play credits, not money. If you run out, tap <b>Start over</b> for 100 more. <b>Best</b> is the most credits you’ve ever had.',
+      ],
+      tips: [
+        'Bet 5 when you can: a royal flush then pays 4000 instead of 1250.',
+        'Keep any pair, even a low one: it can grow into three of a kind, a full house or four of a kind.',
+        'With nothing, keep your jacks, queens, kings and aces, or four cards to a flush.',
+      ],
+    },
+    load: () => import('./videopoker'),
   },
   {
     id: 'hotdice',

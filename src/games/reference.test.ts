@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { seededRng, shuffle } from '../core/random';
 import { newDeck } from '../core/cards';
+import { rankFive } from '../core/poker';
 import { move as slide } from './2048/logic';
 import { handValue } from './blackjack/logic';
 import { applyMove, legalMoves as checkersMoves, startBoard, type Piece } from './checkers/logic';
@@ -46,6 +47,32 @@ describe('Chess: move counts (published "perft" numbers, Chess Programming Wiki)
   ])('%s', (_name, fen, counts) => {
     counts.forEach((expected, i) => expect(perft(fromFen(fen as string), i + 1)).toBe(expected));
   });
+});
+
+describe('Poker: every five-card hand, counted by kind (published combinatorics)', () => {
+  it('ranks all 2,598,960 hands into the known totals', () => {
+    const d = newDeck();
+    const counts: Record<string, number> = {};
+    for (let a = 0; a < 52; a++)
+      for (let b = a + 1; b < 52; b++)
+        for (let c = b + 1; c < 52; c++)
+          for (let e = c + 1; e < 52; e++)
+            for (let f = e + 1; f < 52; f++) {
+              const k = rankFive([d[a], d[b], d[c], d[e], d[f]]).category;
+              counts[k] = (counts[k] ?? 0) + 1;
+            }
+    expect(counts).toEqual({
+      straightFlush: 40, // including the 4 royal flushes
+      four: 624,
+      fullHouse: 3744,
+      flush: 5108,
+      straight: 10200,
+      three: 54912,
+      twoPair: 123552,
+      pair: 1098240,
+      high: 1302540,
+    });
+  }, 60_000);
 });
 
 describe('Reversi: move counts from the start (published "perft" numbers, OEIS A124004)', () => {

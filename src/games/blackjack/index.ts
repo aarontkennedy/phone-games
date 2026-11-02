@@ -22,6 +22,9 @@ import {
 import './style.css';
 
 const STATE_KEY = 'blackjack:state';
+/** A flat light bulb, for Hint. */
+const BULB_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z"/></svg>';
 const BEST_KEY = 'blackjack:best';
 
 const ACTIONS: [Action, string][] = [
@@ -50,7 +53,7 @@ export function mount(container: HTMLElement): () => void {
     <div class="screen cards bj">
       <div class="stats">
         <div class="stat"><small>Chips</small><b data-chips></b></div>
-        <button class="btn secondary" data-hint>Hint</button>
+        <button class="btn secondary bj-hint" data-hint aria-label="Hint" hidden>${BULB_ICON}</button>
         <div class="stat"><small>Best</small><b data-best></b></div>
       </div>
       <div class="board-frame bj-table" data-board></div>
@@ -161,7 +164,8 @@ export function mount(container: HTMLElement): () => void {
     chipsEl.textContent = String(state.chips);
     bestEl.textContent = String(best);
     statusEl.textContent = statusText();
-    hintBtn.disabled = state.phase !== 'playing';
+    // Only while a hand is in play: a narrow icon, so the stats still fit one row sideways.
+    hintBtn.hidden = state.phase !== 'playing';
   }
 
   // --- Input ---

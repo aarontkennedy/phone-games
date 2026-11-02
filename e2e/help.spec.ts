@@ -29,6 +29,7 @@ const GAMES = [
   { id: 'gofish', title: 'Go Fish' },
   { id: 'rummy', title: 'Rummy 500' },
   { id: 'chess', title: 'Chess' },
+  { id: 'videopoker', title: 'Video Poker' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));
