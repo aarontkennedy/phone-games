@@ -1,4 +1,5 @@
 import type { GameMeta } from '../core/game';
+import { chartHtml as blackjackChart } from './blackjack/strategy';
 import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
@@ -101,13 +102,16 @@ export const games: GameMeta[] = [
         'When you’re done, the dealer turns over the face-down card and must take cards until reaching 17 or more.',
         'You win if the dealer busts or you’re closer to 21. A win pays even money (a 20 bet wins 20). A tie is a <b>push</b>: your bet comes back.',
         'These are play chips, not money. If you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve ever had.',
+        'The dealer deals from a shoe of 6 decks. Between hands, tap the decks button at the top of the table to play with 1, 2, 6 or 8 decks. Each change starts a freshly shuffled shoe.',
+        '<b>Right</b> is how often your play matched the best play in the chart below. After a play that wasn’t the best, the line above the buttons says what was. Plays you make after tapping <b>Hint</b> don’t count.',
       ],
       tips: [
-        'Not sure? During a hand, tap the light bulb (<b>Hint</b>) at the top, and the line under the table tells you the best play for that moment. It only shows when you ask.',
+        'Not sure? Tap <b>Hint</b> above the buttons to see the best play for that moment. It only shows when you ask.',
         'Always split aces and eights. Never split tens or fives.',
-        'Stand on 12 to 16 when the dealer shows 2 to 6 (the dealer is likely to bust), and hit when the dealer shows 7 or higher.',
+        'Stand on 13 to 16 when the dealer shows 2 to 6 (the dealer is likely to bust), and hit when the dealer shows 7 or higher. Stand on 12 only against 4 to 6.',
         'Double on 11 unless the dealer shows an ace.',
       ],
+      extra: blackjackChart(),
     },
     load: () => import('./blackjack'),
   },

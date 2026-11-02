@@ -159,6 +159,15 @@ describe('startApp', () => {
       expect(panel(root).querySelector('h3')).toBeNull();
       stop();
     });
+
+    it('adds a game’s extra reference, such as a chart, after the tips', async () => {
+      const g = game('a', noop);
+      g.howToPlay = { goal: 'Win', steps: ['Play'], tips: ['Tip'], extra: '<table class="chart"></table>' };
+      const { root, stop, go } = setup([g]);
+      await go('#/a');
+      expect(panel(root).querySelector('ul + table.chart')).not.toBeNull();
+      stop();
+    });
   });
 
   describe('share', () => {

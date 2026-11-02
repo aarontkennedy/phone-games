@@ -62,7 +62,7 @@ describe('Blackjack screen', () => {
     expect($$('[data-action]').map((b) => b.textContent)).toEqual(['Hit', 'Stand', 'Double', 'Split']);
     expect($<HTMLButtonElement>('[data-action="split"]').disabled).toBe(true);
     expect($('.bj-hand.active')).not.toBeNull();
-    expect(status()).toBe('Hit to take a card, or stand to keep your total.');
+    expect(status()).toBe('Hit for another card, or stand.');
   });
 
   it('names an ace and soft totals', () => {
@@ -122,17 +122,81 @@ describe('Blackjack screen', () => {
     expect($$('.bj-hand').indexOf($$('.bj-hand.active')[0])).toBe(2);
   });
 
-  it('shows a hint only when you ask, for that decision only', () => {
-    const { $, press, status } = table('10H 2S 2C 10D 3H');
-    expect($('[data-hint]').hidden).toBe(true); // nothing to advise while betting
+  it('shows a hint above the buttons only when you ask, for that decision only', () => {
+    const { $, press, status, container } = table('10H 2S 2C 10D 3H');
+    expect(container.querySelector('[data-hint]')).toBeNull(); // nothing to advise while betting
     press('[data-deal]');
-    expect(status()).toBe('Hit to take a card, or stand to keep your total.');
+    expect(status()).toBe('Hit for another card, or stand.');
     press('[data-hint]');
-    expect(status()).toBe('Hint: the best play here is to hit.');
+    expect($('[data-tip]').textContent).toBe('Best play: Hit');
+    expect(status()).toBe('Hit for another card, or stand.'); // the instructions stay
     press('[data-action="hit"]');
-    expect(status()).toBe('Hit to take a card, or stand to keep your total.'); // ask again for the next one
+    expect(container.querySelector('[data-tip]')).toBeNull(); // ask again for the next one
+    expect($('[data-hint]').textContent).toBe('Hint');
+  });
+
+  it('scores each play against the best one, and says what was best after a miss', () => {
+    const { $, press, status } = table('10H 2S 2C 10D 3H 10C'); // 12 vs 2: hit
+    expect($('[data-accuracy]').textContent).toBe('–');
+    press('[data-deal]');
+    press('[data-action="stand"]');
+    expect(status()).toMatch(/ Best was to hit\.$/);
+    expect($('[data-accuracy]').textContent).toBe('0%');
+    expect(load('blackjack:accuracy', null)).toEqual({ right: 0, plays: 1 });
+    press('[data-deal]');
+    expect(status()).toBe('Hit for another card, or stand.'); // a new hand, a clean slate
+  });
+
+  it('counts a right play, keeps the lesson in view mid-hand, and skips plays made after a hint', () => {
+    save('blackjack:accuracy', { right: 3, plays: 3 });
+    const { $, press, status } = table('10H 7S 2C 10D 2H 2D 9C'); // 12 vs 7: hit
+    expect($('[data-accuracy]').textContent).toBe('100%');
+    press('[data-deal]');
+    press('[data-action="hit"]'); // right: 14 vs 7, hit again
+    expect($('[data-accuracy]').textContent).toBe('100%');
     press('[data-hint]');
-    expect(status()).toMatch(/^Hint: the best play here is to /);
+    press('[data-action="stand"]'); // looked first: not counted
+    expect(load('blackjack:accuracy', null)).toEqual({ right: 4, plays: 4 });
+    expect(status()).not.toMatch(/Best was/);
+
+    const again = table('10H 7S 2C 10D 2H 2D 9C');
+    again.press('[data-deal]');
+    again.press('[data-action="double"]'); // wrong: 12 vs 7 hits
+    expect(load('blackjack:accuracy', null)).toEqual({ right: 4, plays: 5 });
+  });
+
+  it('starts fresh if the saved score is broken', () => {
+    save('blackjack:accuracy', { right: 5, plays: 2 });
+    const { $ } = setup();
+    expect($('[data-accuracy]').textContent).toBe('–');
+  });
+
+  it('shows the decks at the top of the table, changeable only between hands', () => {
+    const { $, press, stored } = table('9H 7S 8C 10D');
+    expect($('[data-decks]').textContent).toBe('6 decks');
+    press('[data-decks]');
+    expect(stored().decks).toBe(8);
+    expect(stored().shoe).toHaveLength(416);
+    press('[data-decks]');
+    expect($('[data-decks]').textContent).toBe('1 deck');
+    expect($('[data-decks]').getAttribute('aria-label')).toBe('1 deck. Tap to change.');
+    press('[data-decks]');
+    press('[data-decks]');
+    expect(stored().decks).toBe(6);
+
+    const playing = table('9H 7S 8C 10D', { decks: 2 });
+    playing.press('[data-deal]');
+    expect(playing.container.querySelector('[data-decks]')).toBeNull();
+    expect(playing.$('.bj-decks').textContent).toBe('2 decks'); // still shown, not a button
+    playing.$('[data-board]').click(); // taps elsewhere on the table do nothing
+    expect(playing.stored().phase).toBe('playing');
+  });
+
+  it('opens a save from before the deck choice with 6 decks and the same chips', () => {
+    const { decks: _gone, ...old } = stacked('9H 7S 8C 10D', { chips: 777 });
+    const { $ } = setup(old);
+    expect($('[data-chips]').textContent).toBe('777');
+    expect($('[data-decks]').textContent).toBe('6 decks');
   });
 
   it('offers Start over when out of chips', () => {

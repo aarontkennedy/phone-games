@@ -32,7 +32,6 @@
 }
 
 .bj-label {
-  margin: 0 0 var(--space-2);
   min-height: 1.3em;
 }
 
@@ -79,16 +78,49 @@
   }
 }
 
-/* Hint: an icon button between Chips and Best. */
-.bj-hint {
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: var(--tap);
-  padding: 0;
+/* The label row of a hand; the dealer's also shows the decks, on the right. */
+.bj-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
 }
 
-.bj-hint svg {
+.bj-top .bj-label {
+  margin: 0;
+}
+
+.bj-decks {
+  flex: none;
+  color: var(--muted);
+}
+
+.btn.bj-decks {
+  padding-inline: var(--space-3);
+  color: var(--text);
+}
+
+/* Hint: its own row just above the four play buttons. Tapping it shows the best play in
+   the same spot, leaving the instructions in the status line alone. */
+.bj-coach {
+  flex: 1 1 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.bj-hint,
+.bj-tip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  margin: 0;
+}
+
+.bj-hint svg,
+.bj-tip svg {
+  flex: none;
   width: 26px;
   height: 26px;
   fill: none;
@@ -96,4 +128,28 @@
   stroke-width: 2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* The instructions sit right above the buttons they're about, not up under the table. */
+.screen.bj > .status-line {
+  margin-top: auto;
+}
+
+.screen.bj > .controls {
+  margin-top: 0;
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  /* The spare height goes above the status line, not between it and the buttons. */
+  #app:has(> .game .bj) {
+    grid-template-rows: auto auto 1fr auto auto;
+  }
+
+  .game .bj > .status-line {
+    grid-row: 4;
+  }
+
+  .game .bj > .controls {
+    grid-row: 5;
+  }
 }

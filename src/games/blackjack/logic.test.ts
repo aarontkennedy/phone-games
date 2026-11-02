@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { seededRng } from '../../core/random';
 import {
   BETS,
-  DECKS,
-  RESHUFFLE_AT,
+  DEFAULT_DECKS,
   START_CHIPS,
   act,
   canAct,
@@ -15,8 +14,11 @@ import {
   isBust,
   isValidState,
   newState,
+  reshuffleAt,
   restart,
   setBet,
+  setDecks,
+  upgrade,
   type Action,
   type State,
 } from './logic';
@@ -46,7 +48,8 @@ describe('hand values', () => {
 describe('a new table', () => {
   it('starts with a full shoe, 1000 chips and a 20 bet', () => {
     const s = newState(seededRng(1));
-    expect(s.shoe).toHaveLength(52 * DECKS);
+    expect(s.decks).toBe(6);
+    expect(s.shoe).toHaveLength(52 * DEFAULT_DECKS);
     expect(s.chips).toBe(START_CHIPS);
     expect(s.bet).toBe(20);
     expect(s.phase).toBe('betting');
@@ -58,6 +61,26 @@ describe('a new table', () => {
     expect(setBet(s, 30)).toBeNull();
     expect(setBet({ ...s, chips: 40 }, 50)).toBeNull(); // more than you have
     expect(setBet(dealt('9H 7S 8C 10D'), 50)).toBeNull();
+  });
+
+  it('changes the number of decks between hands, with a fresh shoe', () => {
+    const s = newState(seededRng(1));
+    const one = setDecks(s, 1, seededRng(2))!;
+    expect(one.decks).toBe(1);
+    expect(one.shoe).toHaveLength(52);
+    expect(setDecks(one, 8)!.shoe).toHaveLength(416);
+    expect(setDecks(s, 6)).toBeNull(); // already 6
+    expect(setDecks(s, 3)).toBeNull(); // not a choice
+    expect(setDecks(dealt('9H 7S 8C 10D'), 1)).toBeNull(); // mid-hand
+    expect(restart({ ...one, chips: 0 }).decks).toBe(1); // starting over keeps your choice
+  });
+
+  it('gives saves from before the deck choice a 6-deck shoe', () => {
+    const { decks: _gone, ...old } = newState(seededRng(1));
+    expect((upgrade(old) as typeof old & { decks: number }).decks).toBe(6);
+    expect(upgrade(null)).toBeNull();
+    const one = { ...old, decks: 1 };
+    expect(upgrade(one)).toBe(one);
   });
 });
 
@@ -77,8 +100,18 @@ describe('dealing', () => {
 
   it('reshuffles a low shoe before dealing', () => {
     const s = { ...newState(seededRng(1)), shoe: cards('2H 3H 4H 5H') };
-    expect(deal(s, seededRng(2))!.shoe).toHaveLength(52 * DECKS - 4);
-    expect(RESHUFFLE_AT).toBe(78);
+    expect(deal(s, seededRng(2))!.shoe).toHaveLength(52 * DEFAULT_DECKS - 4);
+    expect(reshuffleAt(6)).toBe(78);
+    expect(reshuffleAt(1)).toBe(13);
+  });
+
+  it('shuffles the cards not on the table into a new shoe if a hand empties it', () => {
+    // One deck, and the shoe ran out with the deal: the hit needs a new shoe.
+    const playing = { ...dealt('8H 7S 2C 10D'), decks: 1, shoe: [] };
+    const hit = act(playing, 'hit', seededRng(3))!;
+    expect(hit.shoe).toHaveLength(52 - 5);
+    const all = [...hit.shoe, ...hit.dealer, ...hit.hands[0].cards].map((c) => `${c.rank}${c.suit}`);
+    expect(new Set(all).size).toBe(52); // no card twice
   });
 
   it('pays a blackjack 3 to 2 at once', () => {
@@ -244,7 +277,8 @@ describe('basic strategy hint', () => {
     ['5H 2S 4C 9D', 'hit'], // 9 vs 2
     ['3H 2S 4C 9D', 'hit'], // 7
     ['AH 5S 9C 9D', 'stand'], // soft 20
-    ['AH 6S 8C 9D', 'double'], // soft 19 vs 6
+    ['AH 6S 8C 9D', 'stand'], // soft 19 vs 6 (doubles with 1 deck)
+    ['AH 2S 7C 9D', 'stand'], // soft 18 vs 2
     ['AH 5S 8C 9D', 'stand'], // soft 19 vs 5
     ['AH 4S 7C 9D', 'double'], // soft 18 vs 4
     ['AH 8S 7C 9D', 'stand'], // soft 18 vs 8
@@ -278,6 +312,17 @@ describe('basic strategy hint', () => {
     expect(hint(soft18)).toBe('stand');
   });
 
+  it('follows the chart for the number of decks', () => {
+    expect(hint({ ...dealt('AH 6S 8C 9D'), decks: 1 })).toBe('double'); // soft 19 vs 6
+    expect(hint({ ...dealt('5H 2S 4C 9D'), decks: 2 })).toBe('double'); // 9 vs 2
+    expect(hint({ ...dealt('6H AS 5C 9D'), decks: 8 })).toBe('hit'); // 11 vs ace
+  });
+
+  it("plays a pair by its total when you can't afford to split", () => {
+    expect(hint({ ...dealt('8H 10S 8C 9D'), chips: 0 })).toBe('hit'); // 16 vs 10
+    expect(hint({ ...dealt('AH 6S AC 9D'), chips: 0 })).toBe('hit'); // soft 12
+  });
+
   it('has nothing to say between hands', () => {
     expect(hint(newState(seededRng(1)))).toBeNull();
   });
@@ -297,6 +342,7 @@ describe('isValidState', () => {
     ['negative chips', (s: State) => ({ ...s, chips: -5 })],
     ['odd bet', (s: State) => ({ ...s, bet: 7 })],
     ['bad phase', (s: State) => ({ ...s, phase: 'lunch' })],
+    ['3 decks', (s: State) => ({ ...s, decks: 3 })],
     ['bad hand', (s: State) => ({ ...s, hands: [{ cards: 'x' }] })],
     ['playing with no hands', (s: State) => ({ ...s, phase: 'playing' })],
   ])('rejects %s', (_name, change) => {

@@ -38,12 +38,44 @@ test('bet, deal, stand and get paid', async ({ page }) => {
   await expect(page.locator('[data-deal]')).toBeEnabled();
 });
 
-test('Hint suggests the best play for this hand when asked', async ({ page }) => {
+test('Hint shows the best play just above the buttons, leaving the instructions', async ({ page }) => {
   await openBlackjackWith(page, '6H 5S 5C 9D'); // 11 vs 5: double
   await page.locator('[data-deal]').click();
-  await expect(page.locator('[data-status]')).toHaveText('Hit to take a card, or stand to keep your total.');
+  const status = page.locator('[data-status]');
+  await expect(status).toHaveText('Hit for another card, or stand.');
   await page.locator('[data-hint]').click();
-  await expect(page.locator('[data-status]')).toHaveText('Hint: the best play here is to double.');
+  await expect(page.locator('[data-tip]')).toHaveText('Best play: Double');
+  await expect(status).toHaveText('Hit for another card, or stand.');
+  await expectTouchTargets(page);
+  await expectReadableText(page);
+
+  // The instructions sit right above the buttons they describe.
+  const line = (await status.boundingBox())!;
+  const controls = (await page.locator('[data-controls]').boundingBox())!;
+  expect(controls.y - (line.y + line.height)).toBeLessThan(30);
+});
+
+test('a play that isn’t the best is scored, and the best one named', async ({ page }) => {
+  await openBlackjackWith(page, '10H 2S 2C 10D 3H 10C'); // 12 vs 2: hit
+  await page.locator('[data-deal]').click();
+  await page.locator('[data-action="stand"]').click();
+  await expect(page.locator('[data-status]')).toContainText('Best was to hit.');
+  await expect(page.locator('[data-accuracy]')).toHaveText('0%');
+});
+
+test('the decks button at the top of the table changes the shoe between hands', async ({ page }) => {
+  const decks = page.locator('[data-decks]');
+  await expect(decks).toHaveText('6 decks');
+  await decks.click();
+  await expect(decks).toHaveText('8 decks');
+  await decks.click();
+  await expect(decks).toHaveText('1 deck');
+  await expectNoHorizontalOverflow(page);
+  await expectTouchTargets(page);
+  await openBlackjackWith(page, '9H 7S 8C 10D'); // a 6-deck save, mid-hand after the deal
+  await page.locator('[data-deal]').click();
+  await expect(decks).toHaveCount(0); // not changeable during a hand
+  await expect(page.locator('.bj-decks')).toHaveText('6 decks');
 });
 
 test('split hands sit side by side and still fit', async ({ page }) => {

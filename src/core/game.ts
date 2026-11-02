@@ -11,6 +11,8 @@ export interface HowToPlay {
   steps: string[];
   /** Optional strategy hints. */
   tips?: string[];
+  /** Optional reference after the tips, as HTML, such as a strategy chart. */
+  extra?: string;
 }
 
 /** Home screen groups, in the order they appear. Games are A to Z within a group. */

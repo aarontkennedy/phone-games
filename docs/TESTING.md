@@ -90,6 +90,11 @@ misunderstanding. It includes:
 - **Scoring tables** for Hot Dice, Yacht, Spades and Blackjack hand values, and the 2048
   merge rules.
 
+`src/games/blackjack/strategy.test.ts` does the same for Blackjack's best plays: it
+holds the full chart for 1, 2, 6 and 8 decks from an exact expected-value calculation
+for our rules, and checks the game's chart square by square. The 6-deck result matches
+the published chart for these rules.
+
 When a rule has common variants, the test names the one we chose. Add a reference test
 whenever a game has published numbers to check against.
 

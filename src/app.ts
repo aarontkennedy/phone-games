@@ -46,7 +46,7 @@ const list = (tag: string, items: string[]) => `<${tag}>${items.map((s) => `<li>
 
 /** Full-screen How to play page, opened by the Rules button. */
 function setUpHelp(root: HTMLElement, meta: GameMeta): void {
-  const { goal, steps, tips } = meta.howToPlay;
+  const { goal, steps, tips, extra = '' } = meta.howToPlay;
   root.insertAdjacentHTML(
     'beforeend',
     `<div class="help prose" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
@@ -57,6 +57,7 @@ function setUpHelp(root: HTMLElement, meta: GameMeta): void {
       <p><b>Goal:</b> ${goal}</p>
       ${list('ol', steps)}
       ${tips?.length ? `<h3>Tips</h3>${list('ul', tips)}` : ''}
+      ${extra}
       <button class="btn" data-help-close>Got it</button>
     </div>`,
   );

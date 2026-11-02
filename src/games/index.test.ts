@@ -65,9 +65,10 @@ describe('game registry', () => {
 
   it('gives every game rules a first-time player can follow', () => {
     for (const g of games) {
-      const { goal, steps, tips = [] } = g.howToPlay;
+      const { goal, steps, tips = [], extra = '' } = g.howToPlay;
       expect(goal.trim(), g.id).not.toBe('');
       expect(steps.length, `${g.id} needs at least 3 steps`).toBeGreaterThanOrEqual(3);
+      expect(extra, `${g.id}: no emoji (they aren't flat)`).not.toMatch(/\p{Extended_Pictographic}/u);
       for (const line of [goal, ...steps, ...tips]) {
         expect(line.trim(), g.id).not.toBe('');
         expect(line, `${g.id}: no emoji (they aren't flat)`).not.toMatch(/\p{Extended_Pictographic}/u);
