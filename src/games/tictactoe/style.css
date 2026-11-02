@@ -1,7 +1,9 @@
 /* A 3x3 board of big square cells. X and O are flat strokes in two colors. */
 .ttt-board {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* Fixed rows too, so a cell doesn't grow when an X or O goes in it. */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
   gap: var(--space-2);
   padding: var(--space-2);
   aspect-ratio: 1;
@@ -13,6 +15,9 @@
   border-radius: var(--radius);
   background: var(--surface);
   padding: 18%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
   cursor: pointer;
 }
 

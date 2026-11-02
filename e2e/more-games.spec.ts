@@ -25,6 +25,9 @@ test('Tic-Tac-Toe: you move, the computer answers', async ({ page }) => {
   await expect(page.locator('[data-cell="4"]')).toHaveAttribute('aria-label', /: X$/);
   await expect(status(page)).toHaveText(/^Your turn/, { timeout: 5000 });
   await expect(page.locator('.ttt-o')).toHaveCount(1);
+  // Cells stay the same size whether they hold an X, an O or nothing.
+  const heights = await page.locator('[data-cell]').evaluateAll((els) => els.map((e) => Math.round(e.getBoundingClientRect().height)));
+  expect(new Set(heights).size).toBe(1);
 });
 
 test('Four in a Row: drop a disc, the computer answers', async ({ page }) => {
