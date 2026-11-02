@@ -32,6 +32,9 @@ const GAMES = [
   { id: 'videopoker', title: 'Video Poker' },
   { id: 'holdem', title: 'Texas Hold’em' },
   { id: 'drawpoker', title: 'Five-Card Draw' },
+  { id: 'roulette', title: 'Roulette' },
+  { id: 'craps', title: 'Craps' },
+  { id: 'paigow', title: 'Pai Gow Poker' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));
@@ -39,7 +42,7 @@ test.beforeEach(({ page }) => failOnErrors(page));
 test('home groups the games, and shows the most played once you’ve played', async ({ page }) => {
   await page.goto('./');
   const groups = page.locator('.home-group h2');
-  await expect(groups).toHaveText(['Card games', 'Puzzles', 'Board games', 'Dice and tiles']);
+  await expect(groups).toHaveText(['Card games', 'Casino', 'Puzzles', 'Board games', 'Dice and tiles']);
   await expectNoHorizontalOverflow(page);
   await expectReadableText(page);
 

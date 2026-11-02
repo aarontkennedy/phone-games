@@ -18,6 +18,7 @@ export interface HowToPlay {
 /** Home screen groups, in the order they appear. Games are A to Z within a group. */
 export const CATEGORIES = [
   { id: 'cards', title: 'Card games' },
+  { id: 'casino', title: 'Casino' },
   { id: 'puzzles', title: 'Puzzles' },
   { id: 'board', title: 'Board games' },
   { id: 'dice', title: 'Dice and tiles' },

@@ -1,0 +1,103 @@
+/* The dealer's seven cards above yours. While you set your hand, your cards are buttons:
+   the two you pick for the low hand lift, marked "Low". Once played, each side shows its
+   five-card high hand and two-card low hand apart, named underneath, with a ring around
+   each hand that won. */
+.pg-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.pg-label,
+.pg-empty,
+.pg-caption {
+  margin: 0;
+}
+
+.pg-label {
+  margin-bottom: var(--space-1);
+  font-weight: 700;
+}
+
+.pg-empty {
+  color: var(--muted);
+}
+
+.pg-seven {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.pg-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.pg-slot > .card {
+  width: 100%;
+}
+
+.pg-slot > .card.picked {
+  transform: translateY(-6px);
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.pg-mark {
+  min-height: 1.2em;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+/* Five cards, a gap, two cards; the names line up underneath. */
+.pg-set {
+  display: grid;
+  grid-template-columns: 5fr 2fr;
+  column-gap: var(--space-3);
+  row-gap: 2px;
+}
+
+.pg-five,
+.pg-two {
+  display: grid;
+  gap: var(--space-1);
+  padding: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.pg-five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.pg-two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pg-five.won,
+.pg-two.won {
+  outline: 3px solid var(--text);
+}
+
+.pg-caption {
+  line-height: 1.2;
+}
+
+.card.joker {
+  color: var(--pg-joker);
+}
+
+/* Card faces stay light in both themes, so the joker's color does too. */
+.pg {
+  --pg-joker: #5b4fd6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pg {
+    --pg-joker: #5b4fd6;
+  }
+}

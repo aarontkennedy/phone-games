@@ -1,0 +1,155 @@
+/* The last numbers, then the betting table seen from the side: 0 across the top, twelve
+   columns of three numbers with a column bet at the end of each row, the dozens, and the
+   even-money bets. Number squares are solid red, black or green with white numbers. */
+.rl-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.rl-result {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 44px;
+  overflow: hidden;
+}
+
+.rl-pocket {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: var(--rl-on);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.rl-pocket.big {
+  width: 44px;
+  height: 44px;
+  margin-right: var(--space-2);
+  font-size: var(--text-xl);
+}
+
+.rl-pocket.spinning {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.rl-muted {
+  color: var(--muted);
+}
+
+.rl-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr)) minmax(0, 1.3fr);
+  gap: 2px;
+}
+
+.rl-spot {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.rl-spot:disabled {
+  cursor: default;
+}
+
+.rl-pocket.red,
+.rl-spot.red {
+  background: var(--rl-red);
+  color: var(--rl-on);
+}
+
+.rl-pocket.black,
+.rl-spot.black {
+  background: var(--rl-black);
+  color: var(--rl-on);
+}
+
+.rl-pocket.green,
+.rl-spot.green {
+  background: var(--rl-green);
+  color: var(--rl-on);
+}
+
+.rl-spot.zero {
+  grid-column: 1 / -1;
+}
+
+.rl-spot.dozen {
+  grid-column: span 4;
+}
+
+.rl-spot.even {
+  grid-column: span 2;
+}
+
+.rl-spot svg {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: auto;
+}
+
+.rl-spot.red svg {
+  fill: var(--rl-diamond);
+}
+
+/* Edged, so the black diamond shows on a dark table too. */
+.rl-spot.black svg {
+  fill: var(--rl-black);
+  stroke: var(--text);
+  stroke-width: 1.5;
+}
+
+/* The even-money red and black bets are diamonds on the plain table, not solid squares. */
+.rl-spot.even.red,
+.rl-spot.even.black {
+  background: var(--surface);
+}
+
+/* Chips on a spot (the amounts are in the status line): a thick orange ring inside a
+   number square, or an orange fill on the plain outside bets. The last winning number
+   is marked the same way until you bet again. */
+.rl-spot.bet,
+.rl-spot.won {
+  outline: 4px solid var(--accent);
+  outline-offset: -4px;
+}
+
+.rl-spot.outside.bet,
+.rl-spot.outside.won {
+  outline: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.rl {
+  --rl-red: #b3261e;
+  --rl-black: #23202e;
+  --rl-green: #17693a;
+  --rl-on: #ffffff;
+  --rl-diamond: #b3261e;
+}
+
+@media (prefers-color-scheme: dark) {
+  .rl {
+    --rl-black: #0f0d17;
+    --rl-diamond: #ff6b5e;
+  }
+}

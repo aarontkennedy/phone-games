@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, seedRandom } from './helpers';
 
 // Browser checks for Tic-Tac-Toe, Four in a Row, Checkers, Number Place, Free Cells,
-// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala, Hangman, Spider, Backgammon and Dots and Boxes: each fits the phone, reads without
+// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala, Hangman, Spider, Backgammon, Dots and Boxes and the casino games: each fits the phone, reads without
 // glasses, and plays a first move.
 
 test.beforeEach(async ({ page }) => {
@@ -253,4 +253,42 @@ test('Five-Card Draw: bet, swap cards, and the hand plays on', async ({ page }) 
     await swapBtn.click();
     await expect(status(page)).not.toHaveText(/^The draw: tap/);
   }
+});
+
+test('Roulette: bet on red, spin, and get paid or not', async ({ page }) => {
+  await page.goto('./#/roulette');
+  await expectGoodLayout(page);
+  await page.locator('[data-spot="red"]').click();
+  await page.locator('[data-spot="17"]').click();
+  await expect(status(page)).toHaveText('On the table: 17 (25), Red (25). Tap Spin.');
+  await expectGoodLayout(page);
+  await page.locator('[data-spin]').click();
+  await expect(status(page)).toHaveText(/^\d+ (red|black|green)\. /, { timeout: 5000 });
+  await expect(page.locator('[data-result] .rl-pocket.big')).toBeVisible();
+  await expectGoodLayout(page);
+});
+
+test('Craps: bet the pass line and roll', async ({ page }) => {
+  await page.goto('./#/craps');
+  await expectGoodLayout(page);
+  await page.locator('[data-target="pass"]').click();
+  await page.locator('[data-target="field"]').click();
+  await page.locator('[data-roll]').click();
+  await expect(status(page)).toHaveText(/^Rolled \d+\./, { timeout: 5000 });
+  await expect(page.locator('.cr-die').first()).toHaveAttribute('aria-label', /^Die showing [1-6]$/);
+  await expectGoodLayout(page);
+});
+
+test('Pai Gow Poker: deal, set the hand with the hint, and play', async ({ page }) => {
+  await page.goto('./#/paigow');
+  await expectGoodLayout(page);
+  await page.locator('[data-deal]').click();
+  await expect(page.locator('[data-pick]')).toHaveCount(7);
+  await page.locator('[data-hint]').click();
+  await expect(status(page)).toHaveText(/^High: .*\. Low: .*\. Tap Play\.$/);
+  await expectGoodLayout(page);
+  await page.locator('[data-play]').click();
+  await expect(status(page)).toHaveText(/^High hand: (you|dealer) wins?\. Low hand: /);
+  await expect(page.locator('.pg-caption')).toHaveCount(4);
+  await expectGoodLayout(page);
 });

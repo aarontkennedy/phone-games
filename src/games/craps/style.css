@@ -1,0 +1,116 @@
+/* The dice and the point, the six point numbers (holding your come bets), then the bet
+   areas: pass line and don't pass, come and don't come, and the field. */
+.cr-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.cr-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.cr-dice {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.cr-die {
+  display: block;
+  width: 44px;
+  height: 44px;
+  padding: 4px;
+  border: 2px solid var(--text);
+  border-radius: var(--radius);
+  background: var(--surface);
+  fill: var(--text);
+}
+
+.cr-die svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cr-puck {
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+}
+
+.cr-puck.on {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.cr-numbers {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.cr-bets {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.cr-number,
+.cr-bet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 44px;
+  padding: 2px var(--space-1);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.cr-number:disabled,
+.cr-bet:disabled {
+  cursor: default;
+}
+
+/* A bet you can't make right now (pass line during a point, say) is dimmed. */
+.cr-bet:disabled > span {
+  color: var(--muted);
+}
+
+.cr-number > span {
+  font-weight: 700;
+}
+
+.cr-bet b,
+.cr-number b {
+  min-height: 1.2em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Where your chips are: a dark edge, as well as the amount. The point is filled orange. */
+.cr-number.on,
+.cr-bet.on {
+  border-color: var(--text);
+}
+
+.cr-number.point {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.cr-bet.field {
+  grid-column: 1 / -1;
+}

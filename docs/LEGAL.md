@@ -32,6 +32,8 @@ protected list. Add to that list when you learn of a new one.
 | Kalah (a mancala game) | Mancala | Kalah (an old trade name) |
 | UNO | Don't build one; Crazy Eights covers it | UNO, and its card design |
 | Chess, Checkers, Cribbage, Blackjack, Spades, Hearts, Euchre, Dominoes, Gin Rummy | Same. These are generic. | Brand names of specific apps |
+| Roulette, Craps, Pai Gow Poker, Video Poker, Texas Hold'em, Five-Card Draw | Same. These are generic (Pai Gow Poker was never patented or trademarked). | Brand names of specific casinos and machines |
+| Proprietary table games | Don't build them under their names; check for live patents before copying their rules | Three Card Poker, Let It Ride, Caribbean Stud, Ultimate Texas Hold'em, Spanish 21 |
 | Falling-block puzzles | Don't build one | Tetris (its owners actively enforce its look and name) |
 
 ## Code and dependencies

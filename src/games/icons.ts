@@ -250,3 +250,32 @@ export const dotsIcon = svg(
     '<path d="M24 40H40" stroke="#ef5f58" stroke-width="3" stroke-linecap="round"/>' +
     [8, 24, 40].flatMap((x) => [8, 24, 40].map((y) => `<circle cx="${x}" cy="${y}" r="3.5" fill="#1d1a2b"/>`)).join(''),
 );
+
+/** A roulette wheel from above: red and black pockets around a green center. */
+export const rouletteIcon = svg(
+  '<circle cx="24" cy="24" r="21" fill="#23202e"/>' +
+    Array.from({ length: 6 }, (_, i) => {
+      const a = (i * 60 * Math.PI) / 180;
+      const b = ((i * 60 + 30) * Math.PI) / 180;
+      const p = (t: number) => `${round(24 + 21 * Math.sin(t))} ${round(24 - 21 * Math.cos(t))}`;
+      return `<path d="M24 24L${p(a)}A21 21 0 0 1 ${p(b)}Z" fill="#ef5f58"/>`;
+    }).join('') +
+    '<circle cx="24" cy="24" r="10" fill="#17693a"/><circle cx="24" cy="24" r="3" fill="#ffffff"/>',
+);
+
+/** Two dice showing 6 and 1 (a seven) on a green table edge. */
+export const crapsIcon = svg(
+  '<rect x="2" y="34" width="44" height="10" rx="3" fill="#17693a"/>' +
+    '<rect x="4" y="10" width="20" height="20" rx="4" fill="#ffffff" stroke="#23202e" stroke-width="2" transform="rotate(-10 14 20)"/>' +
+    [[9, 14], [9, 20], [9, 26], [19, 14], [19, 20], [19, 26]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="1.8" fill="#23202e" transform="rotate(-10 14 20)"/>`).join('') +
+    '<rect x="25" y="13" width="20" height="20" rx="4" fill="#ef5f58" transform="rotate(12 35 23)"/>' +
+    '<circle cx="35" cy="23" r="2.4" fill="#ffffff"/>',
+);
+
+/** Seven cards set as a hand of five and a hand of two, the two set apart. */
+export const paiGowIcon = svg(
+  [4, 10, 16, 22].map((x) => `<rect x="${x}" y="12" width="12" height="18" rx="2" fill="#ffffff" stroke="#6c63ff" stroke-width="2"/>`).join('') +
+    '<rect x="28" y="12" width="12" height="18" rx="2" fill="#6c63ff"/>' +
+    '<rect x="30" y="30" width="10" height="15" rx="2" fill="#ef5f58" transform="rotate(-8 35 37)"/>' +
+    '<rect x="37" y="30" width="10" height="15" rx="2" fill="#ef5f58" transform="rotate(8 42 37)"/>',
+);

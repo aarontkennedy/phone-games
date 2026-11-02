@@ -1,3 +1,4 @@
+import { dieFace } from '../../core/dice-view';
 import { load, save } from '../../core/storage';
 import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import { GOAL, bank, computerStep, endBust, isValidState, keep, newGame, roll, scoreDice, winner, type Level, type State } from './logic';
@@ -9,16 +10,7 @@ export const AI_DELAY = 800;
 /** How long a bust stays on screen before the turn passes. */
 export const BUST_PAUSE = 1600;
 
-const PIPS: Record<number, [number, number][]> = {
-  1: [[12, 12]],
-  2: [[7, 7], [17, 17]],
-  3: [[7, 7], [12, 12], [17, 17]],
-  4: [[7, 7], [17, 7], [7, 17], [17, 17]],
-  5: [[7, 7], [17, 7], [12, 12], [7, 17], [17, 17]],
-  6: [[7, 6], [17, 6], [7, 12], [17, 12], [7, 18], [17, 18]],
-};
-const face = (n: number) =>
-  `<svg viewBox="0 0 24 24" aria-hidden="true">${PIPS[n].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.3"/>`).join('')}</svg>`;
+const face = dieFace;
 const fmt = (n: number) => n.toLocaleString('en-US');
 
 export function mount(container: HTMLElement): () => void {

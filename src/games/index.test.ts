@@ -27,6 +27,12 @@ const PROTECTED_NAMES = [
   'yatzy',
   'yatz',
   'kalah',
+  // Proprietary casino table games: don't build them under these names.
+  'three card poker',
+  'let it ride',
+  'caribbean stud',
+  'ultimate texas',
+  'spanish 21',
 ];
 
 describe('game registry', () => {

@@ -1,6 +1,6 @@
 import type { GameMeta } from '../core/game';
 import { chartHtml as blackjackChart } from './blackjack/strategy';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon, rouletteIcon, crapsIcon, paiGowIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -89,7 +89,7 @@ export const games: GameMeta[] = [
     title: 'Blackjack',
     description: 'Get closer to 21 than the dealer',
     icon: chipIcon,
-    category: 'cards',
+    category: 'casino',
     howToPlay: {
       goal: 'Finish with a hand closer to 21 than the dealer’s, without going over 21.',
       steps: [
@@ -376,6 +376,31 @@ export const games: GameMeta[] = [
     load: () => import('./freecells'),
   },
   {
+    id: 'craps',
+    title: 'Craps',
+    description: 'Bet on rolls of two dice',
+    icon: crapsIcon,
+    category: 'casino',
+    howToPlay: {
+      goal: 'Bet on rolls of two dice, and grow your chips.',
+      steps: [
+        'Choose a chip (5, 25 or 100), tap a bet to put it down, and tap <b>Roll</b>. Tap a bet again to add another chip.',
+        'The first roll of a round is the <b>come-out</b>. A <b>Pass line</b> bet wins on 7 or 11 and loses on 2, 3 or 12. Any other total (4, 5, 6, 8, 9 or 10) becomes the <b>point</b>.',
+        'Once there’s a point, the pass line wins if the point is rolled again before a 7, and loses if a 7 comes first. Then a new come-out roll starts.',
+        '<b>Don’t pass</b> is the opposite: it wins on 2 or 3, ties on 12, and loses on 7 or 11 on the come-out; then it wins if a 7 comes before the point.',
+        '<b>Come</b> and <b>Don’t come</b> work just like pass and don’t pass, but you make them while a point is on. The next roll gives each its own number, shown in the row of numbers.',
+        '<b>Odds:</b> once a bet has a number, tap it (the pass line, or its number in the row) to put more chips behind it. Odds pay exactly the true odds: 2 to 1 on 4 and 10, 3 to 2 on 5 and 9, 6 to 5 on 6 and 8 (the other way round for don’t). Up to 3, 4 or 5 times your bet, or 6 times on a don’t bet.',
+        'The <b>Field</b> is for one roll: it wins on 2, 3, 4, 9, 10, 11 or 12 (2 pays double, 12 pays triple) and loses on 5, 6, 7 or 8.',
+        '<b>Clear</b> takes back what you’re allowed to: the field, odds, and bets that haven’t got a number yet. These are play chips, not money: if you run out, tap <b>Start over</b> for 1000 more.',
+      ],
+      tips: [
+        'The best bets are pass or don’t pass with as much odds as you can: odds are the only bet in the casino with no house edge.',
+        'The field looks generous but loses 1 chip in 36 on average, about twice what the pass line does.',
+      ],
+    },
+    load: () => import('./craps'),
+  },
+  {
     id: 'crazyeights',
     title: 'Crazy Eights',
     description: 'Match suits or numbers; 8s are wild',
@@ -452,7 +477,7 @@ export const games: GameMeta[] = [
     title: 'Video Poker',
     description: 'Keep the best cards, draw once, jacks or better pays',
     icon: videoPokerIcon,
-    category: 'cards',
+    category: 'casino',
     howToPlay: {
       goal: 'Make the best poker hand you can from five cards. Better hands pay more credits.',
       steps: [
@@ -617,6 +642,55 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./yacht'),
+  },
+  {
+    id: 'roulette',
+    title: 'Roulette',
+    description: 'Bet on where the ball lands',
+    icon: rouletteIcon,
+    category: 'casino',
+    howToPlay: {
+      goal: 'Bet on where the ball lands, and grow your chips.',
+      steps: [
+        'The wheel has 37 numbered pockets: 0, which is green, and 1 to 36, half red and half black.',
+        'Choose a chip (5, 25 or 100), then tap the table to bet it. Tap a spot again to add another chip. <b>Clear</b> takes all your chips back.',
+        'A single number pays 35 to 1. A column (<b>2:1</b>, at the end of each row) or a dozen (<b>1st 12</b>, <b>2nd 12</b>, <b>3rd 12</b>) pays 2 to 1.',
+        'The even-money bets pay 1 to 1: <b>1–18</b>, <b>Even</b>, red (the red diamond), black (the black diamond), <b>Odd</b> and <b>19–36</b>.',
+        'Tap <b>Spin</b>. Every bet that covers the winning number is paid and comes back to you; the rest lose. If the ball lands on 0, every bet except a bet on 0 loses.',
+        'Spots with your chips on them are marked in orange, and the line under the table lists your bets. After a spin, the winning number and the bets that would have won it are marked.',
+        '<b>Repeat</b> puts the same bets down again. These are play chips, not money: if you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve had.',
+      ],
+      tips: [
+        'Every bet gives the house the same small edge (1 in 37), so no betting pattern beats the wheel. Bet for fun.',
+        'Even-money bets win often but pay little; single numbers rarely win but pay big.',
+      ],
+    },
+    load: () => import('./roulette'),
+  },
+  {
+    id: 'paigow',
+    title: 'Pai Gow Poker',
+    description: 'Split seven cards into two poker hands',
+    icon: paiGowIcon,
+    category: 'casino',
+    howToPlay: {
+      goal: 'Split seven cards into two poker hands that both beat the dealer’s.',
+      steps: [
+        'Choose a bet and tap <b>Deal</b>. You and the dealer each get seven cards from a deck of 52 plus one joker.',
+        'Tap two cards to make your <b>low hand</b>. The other five are your <b>high hand</b>, ranked like poker. Your high hand must beat your low hand; if it doesn’t, pick two other cards.',
+        'A low hand of two cards is either a pair or two different cards, ranked by the higher card and then the lower one.',
+        'The <b>joker</b> counts as an ace, or as any card that completes a straight, a flush or a straight flush. Four aces and the joker make <b>five aces</b>, the best hand of all.',
+        'Tap <b>Play</b>. The dealer sets its hand the usual house way, then each of your hands is compared with the dealer’s. A tie goes to the dealer.',
+        'Win both hands and you win your bet, less a 5% commission (a 40 bet wins 38). Win one and it’s a <b>push</b>: your bet comes back. Lose both and you lose your bet.',
+        'These are play chips, not money. If you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve had.',
+      ],
+      tips: [
+        'Not sure? <b>Hint</b> picks your low hand the way the dealer would set it.',
+        'Usually keep your best card in the high hand and the next two in the low hand. With one pair, keep it in the high hand. Split two pair unless both pairs are small and you have an ace to play in the low hand.',
+        'Pushes are common, so a hand rarely costs you much. Play patiently.',
+      ],
+    },
+    load: () => import('./paigow'),
   },
   {
     id: 'reversi',

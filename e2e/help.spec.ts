@@ -32,6 +32,9 @@ const GAMES = [
   { id: 'videopoker', title: 'Video Poker' },
   { id: 'holdem', title: 'Texas Hold’em' },
   { id: 'drawpoker', title: 'Five-Card Draw' },
+  { id: 'roulette', title: 'Roulette' },
+  { id: 'craps', title: 'Craps' },
+  { id: 'paigow', title: 'Pai Gow Poker' },
 ];
 
 test.beforeEach(({ page }) => failOnErrors(page));
