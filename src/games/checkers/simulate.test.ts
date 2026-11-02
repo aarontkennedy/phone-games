@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../../test/simulate';
-import { DRAW_AFTER, chooseMove, isValidState, legalMoves, move, newGame, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { chooseMove, DRAW_AFTER, isValidState, legalMoves, move, newGame, newRound, type State } from './logic';
 
 describe('Checkers, many whole rounds', () => {
   it('always ends: the loser can’t move, or 50 quiet moves each is a draw', () => {
@@ -21,5 +22,16 @@ describe('Checkers, many whole rounds', () => {
         else expect(legalMoves(s.board, s.result === 0 ? 1 : 0)).toEqual([]);
       },
     });
+  }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 20,
+      maxSteps: 3000,
+      start: (_rng, i) => (i % 4 >= 2 ? newRound(newGame()) : newGame()), // either side moves first
+      step: (s, rng, strong) => move(s, chooseMove({ ...s, level: levelFor(s.turn === strong) }, rng)),
+      isOver: (s) => s.result !== null,
+      score: (s, strong) => (s.result === 'draw' ? 0.5 : s.result === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.8);
   }, 60_000);
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../../test/simulate';
-import { GAME_POINTS, GIN_BONUS, KNOCK_AT, UNDERCUT_BONUS, applyTurn, chooseTurn, isValidState, newGame, nextHand, winner, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { applyTurn, chooseTurn, GAME_POINTS, GIN_BONUS, isValidState, KNOCK_AT, newGame, nextHand, UNDERCUT_BONUS, winner, type State } from './logic';
 
 describe('Gin Rummy, many whole games', () => {
   it('always finishes, and every knock, gin, undercut and draw scores by the rules', () => {
@@ -35,5 +36,16 @@ describe('Gin Rummy, many whole games', () => {
         expect(s.scores[winner(s)!]).toBeGreaterThanOrEqual(GAME_POINTS);
       },
     });
+  }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 40,
+      maxSteps: 5000,
+      start: (rng) => newGame('strong', rng),
+      step: (s, rng, strong) => (s.phase === 'handOver' ? nextHand(s, rng) : applyTurn(s, s.turn, chooseTurn({ ...s, level: levelFor(s.turn === strong) }, s.turn, rng))),
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s, strong) => (winner(s) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.75);
   }, 60_000);
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../../test/simulate';
-import { GOAL, canScore, computerStep, isValidState, newGame, winner, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { canScore, computerStep, GOAL, isValidState, newGame, winner, type State } from './logic';
 
 describe('Hot Dice, many whole games', () => {
   it('always finishes; banked points are what was kept, and a bust scores nothing', () => {
@@ -24,5 +25,16 @@ describe('Hot Dice, many whole games', () => {
       },
       end: (s) => expect(s.scores[winner(s)!]).toBeGreaterThanOrEqual(GOAL),
     });
+  }, 60_000);
+  it('Strong beats Easy (it’s mostly luck, so by less)', () => {
+    const share = strongShare<State>({
+      games: 200,
+      maxSteps: 20000,
+      start: () => newGame(),
+      step: (s, rng, strong) => computerStep({ ...s, level: levelFor(s.turn === strong) }, rng),
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s, strong) => (winner(s) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.55);
   }, 60_000);
 });

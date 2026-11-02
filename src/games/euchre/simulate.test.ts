@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../../test/simulate';
-import { GAME_POINTS, applyBid, chooseBid, chooseCard, chooseDiscard, collect, discard, isValidState, newGame, nextHand, play, playersIn, teamOf, winner, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { applyBid, chooseBid, chooseCard, chooseDiscard, collect, discard, GAME_POINTS, isValidState, newGame, nextHand, play, playersIn, teamOf, winner, type State } from './logic';
 
 describe('Euchre, many whole games', () => {
   it('always finishes, five tricks a hand, 1, 2 or 4 points to the right team', () => {
@@ -37,5 +38,23 @@ describe('Euchre, many whole games', () => {
         expect(s.scores[winner(s)!]).toBeGreaterThanOrEqual(GAME_POINTS);
       },
     });
+  }, 60_000);
+  it('a Strong team beats an Easy team', () => {
+    const share = strongShare<State>({
+      games: 60,
+      maxSteps: 3000,
+      start: (rng) => newGame('strong', rng),
+      step: (s, rng, strong) => {
+        const level = levelFor(s.turn % 2 === strong);
+        if (s.phase === 'handOver') return nextHand(s, rng);
+        if (s.phase === 'bidding1' || s.phase === 'bidding2') return applyBid(s, s.turn, chooseBid({ ...s, level }, s.turn, rng));
+        if (s.phase === 'discard') return discard(s, chooseDiscard(s));
+        if (s.trick.length === playersIn(s)) return collect(s);
+        return play(s, s.turn, chooseCard({ ...s, level }, s.turn, rng));
+      },
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s, strong) => (winner(s) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.75);
   }, 60_000);
 });

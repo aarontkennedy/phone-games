@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../../test/simulate';
-import { DRAW_AFTER, chooseMove, inCheck, insufficient, isValidState, legalMoves, newGame, other, play, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { chooseMove, DRAW_AFTER, inCheck, insufficient, isValidState, legalMoves, newGame, other, play, type State } from './logic';
 
 describe('Chess, many whole games', () => {
   it('always ends, with the result the rules say', () => {
@@ -28,4 +29,15 @@ describe('Chess, many whole games', () => {
       },
     });
   }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 6,
+      maxSteps: 600,
+      start: () => newGame('strong'),
+      step: (s, rng, strong) => play(s, chooseMove({ ...s, level: levelFor((s.turn === 'w' ? 0 : 1) === strong) }, rng, 8000)),
+      isOver: (s) => s.result !== null || s.moves.length >= 400, // a very long game counts as a draw
+      score: (s, strong) => (s.result === null || s.result === 'draw' ? 0.5 : (s.result === 'w' ? 0 : 1) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.8);
+  }, 120_000);
 });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../../test/simulate';
-import { GAME_POINTS, applyTurn, cardPoints, chooseTurn, isValidState, newGame, nextRound, winner, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { applyTurn, cardPoints, chooseTurn, GAME_POINTS, isValidState, newGame, nextRound, winner, type State } from './logic';
 
 describe('Crazy Eights, many whole games', () => {
   it('always finishes, and the round winner scores the cards left in the other hands', () => {
@@ -26,5 +27,17 @@ describe('Crazy Eights, many whole games', () => {
         expect(s.scores[winner(s)!]).toBeGreaterThanOrEqual(GAME_POINTS);
       },
     });
+  }, 60_000);
+  it('a Strong player wins more than its share against three Easy ones (it’s mostly luck)', () => {
+    const share = strongShare<State>({
+      games: 400,
+      sides: 4, // the Strong seat moves round the table
+      maxSteps: 6000,
+      start: (rng) => newGame('strong', rng),
+      step: (s, rng, strong) => (s.phase === 'roundOver' ? nextRound(s, rng) : applyTurn(s, s.turn, chooseTurn({ ...s, level: levelFor(s.turn === strong) }, s.turn, rng), rng)),
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s, strong) => (winner(s) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.32); // an even share is 0.25
   }, 60_000);
 });

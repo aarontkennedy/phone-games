@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pick, simulate } from '../../test/simulate';
-import { GAME_POINTS, bid, chooseBid, chooseCard, collect, isValidState, legalPlays, newGame, nextRound, play, winner, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { bid, chooseBid, chooseCard, collect, GAME_POINTS, isValidState, legalPlays, newGame, nextRound, play, winner, type State } from './logic';
 
 describe('Spades, many whole games', () => {
   it('always finishes, 13 tricks a round, scores move by the round result', () => {
@@ -31,5 +32,22 @@ describe('Spades, many whole games', () => {
         expect(s.scores[winner(s)!]).toBe(Math.max(...s.scores));
       },
     });
+  }, 60_000);
+  it('a Strong team beats an Easy team', () => {
+    const share = strongShare<State>({
+      games: 40,
+      maxSteps: 5000,
+      start: (rng) => newGame('strong', rng),
+      step: (s, rng, strong) => {
+        const level = levelFor(s.turn % 2 === strong);
+        if (s.phase === 'roundOver') return nextRound(s, rng);
+        if (s.phase === 'bidding') return bid(s, s.turn, chooseBid({ ...s, level }, s.turn, rng));
+        if (s.trick.length === 4) return collect(s);
+        return play(s, s.turn, chooseCard({ ...s, level }, s.turn, rng));
+      },
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s, strong) => (winner(s) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.8);
   }, 60_000);
 });

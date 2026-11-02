@@ -15,6 +15,8 @@ import { scoreDice } from './hotdice/logic';
 import { countSolutions } from './numberplace/logic';
 import { flips, legalMoves as reversiMoves, newGame as newReversi, type Cell, type Side } from './reversi/logic';
 import { scoreTeam } from './spades/logic';
+import { move as markCell, newGame as newTicTacToe, type State as TicTacToe } from './tictactoe/logic';
+import { drop, newGame as newFourInARow, type State as FourInARow } from './fourinarow/logic';
 import { basicScore } from './yacht/logic';
 
 describe('Checkers: move counts from the start (published "perft" numbers)', () => {
@@ -72,6 +74,38 @@ describe('Poker: every five-card hand, counted by kind (published combinatorics)
       pair: 1098240,
       high: 1302540,
     });
+  }, 60_000);
+});
+
+describe('Tic-Tac-Toe: every possible game (published count: 255,168)', () => {
+  it('ends in the known numbers of wins and draws', () => {
+    const counts: Record<string, number> = {};
+    const walk = (s: TicTacToe) => {
+      if (s.result) counts[s.result] = (counts[s.result] ?? 0) + 1;
+      else for (let i = 0; i < 9; i++) {
+        const n = markCell(s, i);
+        if (n) walk(n);
+      }
+    };
+    walk(newTicTacToe());
+    expect(counts).toEqual({ X: 131184, O: 77904, draw: 46080 });
+  });
+});
+
+describe('Four in a Row: move counts from the start (published "perft" numbers)', () => {
+  // A finished game has no moves after it; a full column takes no more discs.
+  const perft = (s: FourInARow, depth: number): number => {
+    if (depth === 0) return 1;
+    if (s.result !== null) return 0;
+    let n = 0;
+    for (let c = 0; c < 7; c++) {
+      const next = drop(s, c);
+      if (next) n += perft(next, depth - 1);
+    }
+    return n;
+  };
+  it('matches to eight moves deep', () => {
+    expect([1, 2, 3, 4, 5, 6, 7, 8].map((d) => perft(newFourInARow(), d))).toEqual([7, 49, 343, 2401, 16807, 117649, 823536, 5673234]);
   }, 60_000);
 });
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../../test/simulate';
-import { GAME_POINTS, applyTurn, chooseTurn, isValidState, newGame, nextRound, pips, winner, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { applyTurn, chooseTurn, GAME_POINTS, isValidState, newGame, nextRound, pips, winner, type State } from './logic';
 
 const handPips = (s: State, p: number) => pips(s.hands[p]);
 
@@ -33,5 +34,16 @@ describe('Dominoes, many whole games', () => {
         expect(s.scores[winner(s)!]).toBeGreaterThanOrEqual(GAME_POINTS);
       },
     });
+  }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 100,
+      maxSteps: 5000,
+      start: (rng) => newGame('strong', rng),
+      step: (s, rng, strong) => (s.phase === 'roundOver' ? nextRound(s, rng) : applyTurn(s, s.turn, chooseTurn({ ...s, level: levelFor(s.turn === strong) }, s.turn, rng))),
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s, strong) => (winner(s) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.6);
   }, 60_000);
 });

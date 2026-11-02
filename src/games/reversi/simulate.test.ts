@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { pick, simulate } from '../../test/simulate';
+import { levelFor, strongShare } from '../../test/strength';
 import { chooseMove, count, isValidState, legalMoves, move, newGame, newRound, type State } from './logic';
 
 describe('Reversi, many whole rounds', () => {
@@ -22,4 +23,15 @@ describe('Reversi, many whole rounds', () => {
       },
     });
   }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 10,
+      maxSteps: 200,
+      start: (_rng, i) => (i % 4 >= 2 ? newRound(newGame()) : newGame()),
+      step: (s, rng, strong) => move(s, chooseMove({ ...s, level: levelFor(s.turn === strong) }, rng)),
+      isOver: (s) => s.result !== null,
+      score: (s, strong) => ((s.result as unknown) === 'draw' ? 0.5 : s.result === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.7);
+  }, 120_000);
 });

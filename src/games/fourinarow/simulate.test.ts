@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pick, simulate } from '../../test/simulate';
-import { COLS, chooseColumn, drop, isValidState, landingRow, lineThrough, newGame, newRound, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { chooseColumn, COLS, drop, isValidState, landingRow, lineThrough, newGame, newRound, type State } from './logic';
 
 describe('Four in a Row, many whole rounds', () => {
   it('always ends with a real line of four, or a full board', () => {
@@ -23,5 +24,16 @@ describe('Four in a Row, many whole rounds', () => {
         }
       },
     });
+  }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 20,
+      maxSteps: 50,
+      start: (_rng, i) => (i % 4 >= 2 ? newRound(newGame()) : newGame()),
+      step: (s, rng, strong) => drop(s, chooseColumn({ ...s, level: levelFor(s.turn === strong) }, rng)),
+      isOver: (s) => s.result !== null,
+      score: (s, strong) => (s.result === 'draw' ? 0.5 : s.result === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.8);
   }, 60_000);
 });

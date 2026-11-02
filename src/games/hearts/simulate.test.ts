@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pick, simulate } from '../../test/simulate';
-import { GAME_POINTS, chooseCard, choosePass, collect, isValidState, legalPlays, newGame, nextRound, passCards, play, winners, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { chooseCard, choosePass, collect, GAME_POINTS, isValidState, legalPlays, newGame, nextRound, passCards, play, winners, type State } from './logic';
 
 const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
 
@@ -36,5 +37,22 @@ describe('Hearts, many whole games', () => {
         expect(winners(s).every((seat) => s.scores[seat] === low)).toBe(true);
       },
     });
+  }, 60_000);
+  it('a Strong player wins more than its share against three Easy ones', () => {
+    const share = strongShare<State>({
+      games: 40,
+      sides: 1, // you (seat 0) play Strong; the computer players' passes use the state's Easy level
+      maxSteps: 3000,
+      start: (rng) => newGame('easy', rng),
+      step: (s, rng) => {
+        if (s.phase === 'passing') return passCards(s, choosePass({ ...s, level: 'strong' }, 0, rng), rng);
+        if (s.phase === 'roundOver') return nextRound(s, rng);
+        if (s.trick.length === 4) return collect(s);
+        return play(s, s.turn, chooseCard({ ...s, level: levelFor(s.turn === 0) }, s.turn, rng));
+      },
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s) => (winners(s).includes(0) ? 1 / winners(s).length : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.6); // an even share is 0.25
   }, 60_000);
 });

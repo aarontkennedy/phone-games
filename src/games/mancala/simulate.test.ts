@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pick, simulate } from '../../test/simulate';
-import { PITS, SEEDS, STORE, choosePit, isValidState, legalPits, move, newGame, newRound, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { choosePit, isValidState, legalPits, move, newGame, newRound, PITS, SEEDS, STORE, type State } from './logic';
 
 describe('Mancala, many whole rounds', () => {
   it('always ends with every seed in a store, and the bigger store wins', () => {
@@ -21,5 +22,16 @@ describe('Mancala, many whole rounds', () => {
         expect(s.result).toBe(you > them ? 0 : them > you ? 1 : 'draw');
       },
     });
+  }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 16,
+      maxSteps: 500,
+      start: (_rng, i) => (i % 4 >= 2 ? newRound(newGame()) : newGame()),
+      step: (s, rng, strong) => move(s, choosePit({ ...s, level: levelFor(s.turn === strong) }, rng)),
+      isOver: (s) => s.result !== null,
+      score: (s, strong) => (s.result === 'draw' ? 0.5 : s.result === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.8);
   }, 60_000);
 });

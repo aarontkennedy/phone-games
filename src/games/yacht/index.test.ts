@@ -1,4 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
+import css from './style.css?raw';
+import appCss from '../../style.css?raw';
+import { contrast, themes } from '../../test/contrast';
 import { load, save } from '../../core/storage';
 import { makeContainer, track } from '../../test/helpers';
 import { mount } from './index';
@@ -109,5 +112,17 @@ describe('Yacht screen', () => {
     $('[data-dice]').click(); // a tap between dice
     unmount();
     expect(container.children).toHaveLength(0);
+  });
+});
+
+describe('Yacht colors', () => {
+  const ya = themes(css, '.ya');
+  const app = themes(appCss, ':root');
+  it.each([
+    ['light', ya.light, app.light],
+    ['dark', ya.dark, app.dark],
+  ])('the dice outline stands out from the die and the table in the %s theme (3:1)', (_n, t, a) => {
+    expect(contrast(t['ya-edge'], a.surface)).toBeGreaterThanOrEqual(3);
+    expect(contrast(t['ya-edge'], a.board)).toBeGreaterThanOrEqual(3);
   });
 });

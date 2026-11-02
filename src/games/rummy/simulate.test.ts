@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { simulate } from '../../test/simulate';
-import { GAME_POINTS, applyTurn, cardPoints, chooseTurn, isValidState, meldPoints, newGame, nextHand, winner, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { applyTurn, cardPoints, chooseTurn, GAME_POINTS, isValidState, meldPoints, newGame, nextHand, winner, type State } from './logic';
 
 describe('Rummy 500, many whole games', () => {
   it('always finishes, every meld on the table is real, and hands score melded minus held', () => {
@@ -32,5 +33,16 @@ describe('Rummy 500, many whole games', () => {
         expect(s.scores[winner(s)!]).toBe(Math.max(...s.scores));
       },
     });
+  }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 40,
+      maxSteps: 20000,
+      start: (rng) => newGame('strong', rng),
+      step: (s, rng, strong) => (s.phase === 'handOver' ? nextHand(s, rng) : applyTurn(s, s.turn, chooseTurn({ ...s, level: levelFor(s.turn === strong) }, s.turn, rng))),
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s, strong) => (winner(s) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.8);
   }, 60_000);
 });

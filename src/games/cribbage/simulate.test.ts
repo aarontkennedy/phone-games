@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pick, simulate } from '../../test/simulate';
-import { GAME_POINTS, chooseCard, chooseDiscard, discard, isValidState, legalPlays, newGame, nextStep, play, winner, type State } from './logic';
+import { levelFor, strongShare } from '../../test/strength';
+import { chooseCard, chooseDiscard, discard, GAME_POINTS, isValidState, legalPlays, newGame, nextStep, play, winner, type State } from './logic';
 
 describe('Cribbage, many whole games', () => {
   it('always finishes at 121, scores only climb, and the back pegs trail correctly', () => {
@@ -34,5 +35,21 @@ describe('Cribbage, many whole games', () => {
         expect(s.scores[1 - winner(s)!]).toBeLessThan(GAME_POINTS);
       },
     });
+  }, 60_000);
+  it('Strong beats Easy', () => {
+    const share = strongShare<State>({
+      games: 40,
+      maxSteps: 3000,
+      start: (rng) => newGame('strong', rng),
+      step: (s, rng, strong) => {
+        // The computer's discard happens inside discard(), at the state's level.
+        if (s.phase === 'discard') return discard({ ...s, level: levelFor(strong === 1) }, chooseDiscard({ ...s, level: levelFor(strong === 0) }, 0, rng), rng);
+        if (s.phase === 'show') return nextStep(s, rng);
+        return play(s, s.turn, chooseCard({ ...s, level: levelFor(s.turn === strong) }, s.turn, rng));
+      },
+      isOver: (s) => s.phase === 'gameOver',
+      score: (s, strong) => (winner(s) === strong ? 1 : 0),
+    });
+    expect(share).toBeGreaterThanOrEqual(0.75);
   }, 60_000);
 });
