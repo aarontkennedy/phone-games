@@ -103,7 +103,7 @@ export const games: GameMeta[] = [
         'These are play chips, not money. If you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve ever had.',
       ],
       tips: [
-        'Turn on <b>Hints</b> and the line under the table tells you the best play for every hand.',
+        'Not sure? Tap <b>Hint</b> at the top during a hand, and the line under the table tells you the best play for that moment. It only shows when you ask.',
         'Always split aces and eights. Never split tens or fives.',
         'Stand on 12 to 16 when the dealer shows 2 to 6 (the dealer is likely to bust), and hit when the dealer shows 7 or higher.',
         'Double on 11 unless the dealer shows an ace.',

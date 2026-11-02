@@ -23,7 +23,6 @@ import './style.css';
 
 const STATE_KEY = 'blackjack:state';
 const BEST_KEY = 'blackjack:best';
-const HINTS_KEY = 'blackjack:hints';
 
 const ACTIONS: [Action, string][] = [
   ['hit', 'Hit'],
@@ -44,12 +43,14 @@ export function mount(container: HTMLElement): () => void {
   const saved = load<unknown>(STATE_KEY, null);
   let state: State = isValidState(saved) ? saved : newState();
   let best = Math.max(load(BEST_KEY, START_CHIPS), state.chips);
-  let hints = load(HINTS_KEY, false);
+  /** Whether you asked for a hint on this decision. Cleared by your next move. */
+  let showHint = false;
 
   container.innerHTML = `
     <div class="screen cards bj">
       <div class="stats">
         <div class="stat"><small>Chips</small><b data-chips></b></div>
+        <button class="btn secondary" data-hint>Hint</button>
         <div class="stat"><small>Best</small><b data-best></b></div>
       </div>
       <div class="board-frame bj-table" data-board></div>
@@ -62,10 +63,12 @@ export function mount(container: HTMLElement): () => void {
   const chipsEl = container.querySelector<HTMLElement>('[data-chips]')!;
   const bestEl = container.querySelector<HTMLElement>('[data-best]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
+  const hintBtn = container.querySelector<HTMLButtonElement>('[data-hint]')!;
 
   function update(next: State | null) {
     if (!next) return;
     state = next;
+    showHint = false;
     if (state.chips > best) {
       best = state.chips;
       save(BEST_KEY, best);
@@ -132,14 +135,13 @@ export function mount(container: HTMLElement): () => void {
             `<button data-bet="${b}" aria-pressed="${b === state.bet}"${b > state.chips ? ' disabled' : ''}>${b}</button>`,
         ).join('')}
       </div>
-      <button class="btn secondary" data-hints aria-pressed="${hints}">Hints</button>
       <button class="btn" data-deal>${isBroke(state) ? 'Start over' : 'Deal'}</button>`;
   }
 
   function statusText(): string {
     if (state.phase === 'playing') {
       const tip = hint(state);
-      return hints && tip
+      return showHint && tip
         ? `Hint: the best play here is to ${tip}.`
         : 'Hit to take a card, or stand to keep your total.';
     }
@@ -159,6 +161,7 @@ export function mount(container: HTMLElement): () => void {
     chipsEl.textContent = String(state.chips);
     bestEl.textContent = String(best);
     statusEl.textContent = statusText();
+    hintBtn.disabled = state.phase !== 'playing';
   }
 
   // --- Input ---
@@ -169,11 +172,10 @@ export function mount(container: HTMLElement): () => void {
     if (el.hasAttribute('data-deal')) update(isBroke(state) ? restart(state) : deal(state));
     else if (el.dataset.action) update(act(state, el.dataset.action as Action));
     else if (el.dataset.bet) update(setBet(state, Number(el.dataset.bet)));
-    else {
-      hints = !hints;
-      save(HINTS_KEY, hints);
-      render();
-    }
+  });
+  hintBtn.addEventListener('click', () => {
+    showHint = true;
+    render();
   });
 
   render();

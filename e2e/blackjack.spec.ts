@@ -38,10 +38,11 @@ test('bet, deal, stand and get paid', async ({ page }) => {
   await expect(page.locator('[data-deal]')).toBeEnabled();
 });
 
-test('hints suggest the best play', async ({ page }) => {
+test('Hint suggests the best play for this hand when asked', async ({ page }) => {
   await openBlackjackWith(page, '6H 5S 5C 9D'); // 11 vs 5: double
-  await page.locator('[data-hints]').click();
   await page.locator('[data-deal]').click();
+  await expect(page.locator('[data-status]')).toHaveText('Hit to take a card, or stand to keep your total.');
+  await page.locator('[data-hint]').click();
   await expect(page.locator('[data-status]')).toHaveText('Hint: the best play here is to double.');
 });
 

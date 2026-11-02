@@ -122,13 +122,17 @@ describe('Blackjack screen', () => {
     expect($$('.bj-hand').indexOf($$('.bj-hand.active')[0])).toBe(2);
   });
 
-  it('gives hints when they are turned on, and remembers the setting', () => {
-    const { $, press, status } = table('10H 6S 7C 10D');
-    press('[data-hints]');
-    expect($('[data-hints]').getAttribute('aria-pressed')).toBe('true');
-    expect(load('blackjack:hints', false)).toBe(true);
+  it('shows a hint only when you ask, for that decision only', () => {
+    const { $, press, status } = table('10H 2S 2C 10D 3H');
+    expect($('[data-hint]').hasAttribute('disabled')).toBe(true); // nothing to advise while betting
     press('[data-deal]');
-    expect(status()).toBe('Hint: the best play here is to stand.');
+    expect(status()).toBe('Hit to take a card, or stand to keep your total.');
+    press('[data-hint]');
+    expect(status()).toBe('Hint: the best play here is to hit.');
+    press('[data-action="hit"]');
+    expect(status()).toBe('Hit to take a card, or stand to keep your total.'); // ask again for the next one
+    press('[data-hint]');
+    expect(status()).toMatch(/^Hint: the best play here is to /);
   });
 
   it('offers Start over when out of chips', () => {
