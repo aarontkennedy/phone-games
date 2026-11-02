@@ -1,5 +1,5 @@
 import type { GameMeta } from '../core/game';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -590,5 +590,28 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./backgammon'),
+  },
+  {
+    id: 'dots',
+    title: 'Dots and Boxes',
+    description: 'Draw lines, close boxes, claim the most',
+    icon: dotsIcon,
+    category: 'board',
+    howToPlay: {
+      goal: 'Claim more of the 16 boxes than the computer.',
+      steps: [
+        'You and the computer take turns drawing one line between two dots that sit next to each other, across or down. Tap between two dots to draw.',
+        'Draw the fourth side of a box and it’s yours: it fills purple, and you go again. One line can close two boxes at once.',
+        'The computer’s boxes fill orange. The newest line is orange too, so you can see the computer’s move.',
+        'When every line is drawn, whoever has more boxes wins.',
+        'Tap <b>New</b> for another round. Who goes first switches each round.',
+      ],
+      tips: [
+        '<b>Easy</b> takes any box it can and otherwise plays at random. <b>Strong</b> avoids giving boxes away. You can switch at any time.',
+        'Avoid drawing the third side of a box: that hands it to the computer.',
+        'Late in the game someone has to give boxes away. Give away the shortest chain you can.',
+      ],
+    },
+    load: () => import('./dots'),
   },
 ];

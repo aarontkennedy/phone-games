@@ -1,0 +1,101 @@
+/* Dots, the lines between them and the boxes they close, in one square grid. Open lines are
+   faint dashes you can tap; drawn lines are solid, the newest one in orange; claimed boxes
+   fill with the owner's color. */
+.db-board {
+  display: grid;
+  grid-template-columns: repeat(4, 28px minmax(0, 1fr)) 28px;
+  grid-template-rows: repeat(4, 28px minmax(0, 1fr)) 28px;
+  aspect-ratio: 1;
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.db-dot {
+  display: grid;
+  place-items: center;
+}
+
+.db-dot::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text);
+}
+
+.db-line {
+  position: relative;
+  cursor: pointer;
+}
+
+.db-line::before {
+  content: '';
+  position: absolute;
+  border-radius: 3px;
+}
+
+.db-line.across::before {
+  left: -4px;
+  right: -4px;
+  top: calc(50% - 3px);
+  height: 6px;
+  border-top: 2px dashed var(--db-guide);
+}
+
+.db-line.down::before {
+  top: -4px;
+  bottom: -4px;
+  left: calc(50% - 3px);
+  width: 6px;
+  border-left: 2px dashed var(--db-guide);
+}
+
+.db-line.drawn {
+  cursor: default;
+}
+
+.db-line.drawn::before {
+  border: 0;
+  background: var(--text);
+}
+
+.db-line.last::before {
+  background: var(--accent);
+}
+
+.db-box {
+  margin: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.db-box.p0,
+.db-key.p0 {
+  background: var(--db-you);
+}
+
+.db-box.p1,
+.db-key.p1 {
+  background: var(--db-them);
+}
+
+.db-key {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
+.db {
+  --db-you: #5b4fd6;
+  --db-them: #9a4100;
+  --db-guide: #6e6690;
+}
+
+@media (prefers-color-scheme: dark) {
+  .db {
+    --db-you: #9d94ff;
+    --db-them: #ffb347;
+    --db-guide: #a29fb8;
+  }
+}

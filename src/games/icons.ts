@@ -193,3 +193,11 @@ export const backgammonIcon = svg(
     [0, 1, 2, 3, 4, 5].map((i) => `<path d="M${5 + i * 6.5} 8l3.25 14 3.25-14z" fill="${i % 2 ? '#6e6690' : '#ffffff'}"/><path d="M${5 + i * 6.5} 40l3.25-14 3.25 14z" fill="${i % 2 ? '#ffffff' : '#6e6690'}"/>`).join('') +
     '<circle cx="14.5" cy="35" r="4" fill="#9d94ff"/><circle cx="33.5" cy="13" r="4" fill="#ffb347"/>',
 );
+
+/** A 3 by 3 grid of dots with a few lines drawn and one purple box claimed. */
+export const dotsIcon = svg(
+  '<rect x="9" y="9" width="15" height="15" rx="2" fill="#6c63ff"/>' +
+    '<path d="M8 8H40M8 8V40M24 8V24M8 24H24M24 24H40" stroke="#1d1a2b" stroke-width="3" stroke-linecap="round"/>' +
+    '<path d="M24 40H40" stroke="#ef5f58" stroke-width="3" stroke-linecap="round"/>' +
+    [8, 24, 40].flatMap((x) => [8, 24, 40].map((y) => `<circle cx="${x}" cy="${y}" r="3.5" fill="#1d1a2b"/>`)).join(''),
+);

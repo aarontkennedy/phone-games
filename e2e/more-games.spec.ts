@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, seedRandom } from './helpers';
 
 // Browser checks for Tic-Tac-Toe, Four in a Row, Checkers, Number Place, Free Cells,
-// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala, Hangman, Spider and Backgammon: each fits the phone, reads without
+// Crazy Eights, Hot Dice, Gin Rummy, Dominoes, Yacht, Reversi, Mancala, Hangman, Spider, Backgammon and Dots and Boxes: each fits the phone, reads without
 // glasses, and plays a first move.
 
 test.beforeEach(async ({ page }) => {
@@ -164,4 +164,12 @@ test('Backgammon: roll, move a checker, the computer answers', async ({ page }) 
   }
   await expect(status(page)).toHaveText(/^(You rolled|The computer|Your turn|Tap)/);
   await expectGoodLayout(page);
+});
+
+test('Dots and Boxes: draw a line, the computer answers', async ({ page }) => {
+  await page.goto('./#/dots');
+  await expectGoodLayout(page);
+  await page.locator('[data-line="0"]').click();
+  await expect(status(page)).toHaveText(/^Your turn/, { timeout: 5000 });
+  await expect(page.locator('.db-line.drawn')).toHaveCount(2);
 });
