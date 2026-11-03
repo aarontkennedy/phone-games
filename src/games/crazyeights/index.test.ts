@@ -28,7 +28,8 @@ beforeEach(() => {
 describe('Crazy eights screen', () => {
   it('shows the table and what you can play', () => {
     const { $, $$, status } = setup(position(['7H 2C 8D KS', 'AC 2D', 'AD', 'AH'], '7S'));
-    expect($('[data-seat="1"] .tt-info').textContent!.replace(/\s+/g, ' ')).toBe('2 left · 0');
+    expect($('[data-seat="1"] .tt-info').textContent!.replace(/\s+/g, ' ')).toBe('2 left · 0 pts');
+    expect($('[data-seat="0"] .tt-info').textContent!.replace(/\s+/g, ' ')).toBe('4 left · 0 pts');
     expect($$('[data-hand]:not([disabled])').map((c) => c.dataset.card)).toEqual(['8D', 'KS', '7H']);
     expect(status()).toBe('Your turn: play a spade or a 7, or an 8.');
   });

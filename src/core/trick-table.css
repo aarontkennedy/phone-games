@@ -41,7 +41,9 @@
 .tt-play {
   width: 100%;
   max-width: 64px;
-  margin-top: var(--space-1);
+  /* Bottom of the seat, so played cards line up even when one seat's info wraps to two lines. */
+  margin-top: auto;
+  padding-top: var(--space-1);
 }
 
 /* Seven cards per row (up to ten for a long hand); later rows overlap the bottom of the

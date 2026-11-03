@@ -63,7 +63,7 @@ export function mount(container: HTMLElement): () => void {
 
   function render() {
     const seats = seatsHtml((seat) => ({
-      info: seat === 0 ? String(state.scores[0]) : `${state.hands[seat].length} left<span class="tt-muted"> · ${state.scores[seat]}</span>`,
+      info: `${state.hands[seat].length} left<span class="tt-muted"> · ${state.scores[seat]} pts</span>`,
       card: state.lastPlay[seat] ?? undefined,
       turn: state.phase === 'playing' && state.turn === seat,
     }));
