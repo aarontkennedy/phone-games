@@ -82,8 +82,8 @@ describe('Five-card draw screen', () => {
       setup({ ...table(['AS AH AD 3D 9S', 'KS KH 4C 5D 7S', '', '']), phase: 'handOver', put: [0, 0, 0, 0], ...o });
     const shown = over({ shown: true, pots: [{ amount: 20, eligible: [0, 1], winners: [0] }] });
     expect(shown.status()).toBe('You win the pot of 20 with three aces.');
-    expect(shown.$('[data-seat="1"] .tt-info').textContent).toBe('1000Pair of kings');
-    expect(shown.$('[data-seat="1"] .dp-fan').getAttribute('aria-label')).toBe('West’s cards: King of spades, King of hearts, 4 of clubs, 5 of diamonds, 7 of spades');
+    expect(shown.$('[data-seat="1"] .tt-info').textContent).toBe('1000Pair');
+    expect(shown.$('[data-seat="1"] .dp-fan').getAttribute('aria-label')).toBe('West’s cards: King of spades, King of hearts, 4 of clubs, 5 of diamonds, 7 of spades, pair of kings');
     expect(shown.buttons()).toEqual(['Next hand']);
     shown.$('[data-next]').click();
     expect(shown.stored().hand).toBe(2);

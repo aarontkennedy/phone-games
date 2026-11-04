@@ -4,7 +4,6 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: var(--space-1);
 }
 
 .he-hole > * {
@@ -64,4 +63,15 @@
   .he-board {
     max-width: 250px;
   }
+}
+
+/* The chips and last move under a seat run to one, two or three lines; room for three keeps
+   the cards below from jumping as the words change. */
+.he-seat .tt-info {
+  min-height: calc(3 * 1.25em);
+}
+
+.he-hole {
+  margin-top: auto;
+  padding-top: var(--space-1);
 }

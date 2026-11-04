@@ -4,7 +4,6 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  margin-top: var(--space-1);
 }
 
 .dp-fan > * {
@@ -78,4 +77,15 @@
   .dp-hand {
     max-width: 260px;
   }
+}
+
+/* The chips and last move under a seat run to one, two or three lines; room for three keeps
+   the cards below from jumping as the words change. */
+.dp-seat .tt-info {
+  min-height: calc(3 * 1.25em);
+}
+
+.dp-fan {
+  margin-top: auto;
+  padding-top: var(--space-1);
 }

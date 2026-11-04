@@ -1,6 +1,6 @@
 import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { cardId, cardName, sameCard, type Card } from '../../core/cards';
-import { describeHand } from '../../core/poker';
+import { CATEGORY_NAMES, describeHand, type HandRank } from '../../core/poker';
 import { load, save } from '../../core/storage';
 import { SEAT_NAMES, type Seat } from '../../core/tricks';
 import { SEAT_ORDER } from '../../core/trick-view';
@@ -33,6 +33,9 @@ export const AI_DELAY = 800;
 
 const LABELS: Record<Action, string> = { fold: 'Fold', check: 'Check', call: 'Call', bet: 'Bet', raise: 'Raise' };
 const ROUNDS = ['Before the draw', 'After the draw'];
+/** The kind of hand, short enough for a seat: the full name ("Two pair, kings and fives") won't fit. */
+const shortName = (h: HandRank) => (h.category === 'three' ? '3 of a kind' : h.category === 'four' ? '4 of a kind' : CATEGORY_NAMES[h.category]);
+
 const lowerFirst = (t: string) => t[0].toLowerCase() + t.slice(1);
 const join = (xs: string[], last = 'and') => (xs.length > 1 ? `${xs.slice(0, -1).join(', ')} ${last} ${xs.at(-1)}` : xs[0]);
 
@@ -88,9 +91,9 @@ export function mount(container: HTMLElement): () => void {
     const cards = x === 0 ? '' : hand.length && state.live[x] ? hand.map((c) => (reveal ? cardFace(c) : cardBack())).join('') : cardSlot();
     const turn = (state.phase === 'betting' || state.phase === 'drawing') && state.turn === x;
     const dealer = state.dealer === x ? ' <span class="dp-dealer">D</span>' : '';
-    const named = reveal ? describeHand(handOf(state, x)) : state.said[x];
+    const named = reveal ? shortName(handOf(state, x)) : state.said[x];
     const info = out ? 'Out' : `${state.stacks[x]}<br><span class="tt-muted">${named || '&nbsp;'}</span>`;
-    const label = reveal ? ` aria-label="${SEAT_NAMES[x]}’s cards: ${hand.map(cardName).join(', ')}"` : '';
+    const label = reveal ? ` aria-label="${SEAT_NAMES[x]}’s cards: ${hand.map(cardName).join(', ')}, ${lowerFirst(describeHand(handOf(state, x)))}"` : '';
     return `<div class="tt-seat dp-seat${turn ? ' turn' : ''}" data-seat="${x}">
       <span class="tt-name">${SEAT_NAMES[x]}${dealer}</span>
       <span class="tt-info">${info}</span>

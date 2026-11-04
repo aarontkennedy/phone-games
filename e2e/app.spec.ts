@@ -77,6 +77,26 @@ test('home lists every game', async ({ page }) => {
   await expectReadableText(page);
 });
 
+for (const width of [320, 375, 390]) {
+  test(`home: every game name fits inside its tile at ${width}px wide`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('./');
+    const overflowing = await page.locator('.game-card').evaluateAll((cards) =>
+      cards
+        .filter((card) => {
+          const title = card.querySelector('.game-title')!;
+          const range = document.createRange();
+          range.selectNodeContents(title);
+          const text = range.getBoundingClientRect();
+          const box = card.getBoundingClientRect();
+          return title.scrollWidth > title.clientWidth + 1 || text.right > box.right - 1 || text.left < box.left + 1;
+        })
+        .map((card) => card.querySelector('.game-title')!.textContent),
+    );
+    expect(overflowing).toEqual([]);
+  });
+}
+
 test('Share offers text and email when the browser has no share sheet', async ({ page }) => {
   await page.addInitScript(() => {
     delete (Navigator.prototype as { share?: unknown }).share;
