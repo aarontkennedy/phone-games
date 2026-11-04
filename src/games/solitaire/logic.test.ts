@@ -309,6 +309,20 @@ describe('hints', () => {
     expect(isStuck(s)).toBe(false);
   });
 
+  it('drawing three, only counts deck cards that can reach the top of the turned-over pile', () => {
+    const s = blank();
+    s.draw = 3;
+    s.tableau[0].up = cards('KH');
+    // The last three: the queen always lands under the 2, so it can never be played.
+    s.stock = cards('2D QS 5C');
+    expect(findHint(s)).toBeNull();
+    expect(isStuck(s)).toBe(true);
+    // Here the queen is buried now, but comes up on the next pass through the deck.
+    s.stock = [];
+    s.waste = cards('5H 3C QS 4H');
+    expect(findHint(s)).toEqual({ draw: true });
+  });
+
   it('then any other legal move, rather than calling the game stuck', () => {
     const s = blank();
     s.tableau[0].up = cards('8S 7H');

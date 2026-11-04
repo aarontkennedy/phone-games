@@ -136,9 +136,31 @@ function sources(s: State): Source[] {
   return out;
 }
 
-/** True if some card in the deck could be played right now. */
-const deckUseful = (s: State) =>
-  [...s.stock, ...s.waste].some((c) => canFound(s, c) || s.tableau.some((col) => canStack(c, col)));
+/**
+ * The deck cards that turning the deck can bring to the top of the turned-over pile: the
+ * rest of this pass, then one whole pass after the deck is turned back over (every later
+ * pass is the same). Drawing three, the others stay buried until a card above them is played.
+ */
+function reachable(s: State): Card[] {
+  let stock = s.stock.slice();
+  let waste = s.waste.slice();
+  const tops: Card[] = [];
+  for (let passes = 0; passes < 2; ) {
+    if (!stock.length) {
+      if (!waste.length) break;
+      stock = waste.reverse();
+      waste = [];
+      passes++;
+      continue;
+    }
+    for (let i = 0; i < s.draw && stock.length; i++) waste.push(stock.pop()!);
+    tops.push(waste.at(-1)!);
+  }
+  return tops;
+}
+
+/** True if turning the deck can bring up a card that could be played right now. */
+const deckUseful = (s: State) => reachable(s).some((c) => canFound(s, c) || s.tableau.some((col) => canStack(c, col)));
 
 /**
  * A move to suggest, most useful first: a card up to its pile, a move that turns over a
