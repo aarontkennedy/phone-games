@@ -114,7 +114,7 @@ export function applyMove(board: (Piece | null)[], m: Move): (Piece | null)[] {
 const sameMove = (a: Move, b: Move) => a.from === b.from && a.path.join() === b.path.join();
 
 export function move(s: State, m: Move): State | null {
-  if (s.result || !legalMoves(s.board, s.turn).some((x) => sameMove(x, m))) return null;
+  if (s.result !== null || !legalMoves(s.board, s.turn).some((x) => sameMove(x, m))) return null;
   const board = applyMove(s.board, m);
   const turn: Side = s.turn === 0 ? 1 : 0;
   const quiet = m.captured.length ? 0 : s.quiet + 1;

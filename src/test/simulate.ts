@@ -54,3 +54,27 @@ export function simulate<S>(sim: Simulation<S>): S[] {
 
 /** Picks one item at random. */
 export const pick = <T>(items: readonly T[], rng: Rng): T => items[Math.floor(rng() * items.length)];
+
+/**
+ * Nearly finished games, for screen stress tests to start from: plays games like
+ * `simulate` (without its checks) and keeps, from each, the state `movesBefore` moves
+ * before it ended.
+ */
+export function nearlyFinished<S>(
+  sim: Pick<Simulation<S>, 'games' | 'seed' | 'maxSteps' | 'start' | 'step' | 'isOver'>,
+  movesBefore: number,
+): S[] {
+  const out: S[] = [];
+  for (let game = 0; game < sim.games; game++) {
+    const rng = seededRng((sim.seed ?? 1) + game);
+    const recent: S[] = [sim.start(rng, game)];
+    for (let steps = 0; !sim.isOver(recent.at(-1)!) && steps < sim.maxSteps; steps++) {
+      const next = sim.step(recent.at(-1)!, rng);
+      if (next === null) break;
+      recent.push(next);
+      if (recent.length > movesBefore + 1) recent.shift();
+    }
+    if (sim.isOver(recent.at(-1)!)) out.push(recent[0]);
+  }
+  return out;
+}

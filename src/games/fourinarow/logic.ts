@@ -63,7 +63,7 @@ export function lineThrough(board: (Disc | null)[], idx: number): number[] | nul
 }
 
 export function drop(s: State, col: number): State | null {
-  if (s.result || !Number.isInteger(col) || col < 0 || col >= COLS) return null;
+  if (s.result !== null || !Number.isInteger(col) || col < 0 || col >= COLS) return null;
   const row = landingRow(s.board, col);
   if (row < 0) return null;
   const board = s.board.slice();

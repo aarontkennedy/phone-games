@@ -1,19 +1,26 @@
 import { describe, expect, it } from 'vitest';
-import { pick, simulate } from '../../test/simulate';
+import { stressRun, stressScreen } from '../../test/screen-stress';
+import { nearlyFinished, pick, simulate, type Simulation } from '../../test/simulate';
 import { levelFor, strongShare } from '../../test/strength';
+import { mount } from './index';
 import { CHECKERS, chooseTurn, isValidState, legalMoves, move, newGame, newRound, pips, roll, type State } from './logic';
+
+/** How a whole game is played, shared by the simulation and the screen stress test. */
+const wholeGame: Pick<Simulation<State>, 'maxSteps' | 'start' | 'step' | 'isOver'> = {
+  maxSteps: 3000,
+  start: (_rng, i) => (i % 2 ? newRound(newGame('easy')) : newGame(i % 10 === 0 ? 'strong' : 'easy')),
+  step: (s, rng) => {
+    if (!s.dice.length) return roll(s, rng);
+    return move(s, s.turn === 0 ? pick(legalMoves(s), rng) : chooseTurn(s, rng)[0]);
+  },
+  isOver: (s) => s.result !== null,
+};
 
 describe('Backgammon, many whole games', () => {
   it('always ends with one side’s fifteen checkers off, and pips only shrink for the mover', () => {
     simulate<State>({
+      ...wholeGame,
       games: 50,
-      maxSteps: 3000,
-      start: (_rng, i) => (i % 2 ? newRound(newGame('easy')) : newGame(i % 10 === 0 ? 'strong' : 'easy')),
-      step: (s, rng) => {
-        if (!s.dice.length) return roll(s, rng);
-        return move(s, s.turn === 0 ? pick(legalMoves(s), rng) : chooseTurn(s, rng)[0]);
-      },
-      isOver: (s) => s.result !== null,
       isValid: isValidState, // 15 checkers each, always
       check: (prev, next) => {
         if (prev.dice.length) expect(pips(next, prev.turn)).toBeLessThan(pips(prev, prev.turn));
@@ -36,4 +43,19 @@ describe('Backgammon, many whole games', () => {
     });
     expect(share).toBeGreaterThanOrEqual(0.7);
   }, 60_000);
+
+  // Its own command (npm run test:stress), so it doesn't slow the simulations down.
+  it.skipIf(!stressRun)('survives random tapping on the screen, and a finished game stays finished', () => {
+    const { finishedSteps } = stressScreen({
+      id: 'backgammon',
+      mount,
+      isValid: isValidState,
+      steps: 100,
+      // Finished games (reopening one must not let the computer play on), and nearly finished ones.
+      starts: [...nearlyFinished({ ...wholeGame, games: 2 }, 0), ...nearlyFinished({ ...wholeGame, games: 2 }, 3)],
+      stepsFromStart: 25,
+      isOver: wholeGame.isOver,
+    });
+    expect(finishedSteps).toBeGreaterThan(0); // the check above really ran
+  }, 120_000);
 });

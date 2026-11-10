@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { stressRun, stressScreen } from '../../test/screen-stress';
 import { pick, simulate } from '../../test/simulate';
+import { mount } from './index';
 import { bestTarget, deal, findHint, isValidState, move, newGame, type Source, type State } from './logic';
+import { oneMoveFromWinning } from './test-fixtures';
 
 const sources = (s: State): Source[] =>
   s.tableau.flatMap((col, c) => col.up.map((_, index) => ({ col: c, index }))).filter((src) => bestTarget(s, src) !== null);
@@ -25,4 +28,18 @@ describe('Spider Solitaire, many games of random play', () => {
       check: (prev, next) => expect(next.done.length).toBeGreaterThanOrEqual(prev.done.length),
     });
   }, 60_000);
+
+  // Its own command (npm run test:stress), so it doesn't slow the simulations down.
+  it.skipIf(!stressRun)('survives random tapping on the screen, and a finished game stays finished', () => {
+    const { finishedSteps } = stressScreen({
+      id: 'spider',
+      mount,
+      isValid: isValidState,
+      steps: 100,
+      starts: [oneMoveFromWinning()],
+      tries: 5,
+      stepsFromStart: 25,
+    });
+    expect(finishedSteps).toBeGreaterThan(0); // the check above really ran
+  }, 120_000);
 });

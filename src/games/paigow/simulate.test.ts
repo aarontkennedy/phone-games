@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { stressRun, stressScreen } from '../../test/screen-stress';
 import { pick, simulate } from '../../test/simulate';
+import { mount } from './index';
 import { BETS, deal, isBroke, isValidSplit, isValidState, newState, play, restart, setBet, split, toggleLow, useHint, type State } from './logic';
 
 describe('Pai Gow Poker, many hands', () => {
@@ -36,4 +38,15 @@ describe('Pai Gow Poker, many hands', () => {
     expect(results.push / 6_000).toBeGreaterThan(0.3);
     expect(results.push / 6_000).toBeLessThan(0.5);
   }, 16_000);
+
+  // Its own command (npm run test:stress), so it doesn't slow the simulations down.
+  it.skipIf(!stressRun)('survives random tapping on the screen, and a finished hand stays finished', () => {
+    const { finishedSteps } = stressScreen({
+      id: 'paigow',
+      mount,
+      isValid: isValidState,
+      steps: 100,
+    });
+    expect(finishedSteps).toBeGreaterThan(0); // the check above really ran
+  }, 120_000);
 });

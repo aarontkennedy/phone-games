@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import css from './style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, readVars } from '../../test/contrast';
-import { answerNewGame, makeContainer, track } from '../../test/helpers';
+import { answerNewGame, expectStaysFinished, makeContainer, track } from '../../test/helpers';
 import { AI_DELAY, mount } from './index';
 import { newGame, type State } from './logic';
 
@@ -78,6 +78,18 @@ describe('Backgammon screen', () => {
     expect(status()).toMatch(/^Your turn: tap Roll/);
     $<HTMLButtonElement>('[data-roll]').click();
     expect(status()).toMatch(/^You rolled \d and \d but can’t move\. The computer/);
+  });
+
+  it('wins when you bear off your last checker, and the computer doesn’t play on', () => {
+    const points = Array(24).fill(0);
+    points[0] = 1; // your last checker, one pip from home
+    points[23] = -12;
+    const { pt, $, stored, status } = setup(rolled([1, 2], { points, off: [14, 3] }));
+    pt(0).click();
+    $('[data-pt="off"]').click();
+    expect(stored().result).toBe(0);
+    expect(status()).toMatch(/^You win/);
+    expectStaysFinished(stored);
   });
 
   it('shows a win, and New starts again (asking first mid-game)', () => {

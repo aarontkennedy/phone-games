@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { stressRun, stressScreen } from '../../test/screen-stress';
 import { pick, simulate } from '../../test/simulate';
+import { mount } from './index';
 import { CHIPS, OUTSIDE, isBroke, isValidState, newState, place, repeat, restart, setChip, spin, total, winnings, type State } from './logic';
 
 const SPOTS = [...Object.keys(OUTSIDE), ...Array.from({ length: 37 }, (_, n) => String(n))];
@@ -35,4 +37,18 @@ describe('Roulette, many spins', () => {
     for (const c of counts) expect(c).toBeGreaterThan(420);
     for (const c of counts) expect(c).toBeLessThan(670);
   }, 60_000);
+
+  // Its own command (npm run test:stress), so it doesn't slow the simulations down.
+  it.skipIf(!stressRun)('survives random tapping on the screen, and a finished game stays finished', () => {
+    const { finishedSteps } = stressScreen({
+      id: 'roulette',
+      mount,
+      isValid: isValidState,
+      steps: 100,
+      starts: [{ ...newState(), chips: 0 }, { ...newState(), chips: CHIPS[0] }], // broke, and one chip from it
+      stepsFromStart: 25,
+      isOver: isBroke, // the only way a session ends
+    });
+    expect(finishedSteps).toBeGreaterThan(0); // the check above really ran
+  }, 120_000);
 });

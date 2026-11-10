@@ -70,6 +70,27 @@ Easy and every other test would still pass.
   or a Strong team against an Easy team.
 - Games that are mostly luck (Hot Dice, Crazy Eights) have lower thresholds and more games.
 
+### Screen stress test
+
+Simulations check the rules, not the screen. So every `simulate.test.ts` also runs
+`stressScreen()` from `src/test/screen-stress.ts` on the real screen: random taps on
+whatever can be tapped, arrow keys (2048's swipes), random waits so the computer moves,
+and now and then leaving the game and coming back. After every step it checks that
+nothing crashed or logged an error, the saved game is valid, and a finished game didn't
+change while it only waited.
+
+- It starts from a new game, from finished games (reopening one must not let the
+  computer play on), and from games a few moves from the end, made by the game's own
+  simulation with `nearlyFinished()` or a fixture such as Solitaire's
+  `oneMoveFromWinning()`. Random taps rarely finish a long game on their own.
+- It fails unless some steps really began from a finished game, so the check can't
+  pass by never running.
+- The computer plays Easy here, because Strong is slow; the simulations cover Strong.
+
+It exists because Four in a Row let the computer play on after your win: the rules
+were right, but the screen scheduled a computer move half a second after the winning
+one, and every hand-picked test checked the screen too soon to see it.
+
 ## Reference tests
 
 `src/games/reference.test.ts` checks the rules against answers published elsewhere,
@@ -108,10 +129,13 @@ whenever a game has published numbers to check against.
 3. **Deterministic only.** Use fake timers (`vi.useFakeTimers()`), not real waits. The
    only real waits allowed are E2E long-presses.
 4. **Every bug fix gets a test** that fails without the fix.
+   **Finished means finished.** A screen test that ends a game against the computer
+   also calls `expectStaysFinished(stored)` (`src/test/helpers.ts`), which waits out any
+   computer move and checks nothing changed.
 5. **Test behavior, not implementation.** Screen tests act like a player (tap,
    long-press, swipe, keys) and check what's on screen and in storage.
 6. **Use the shared helpers** in `src/test/helpers.ts` (`tap`, `pointer`, `press`,
-   `setHidden`, `makeContainer`) and `e2e/helpers.ts` (`swipe`, `longPress`,
+   `setHidden`, `makeContainer`, `expectStaysFinished`) and `e2e/helpers.ts` (`swipe`, `longPress`,
    `seedRandom`, layout checks).
 
 ## Checklist for a new game
@@ -120,7 +144,7 @@ whenever a game has published numbers to check against.
 - [ ] `src/games/<id>/logic.test.ts`: every rule, every edge case
 - [ ] `src/games/<id>/index.ts`: the screen, using the shared components (docs/DESIGN.md)
 - [ ] `src/games/<id>/index.test.ts`: every interaction, persistence, cleanup, color contrast
-- [ ] `src/games/<id>/simulate.test.ts`: many whole games, checking the rules after every move, and Strong beats Easy if it has computer players
+- [ ] `src/games/<id>/simulate.test.ts`: many whole games, checking the rules after every move, Strong beats Easy if it has computer players, and the screen stress test
 - [ ] A reference test in `src/games/reference.test.ts` if the game has published numbers to check against
 - [ ] Registered in `src/games/index.ts` with a generic name (docs/LEGAL.md)
 - [ ] `e2e/<id>.spec.ts`: plays a real game on both phones, and cell or target sizes

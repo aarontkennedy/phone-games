@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { isFullDeck } from '../../core/cards';
+import { stressRun, stressScreen } from '../../test/screen-stress';
 import { pick, simulate } from '../../test/simulate';
+import { mount } from './index';
 import { autoFinish, bestTarget, canAutoFinish, draw, isValidState, move, newState, type Source, type State } from './logic';
+import { oneMoveFromWinning } from './test-fixtures';
 
 function sources(s: State): Source[] {
   const out: Source[] = [{ from: 'waste' }];
@@ -34,4 +37,18 @@ describe('Solitaire, many games of random play', () => {
       },
     });
   }, 60_000);
+
+  // Its own command (npm run test:stress), so it doesn't slow the simulations down.
+  it.skipIf(!stressRun)('survives random tapping on the screen, and a finished game stays finished', () => {
+    const { finishedSteps } = stressScreen({
+      id: 'solitaire',
+      mount,
+      isValid: isValidState,
+      steps: 100,
+      starts: [oneMoveFromWinning()],
+      tries: 5,
+      stepsFromStart: 25,
+    });
+    expect(finishedSteps).toBeGreaterThan(0); // the check above really ran
+  }, 120_000);
 });

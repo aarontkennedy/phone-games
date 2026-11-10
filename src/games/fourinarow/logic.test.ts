@@ -21,6 +21,9 @@ describe('four in a row', () => {
     expect(drop(newGame(), 7)).toBeNull();
     expect(drop(newGame(), 1.5)).toBeNull();
     expect(drop({ ...newGame(), result: 'draw' }, 0)).toBeNull();
+    // Your win is result 0: it must count as finished too.
+    expect(drop({ ...newGame(), result: 0 }, 0)).toBeNull();
+    expect(drop({ ...newGame(), result: 1 }, 0)).toBeNull();
   });
 
   it('wins across, down and diagonally', () => {

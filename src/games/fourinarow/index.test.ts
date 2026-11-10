@@ -3,7 +3,7 @@ import css from './style.css?raw';
 import appCss from '../../style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
-import { makeContainer, track } from '../../test/helpers';
+import { expectStaysFinished, makeContainer, track } from '../../test/helpers';
 import { AI_DELAY, mount } from './index';
 import { drop, newGame, type State } from './logic';
 
@@ -51,6 +51,10 @@ describe('Four in a row screen', () => {
     won.col(3).click();
     expect(won.status()).toBe('You win! Tap New for another round.');
     expect(won.$('.fir-space.win')).not.toBeNull();
+    // The computer doesn't take a turn after your win, and the columns stay closed.
+    expectStaysFinished(won.stored);
+    expect(won.status()).toBe('You win! Tap New for another round.');
+    expect(won.col(4).disabled).toBe(true);
     won.$('[data-new]').click();
     expect(won.stored().starter).toBe(1);
     document.body.replaceChildren();

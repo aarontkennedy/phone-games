@@ -74,6 +74,7 @@ describe('checkers', () => {
     expect(n.quiet).toBe(1);
     expect(move(n, m)).toBeNull(); // not player 0's turn any more
     expect(move({ ...s, result: 'draw' }, m)).toBeNull();
+    expect(move({ ...s, result: 0 }, m)).toBeNull(); // your win counts as finished too
   });
 
   it('wins when the other side has no pieces or no moves', () => {

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { load, save } from '../../core/storage';
-import { answerNewGame, makeContainer, track } from '../../test/helpers';
+import { answerNewGame, expectStaysFinished, makeContainer, track } from '../../test/helpers';
 import { AI_DELAY, actionText, meldText, mount } from './index';
 import type { State } from './logic';
 import { cards, position } from './test-fixtures';
@@ -98,15 +98,18 @@ describe('Rummy 500 screen', () => {
     hand.tap('7H', '7S', '7D');
     hand.$('[data-meld]').click();
     expect(hand.$('.overlay h2').textContent).toBe('You win the hand');
+    expectStaysFinished(hand.stored);
     expect(hand.status()).toBe('You went out. You melded 31 and held 0: 31. The computer melded 20 and held 25: -5.');
     hand.$('.overlay .btn').click();
     expect(hand.stored().phase).toBe('draw');
+    hand.unmount(); // it would keep playing the next hand in the background
     document.body.replaceChildren();
 
     const result = (points: [number, number], out: 0 | 1 | null, scores: [number, number], phase: State['phase']) =>
       setup({ ...position(['', ''], '9C'), phase, scores, last: { melded: [0, 0], held: [0, 0], points, out } });
     const lost = result([5, 40], 1, [100, 520], 'gameOver');
     expect(lost.$('.overlay h2').textContent).toBe('The computer wins');
+    expectStaysFinished(lost.stored);
     expect(lost.status()).toBe('The computer went out. You melded 0 and held 0: 5. The computer melded 0 and held 0: 40. First to 500: the computer wins.');
     lost.$('.overlay .btn').click();
     expect(lost.stored().scores).toEqual([0, 0]);

@@ -4,6 +4,7 @@ import { load, save } from '../../core/storage';
 import { answerNewGame, makeContainer, setHidden, track } from '../../test/helpers';
 import { mount } from './index';
 import { newGame, spiderDeck, type State } from './logic';
+import { oneMoveFromWinning } from './test-fixtures';
 
 function setup(saved: unknown = null) {
   if (saved) save('spider:state', saved);
@@ -13,13 +14,6 @@ function setup(saved: unknown = null) {
   const stored = () => load<State>('spider:state', null as unknown as State);
   const status = () => $('[data-status]').textContent;
   return { container, unmount, $, stored, status };
-}
-
-/** One suit, everything finished except a King-to-2 run in column 0 and the ace in column 1. */
-function oneMoveFromWinning(): State {
-  const king2 = Array.from({ length: 12 }, (_, i): Card => ({ suit: 'S', rank: 13 - i }));
-  const tableau = Array.from({ length: 10 }, (_, i) => ({ down: [], up: i === 0 ? king2 : i === 1 ? [{ suit: 'S' as Suit, rank: 1 }] : [] }));
-  return { suits: 1, stock: [], tableau, done: ['S', 'S', 'S', 'S', 'S', 'S', 'S'], moves: 5, elapsed: 0, won: false };
 }
 
 /**

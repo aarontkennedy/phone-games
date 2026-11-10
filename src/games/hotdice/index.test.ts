@@ -3,7 +3,7 @@ import css from './style.css?raw';
 import appCss from '../../style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
-import { makeContainer, track } from '../../test/helpers';
+import { expectStaysFinished, makeContainer, track } from '../../test/helpers';
 import { AI_DELAY, BUST_PAUSE, mount } from './index';
 import { newGame, type State } from './logic';
 
@@ -94,6 +94,14 @@ describe('Hot dice screen', () => {
 
   it('says one die', () => {
     expect(setup(at({ remaining: 1, turnPoints: 50 })).$('.hd-hint').textContent).toBe('1 die to roll');
+  });
+
+  it('ends the game when you bank past 10,000, and the computer doesn’t play on', () => {
+    const { $, stored, act } = setup(at({ scores: [9800, 4000], turnPoints: 450, remaining: 3 }));
+    act('bank');
+    expect(stored().phase).toBe('gameOver');
+    expect($('.overlay h2').textContent).toBe('You win!');
+    expectStaysFinished(stored);
   });
 
   it('ends the game', () => {

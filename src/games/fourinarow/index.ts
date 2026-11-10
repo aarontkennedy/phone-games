@@ -39,7 +39,7 @@ export function mount(container: HTMLElement): () => void {
     save(STATE_KEY, state);
     render();
     clearTimeout(timer);
-    if (!state.result && state.turn === 1) {
+    if (state.result === null && state.turn === 1) {
       timer = window.setTimeout(() => update(drop(state, chooseColumn(state))), AI_DELAY);
     }
   }
@@ -56,7 +56,7 @@ export function mount(container: HTMLElement): () => void {
           .join(' ');
         return `<span class="fir-space ${cls}"></span>`;
       }).join('');
-      const disabled = full || !!state.result || state.turn !== 0;
+      const disabled = full || state.result !== null || state.turn !== 0;
       return `<button class="fir-col" data-col="${c}" aria-label="Column ${c + 1}${full ? ', full' : ''}"${disabled ? ' disabled' : ''}>${spaces}</button>`;
     }).join('');
     container.querySelector('[data-you]')!.textContent = String(state.tally.you);

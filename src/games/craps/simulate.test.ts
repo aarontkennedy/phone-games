@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import { stressRun, stressScreen } from '../../test/screen-stress';
 import { pick, simulate } from '../../test/simulate';
+import { mount } from './index';
 import { CHIPS, POINTS, isBroke, isValidState, newState, onTable, place, restart, roll, setChip, takeDown, type State } from './logic';
 
 const TARGETS = ['pass', 'dontPass', 'come', 'dontCome', 'field', 'odds:pass', 'odds:dontPass', ...POINTS.map((p) => `odds:${p}`)];
@@ -40,4 +42,18 @@ describe('Craps, many rolls', () => {
     expect(passNet / passBet).toBeGreaterThan(-0.15);
     expect(passNet / passBet).toBeLessThan(0.12);
   }, 60_000);
+
+  // Its own command (npm run test:stress), so it doesn't slow the simulations down.
+  it.skipIf(!stressRun)('survives random tapping on the screen, and a finished game stays finished', () => {
+    const { finishedSteps } = stressScreen({
+      id: 'craps',
+      mount,
+      isValid: isValidState,
+      steps: 100,
+      starts: [{ ...newState(), chips: 0 }, { ...newState(), chips: CHIPS[0] }], // broke, and one chip from it
+      stepsFromStart: 25,
+      isOver: isBroke, // the only way a session ends
+    });
+    expect(finishedSteps).toBeGreaterThan(0); // the check above really ran
+  }, 120_000);
 });

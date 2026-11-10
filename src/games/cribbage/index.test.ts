@@ -3,7 +3,7 @@ import css from './style.css?raw';
 import appCss from '../../style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
-import { makeContainer, track, answerNewGame } from '../../test/helpers';
+import { makeContainer, track, answerNewGame, expectStaysFinished } from '../../test/helpers';
 import { AI_DELAY, holeAt, mount } from './index';
 import { nextStep, play, type State } from './logic';
 import { card, cards, pegging, pile } from './test-fixtures';
@@ -75,6 +75,14 @@ describe('Cribbage screen', () => {
     vi.advanceTimersByTime(AI_DELAY);
     expect(stored().scores).toEqual([0, 2]);
     expect(status()).toBe('Computer scores 2 for fifteen. Your turn. The count is 15.');
+  });
+
+  it('ends the game when you peg out, and the computer doesn’t play on', () => {
+    const { $, stored, tap } = setup(pegging(['KH 2D', '5S 9S'], { pile: pile(1, '5C'), scores: [119, 90] }));
+    tap('KH'); // fifteen for 2: 121
+    expect(stored().phase).toBe('gameOver');
+    expect($('.overlay h2').textContent).toBe('You win!');
+    expectStaysFinished(stored);
   });
 
   it('tells you when you score, and when the computer says go', () => {

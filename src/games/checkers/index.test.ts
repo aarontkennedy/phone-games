@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import css from './style.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, readVars } from '../../test/contrast';
-import { makeContainer, track } from '../../test/helpers';
+import { expectStaysFinished, makeContainer, track } from '../../test/helpers';
 import { AI_DELAY, mount } from './index';
 import { newGame, type Piece, type State } from './logic';
 
@@ -67,6 +67,8 @@ describe('Checkers screen', () => {
     const won = setup(state([[5, 2, man(0)], [4, 3, man(1)]]));
     won.sq(5, 2).click();
     won.sq(3, 4).click();
+    expect(won.status()).toBe('You win! Tap New for another round.');
+    expectStaysFinished(won.stored);
     expect(won.status()).toBe('You win! Tap New for another round.');
     won.$('[data-new]').click();
     expect(won.stored().starter).toBe(1);

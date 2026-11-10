@@ -1,4 +1,5 @@
 // Test-only helpers shared by unit tests.
+import { expect, vi } from 'vitest';
 
 export interface PointerInit {
   x?: number;
@@ -74,4 +75,14 @@ export function answerNewGame(choice: 'new' | 'keep' = 'new'): void {
   const button = document.querySelector<HTMLButtonElement>(`.confirm [data-${choice === 'new' ? 'confirm' : 'cancel'}]`);
   if (!button) throw new Error('Expected "Start a new game?" to be asked');
   button.click();
+}
+
+/**
+ * Waits well past any computer move and checks the saved game didn't change: a finished
+ * game must stay finished. (Four in a Row once let the computer play on after your win.)
+ */
+export function expectStaysFinished(stored: () => unknown, wait = 10_000): void {
+  const before = JSON.stringify(stored());
+  vi.advanceTimersByTime(wait);
+  expect(JSON.stringify(stored())).toBe(before);
 }

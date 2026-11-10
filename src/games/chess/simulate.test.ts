@@ -1,17 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { simulate } from '../../test/simulate';
+import { stressRun, stressScreen } from '../../test/screen-stress';
+import { nearlyFinished, simulate, type Simulation } from '../../test/simulate';
 import { levelFor, strongShare } from '../../test/strength';
+import { mount } from './index';
 import { chooseMove, DRAW_AFTER, inCheck, insufficient, isValidState, legalMoves, newGame, other, play, type State } from './logic';
+
+/** How a whole game is played, shared by the simulation and the screen stress test. */
+const wholeGame: Pick<Simulation<State>, 'maxSteps' | 'start' | 'step' | 'isOver'> = {
+  maxSteps: 1500,
+  start: (_rng, i) => newGame('easy', i % 2 ? 'w' : 'b'),
+  // Easy against Easy, with the occasional Strong move.
+  step: (s, rng) => play(s, chooseMove({ ...s, level: rng() < 0.05 ? 'strong' : 'easy' }, rng, 4000)),
+  isOver: (s) => s.result !== null,
+};
 
 describe('Chess, many whole games', () => {
   it('always ends, with the result the rules say', () => {
     simulate<State>({
+      ...wholeGame,
       games: 8,
-      maxSteps: 1500,
-      start: (_rng, i) => newGame('easy', i % 2 ? 'w' : 'b'),
-      // Easy against Easy, with the occasional Strong move.
-      step: (s, rng) => play(s, chooseMove({ ...s, level: rng() < 0.05 ? 'strong' : 'easy' }, rng, 4000)),
-      isOver: (s) => s.result !== null,
       isValid: isValidState,
       check: (prev, next) => {
         expect(next.board.filter(Boolean).length).toBeLessThanOrEqual(prev.board.filter(Boolean).length);
@@ -39,5 +46,20 @@ describe('Chess, many whole games', () => {
       score: (s, strong) => (s.result === null || s.result === 'draw' ? 0.5 : (s.result === 'w' ? 0 : 1) === strong ? 1 : 0),
     });
     expect(share).toBeGreaterThanOrEqual(0.8);
+  }, 120_000);
+
+  // Its own command (npm run test:stress), so it doesn't slow the simulations down.
+  it.skipIf(!stressRun)('survives random tapping on the screen, and a finished game stays finished', () => {
+    const { finishedSteps } = stressScreen({
+      id: 'chess',
+      mount,
+      isValid: isValidState,
+      steps: 100,
+      // Finished games (reopening one must not let the computer play on), and nearly finished ones.
+      starts: [...nearlyFinished({ ...wholeGame, games: 2 }, 0), ...nearlyFinished({ ...wholeGame, games: 2 }, 3)],
+      stepsFromStart: 25,
+      isOver: wholeGame.isOver,
+    });
+    expect(finishedSteps).toBeGreaterThan(0); // the check above really ran
   }, 120_000);
 });

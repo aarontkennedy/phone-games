@@ -36,7 +36,7 @@ export function mount(container: HTMLElement): () => void {
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
 
-  const myMoves = (): Move[] => (!state.result && state.turn === 0 ? legalMoves(state.board, 0) : []);
+  const myMoves = (): Move[] => (state.result === null && state.turn === 0 ? legalMoves(state.board, 0) : []);
 
   function update(next: State | null) {
     if (!next) return;
@@ -45,7 +45,7 @@ export function mount(container: HTMLElement): () => void {
     save(STATE_KEY, state);
     render();
     clearTimeout(timer);
-    if (!state.result && state.turn === 1) {
+    if (state.result === null && state.turn === 1) {
       timer = window.setTimeout(() => update(move(state, chooseMove(state))), AI_DELAY);
     }
   }

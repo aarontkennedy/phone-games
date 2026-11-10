@@ -1,9 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Card, Suit } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { makeContainer, setHidden, track } from '../../test/helpers';
 import { mount } from './index';
 import type { State } from './logic';
+import { nearlyWon, upTo } from './test-fixtures';
 
 function setup(saved: unknown = null) {
   if (saved) save('freecells:state', saved);
@@ -14,19 +14,6 @@ function setup(saved: unknown = null) {
   const stored = () => load<State>('freecells:state', null as unknown as State);
   const status = () => $('[data-status]').textContent;
   return { container, unmount, $, $$, stored, status };
-}
-
-const upTo = (suit: Suit, rank: number): Card[] => Array.from({ length: rank }, (_, i) => ({ suit, rank: i + 1 }));
-/** Everything up except the kings of clubs and diamonds, which sit in columns 0 and 1. */
-function nearlyWon(): State {
-  return {
-    cells: [null, null, null, null],
-    foundations: [upTo('S', 13), upTo('H', 13), upTo('D', 12), upTo('C', 12)],
-    columns: [[{ suit: 'C', rank: 13 }], [{ suit: 'D', rank: 13 }], [], [], [], [], [], []],
-    moves: 0,
-    elapsed: 0,
-    won: false,
-  };
 }
 
 beforeEach(() => {

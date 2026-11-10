@@ -10,11 +10,12 @@
     "preview": "vite preview --host",
     "test": "vitest run --coverage --exclude '**/simulate.test.ts'",
     "test:sim": "vitest run src/games/*/simulate.test.ts",
+    "test:stress": "STRESS=1 vitest run src/games/*/simulate.test.ts -t 'random tapping'",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "licenses": "node scripts/check-licenses.mjs",
     "deps": "npm outdated; npm audit",
-    "check": "tsc && npm run licenses && npm test && npm run test:sim && npm run test:e2e",
+    "check": "tsc && npm run licenses && npm test && npm run test:sim && npm run test:stress && npm run test:e2e",
     "icons": "node scripts/make-icons.mjs"
   },
   "devDependencies": {

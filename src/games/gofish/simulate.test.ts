@@ -1,16 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { simulate } from '../../test/simulate';
+import { stressRun, stressScreen } from '../../test/screen-stress';
+import { nearlyFinished, simulate, type Simulation } from '../../test/simulate';
 import { levelFor, strongShare } from '../../test/strength';
+import { mount } from './index';
 import { applyTurn, BOOKS, chooseTurn, isValidState, newGame, winners, type State } from './logic';
+
+/** How a whole game is played, shared by the simulation and the screen stress test. */
+const wholeGame: Pick<Simulation<State>, 'maxSteps' | 'start' | 'step' | 'isOver'> = {
+  maxSteps: 2000,
+  start: (rng, i) => newGame(i % 2 ? 'easy' : 'strong', rng),
+  step: (s, rng) => applyTurn(s, s.turn, chooseTurn(s, s.turn, rng)),
+  isOver: (s) => s.phase === 'over',
+};
 
 describe('Go Fish, many whole games', () => {
   it('always finishes with all 13 books made, and only a miss passes the turn', () => {
     simulate<State>({
+      ...wholeGame,
       games: 200,
-      maxSteps: 2000,
-      start: (rng, i) => newGame(i % 2 ? 'easy' : 'strong', rng),
-      step: (s, rng) => applyTurn(s, s.turn, chooseTurn(s, s.turn, rng)),
-      isOver: (s) => s.phase === 'over',
       isValid: isValidState,
       check: (prev, next) => {
         const e = next.last!;
@@ -42,4 +49,19 @@ describe('Go Fish, many whole games', () => {
     });
     expect(share).toBeGreaterThanOrEqual(0.5); // an even share is 0.25
   });
+
+  // Its own command (npm run test:stress), so it doesn't slow the simulations down.
+  it.skipIf(!stressRun)('survives random tapping on the screen, and a finished game stays finished', () => {
+    const { finishedSteps } = stressScreen({
+      id: 'gofish',
+      mount,
+      isValid: isValidState,
+      steps: 100,
+      // Finished games (reopening one must not let the computer play on), and nearly finished ones.
+      starts: [...nearlyFinished({ ...wholeGame, games: 2 }, 0), ...nearlyFinished({ ...wholeGame, games: 2 }, 3)],
+      stepsFromStart: 25,
+      isOver: wholeGame.isOver,
+    });
+    expect(finishedSteps).toBeGreaterThan(0); // the check above really ran
+  }, 120_000);
 });
