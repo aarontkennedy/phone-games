@@ -536,13 +536,13 @@ body {
   color: var(--text);
 }
 
-/* A level switch beside a button that comes and goes (Draw, Knock): the switch keeps
+/* A level switch beside a button that comes and goes (Go Fish's Draw): the switch keeps
    its own width, so Easy and Strong never slide over, and the button fills the rest. */
 .segmented.fixed {
   flex: 0 0 auto;
 }
 
-/* Tight padding: CI's wider fallback font must still fit Draw / Knock beside the switch
+/* Tight padding: CI's wider fallback font must still fit Draw beside the switch
    in a sideways iPhone SE's side bar. */
 .segmented.fixed button {
   padding-inline: var(--space-2);

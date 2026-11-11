@@ -155,11 +155,10 @@ Buttons shouldn't move while you play, because your thumb learns where they are.
 
 - **Things that come and go get their own reserved space.** Backgammon's dice have a row
   of their own above the buttons, kept at full height with no dice.
-- **A level switch beside one button that comes and goes** (Go Fish's Draw, Gin's Knock)
-  uses `.segmented.fixed`: the switch keeps its own width and the button fills the rest of
+- **A level switch beside one button that comes and goes** (Go Fish's Draw) uses `.segmented.fixed`: the switch keeps its own width and the button fills the rest of
   the row. Only where the button fits beside the switch on every phone, upright and
   sideways; tested by `e2e/controls.spec.ts`.
-- Not used where the buttons don't fit beside the switch sideways on an iPhone SE: Hearts'
+- Not used where the buttons don't fit beside the switch sideways on an iPhone SE: Gin's Knock, Hearts'
   Pass and Cribbage's Send to crib / Next hand, Crazy Eights' suits, Dominoes' ends, Hot
   Dice, Rummy 500, Chess promotion, Euchre and Spades bidding, and the poker games.
 

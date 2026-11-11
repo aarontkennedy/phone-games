@@ -13,7 +13,6 @@ const CASES: { id: string; name: string; button: string; show: (on: boolean) => 
       document.querySelector('[data-actions]')!.innerHTML = on ? '<button class="btn" data-draw>Draw</button>' : '';
     },
   },
-  { id: 'gin', name: 'Knock', button: '[data-knock]', show: (on) => void (document.querySelector<HTMLElement>('[data-knock]')!.hidden = !on) },
 ];
 
 const SIZES = [
