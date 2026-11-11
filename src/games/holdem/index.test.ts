@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { betText } from '../../core/betting';
 import { load, save } from '../../core/storage';
 import { answerNewGame, makeContainer, track } from '../../test/helpers';
 import { AI_DELAY, mount } from './index';
@@ -14,7 +15,8 @@ function setup(saved: unknown = null) {
   const stored = () => load<State>('holdem:state', null as unknown as State);
   const status = () => $('[data-status]').textContent;
   const buttons = () => $$('[data-actions] button').map((b) => b.textContent);
-  return { container, unmount, $, $$, stored, status, buttons };
+  const recent = () => $$('[data-recent] li').map((li) => li.textContent).reverse();
+  return { container, unmount, $, $$, stored, status, buttons, recent };
 }
 
 beforeEach(() => {
@@ -47,16 +49,35 @@ describe("Hold'em screen", () => {
 
   it('acts, then the computer players take their turns', () => {
     const s = table(['AS AH', 'KS KH', '', ''], '2C 3C 4C', { bets: [0, 10, 0, 0], put: [0, 10, 0, 0], stacks: [1000, 990, 1000, 1000], raises: 1 });
-    const { $, stored, status, buttons } = setup(s);
+    const { $, stored, status, buttons, recent } = setup(s);
     expect(buttons()).toEqual(['Fold', 'Call', 'Raise']);
     expect(status()).toBe('The flop, your turn: call 10, raise 20 or fold.');
     $('[data-action="raise"]').click();
     expect(stored().bets[0]).toBe(20);
+    expect(recent()).toEqual(['You raised 20.']);
     expect(status()).toBe('The flop: West is thinking…');
     expect($('[data-seat="1"]').classList.contains('turn')).toBe(true);
     const before = JSON.stringify(stored());
     vi.advanceTimersByTime(AI_DELAY);
     expect(JSON.stringify(stored())).not.toBe(before); // West acted
+    expect(recent()[1]).toMatch(/^West (folded|called 10|raised 20)\.$/);
+  });
+
+  it('says each action and each new street in the recent moves list', () => {
+    const s = table(['AS AH', 'KS KH', '', ''], '', { bets: [10, 10, 0, 0], put: [10, 10, 0, 0], stacks: [990, 990, 1000, 1000], toAct: [true, false, false, false] });
+    const { $, stored, recent } = setup(s);
+    $('[data-action="check"]').click();
+    expect(stored().street).toBe(1);
+    expect(recent()).toEqual(['You checked.', 'The flop is dealt.']);
+    $('[data-level="easy"]').click(); // not a move
+    expect(recent()).toHaveLength(2);
+
+    const t = table(['AS AH', 'KS KH', '7C 2D', ''], '', { bets: [0, 20, 0, 0], put: [0, 20, 0, 0], stacks: [1000, 980, 15, 1000] });
+    expect(betText(t, 0, 'fold', 10, 'You')).toBe('You folded.');
+    expect(betText(t, 0, 'call', 10, 'You')).toBe('You called 20.');
+    expect(betText(t, 0, 'raise', 10, 'You')).toBe('You raised 30.');
+    expect(betText(t, 2, 'call', 10, 'North')).toBe('North called 15, all in.');
+    expect(betText({ ...t, bets: [0, 0, 0, 0] }, 3, 'bet', 10, 'East')).toBe('East bet 10.');
   });
 
   it('says when a call goes all in', () => {
@@ -75,6 +96,7 @@ describe("Hold'em screen", () => {
       expect(status()).toMatch(/^(You win the pot of \d+|Everyone else folded)/);
       $('[data-next]').click();
       expect(stored().hand).toBe(2);
+      expect($$('[data-recent] li')).toHaveLength(0); // a new list each hand
     }
   });
 

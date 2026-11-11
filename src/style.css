@@ -444,6 +444,11 @@ body {
   margin-top: auto;
 }
 
+/* Recent moves take room from a tall card table, so the screen packs a little tighter. */
+.screen:has(> .recent) {
+  gap: var(--space-2);
+}
+
 .stats,
 .controls {
   display: flex;
@@ -591,6 +596,37 @@ body {
   text-align: center;
 }
 
+/* Recent moves (src/core/recent.ts): the newest (first in the page) at the bottom, in full
+   text color. Its height comes from the screen's spare room, not from the moves (1 to 4
+   lines; the rest scrolls inside it), so the controls don't move as moves come in and stay
+   on screen on short phones. */
+.recent {
+  --recent-line: 1.35em;
+  display: flex;
+  flex-direction: column-reverse;
+  flex: 1 1 0;
+  min-height: calc(var(--recent-line) + 2 * var(--space-1) + 2px);
+  max-height: calc(4 * var(--recent-line) + 2 * var(--space-1) + 2px);
+  overflow-y: auto;
+  margin: 0;
+  padding: var(--space-1) var(--space-3);
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: var(--recent-line);
+}
+
+.recent li:first-child {
+  color: var(--text);
+}
+
+.recent:empty::before {
+  content: 'Moves show up here.';
+}
+
 /* --- Landscape phones: board on the left, controls in a side bar on the right ---
    Applies to any screen built from the standard layout (docs/DESIGN.md). The game's
    wrappers are flattened (display: contents) so the board fills the screen height in
@@ -641,6 +677,27 @@ body {
     grid-row: 4;
     align-self: end;
     margin-top: 0;
+  }
+
+  /* With recent moves, the list takes the side bar's spare height and scrolls inside
+     itself when that's less than its moves (it keeps the newest in view). */
+  #app:has(> .game .recent) {
+    grid-template-rows: repeat(2, auto) minmax(0, 1fr) repeat(2, auto);
+  }
+
+  .game .recent {
+    grid-column: 2;
+    grid-row: 3;
+    min-height: 0;
+    max-height: none;
+  }
+
+  #app:has(> .game .recent) .game .status-line {
+    grid-row: 4;
+  }
+
+  #app:has(> .game .recent) .game .controls {
+    grid-row: 5;
   }
 
   /* The side bar is ~260px on the smallest phones; keep stats on one row. */

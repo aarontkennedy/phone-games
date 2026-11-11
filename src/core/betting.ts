@@ -114,6 +114,18 @@ export function applyAction(t: Table, seat: Seat, action: Action, size: number) 
   if (t.toAct.some(Boolean)) t.turn = after(seat, (x) => t.toAct[x]);
 }
 
+/**
+ * What a betting action does, said before it's applied to `t`, for the recent moves list:
+ * "West raised 20." Amounts are the chips put in now, as the status line says them.
+ */
+export function betText(t: Table, seat: Seat, action: Action, size: number, name: string): string {
+  if (action === 'fold') return `${name} folded.`;
+  if (action === 'check') return `${name} checked.`;
+  const chips = Math.min(t.stacks[seat], action === 'call' ? toCall(t, seat) : raiseCost(t, seat, size));
+  const verb = action === 'call' ? 'called' : action === 'bet' ? 'bet' : 'raised';
+  return `${name} ${verb} ${chips}${chips === t.stacks[seat] ? ', all in' : ''}.`;
+}
+
 /** The pots, main first: each side pot holds what the players eligible for it all put in. */
 export function makePots(put: number[], live: boolean[]): { amount: number; eligible: Seat[] }[] {
   const levels = [...new Set(SEATS.filter((x) => live[x]).map((x) => put[x]))].sort((a, b) => a - b);

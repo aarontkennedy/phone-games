@@ -15,7 +15,8 @@ function setup(saved: unknown = null) {
   const status = () => $('[data-status]').textContent;
   const tap = (...ids: string[]) => ids.forEach((id) => $(`[data-hand][data-card="${id}"]`).click());
   const buttons = () => $$('[data-actions] button').map((b) => b.textContent);
-  return { container, unmount, $, $$, stored, status, tap, buttons };
+  const recent = () => $$('[data-recent] li').map((li) => li.textContent).reverse();
+  return { container, unmount, $, $$, stored, status, tap, buttons, recent };
 }
 
 beforeEach(() => {
@@ -57,10 +58,13 @@ describe('Rummy 500 screen', () => {
   });
 
   it('puts the pile back with Undo', () => {
-    const { $, stored } = setup(position(['7H 7S 2C', 'KD QD'], '7D 4S 9C'));
+    const { $, stored, recent } = setup(position(['7H 7S 2C', 'KD QD'], '7D 4S 9C'));
     $('[data-pile="0"]').click();
     $('[data-undo]').click();
     expect(stored().discard).toHaveLength(3);
+    expect(recent()).toEqual(['You took the 7 of diamonds from the pile and 2 more.', 'You put the pile cards back.']);
+    $('[data-level="easy"]').click(); // not a move
+    expect(recent()).toHaveLength(2);
     expect(stored().phase).toBe('draw');
   });
 
@@ -78,13 +82,15 @@ describe('Rummy 500 screen', () => {
 
   it('says what the computer did, then waits for its moves', () => {
     const s = position(['2C 9D', 'KD QD JD 4S 8C'], '9C', [], { turn: 1, phase: 'play', action: { player: 1, kind: 'stock', cards: [] } });
-    const { stored, status } = setup(s);
-    expect(status()).toBe('The computer drew from the deck. The computer is playing…');
+    const { stored, status, recent } = setup(s);
+    expect(status()).toBe('The computer is playing…');
     vi.advanceTimersByTime(AI_DELAY);
     expect(stored().action).toMatchObject({ kind: 'meld' });
     vi.advanceTimersByTime(AI_DELAY);
     expect(stored().turn).toBe(0);
-    expect(status()).toMatch(/^The computer discarded the 8 of clubs\. Your turn/);
+    expect(recent()).toEqual(['The computer melded the jack, queen and king of diamonds.', 'The computer discarded the 8 of clubs.']);
+    expect(status()).toMatch(/^Your turn/);
+    expect(actionText({ player: 0, kind: 'stock', cards: [] })).toBe('You drew from the deck.');
     expect(actionText({ player: 1, kind: 'pile', cards: cards('7D 4S 9C') })).toBe('The computer took the 7 of diamonds from the pile and 2 more.');
     expect(actionText({ player: 1, kind: 'pile', cards: cards('KD') })).toBe('The computer took the king of diamonds from the pile.');
     expect(actionText({ player: 1, kind: 'layoff', cards: cards('6H 7H') })).toBe('The computer laid off the 6 of hearts and 7 of hearts.');

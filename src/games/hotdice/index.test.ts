@@ -16,7 +16,8 @@ function setup(saved: unknown = null) {
   const stored = () => load<State>('hotdice:state', null as unknown as State);
   const status = () => $('[data-status]').textContent;
   const act = (name: string) => $(`[data-act="${name}"]`).click();
-  return { container, unmount, $, $$, stored, status, act };
+  const recent = () => $$('[data-recent] li').map((li) => li.textContent).reverse();
+  return { container, unmount, $, $$, stored, status, act, recent };
 }
 
 const at = (o: Partial<State>): State => ({ ...newGame(), ...o });
@@ -42,8 +43,9 @@ describe('Hot dice screen', () => {
 
   it('rolls, keeps scoring dice, and rolls on', () => {
     rollAll(1);
-    const { $, $$, stored, status, act } = setup();
+    const { $, $$, stored, status, act, recent } = setup();
     act('roll');
+    expect(recent()).toEqual([]); // said once you keep, with the dice kept
     expect($$('.hd-die:not(.small)')).toHaveLength(6);
     expect(status()).toBe('Tap the dice to keep: 1s, 5s and sets of three or more score.');
     expect($<HTMLButtonElement>('[data-act="keep-roll"]').disabled).toBe(true);
@@ -56,6 +58,10 @@ describe('Hot dice screen', () => {
     expect(stored().turnPoints).toBe(100);
     expect(stored().kept).toEqual([1]);
     expect($$('.hd-kept .hd-die')).toHaveLength(1);
+    expect(recent()).toEqual(['You rolled 1 1 1 1 1 1, kept 1 for 100.']);
+    for (let i = 0; i < 5; i++) $(`[data-die="${i}"]`).click(); // keep-roll rolled the other five
+    act('keep-roll');
+    expect(recent()[1]).toMatch(/^You rolled 1 1 1 1 1, kept all for [\d,]+: hot dice!$/);
   });
 
   it('says when picked dice don’t all score', () => {
@@ -65,10 +71,11 @@ describe('Hot dice screen', () => {
   });
 
   it('keeps and banks, passing the dice to the computer', () => {
-    const { $, stored, status, act } = setup(at({ phase: 'choose', dice: [5, 2, 3, 4, 6, 6], turnPoints: 300, remaining: 6 }));
+    const { $, stored, status, act, recent } = setup(at({ phase: 'choose', dice: [5, 2, 3, 4, 6, 6], turnPoints: 300, remaining: 6 }));
     $('[data-die="0"]').click();
     act('keep-bank');
     expect(stored().scores).toEqual([350, 0]);
+    expect(recent()).toEqual(['You rolled 5 2 3 4 6 6, kept 5 for 50.', 'You banked 350.']);
     expect(stored().turn).toBe(1);
     expect(status()).toBe('The computer is playing…');
     vi.advanceTimersByTime(AI_DELAY);
@@ -84,11 +91,16 @@ describe('Hot dice screen', () => {
 
   it('shows a bust, then passes the turn', () => {
     rollAll(2);
-    const { stored, status, act } = setup(at({ turnPoints: 600, remaining: 2 }));
+    const { stored, status, act, recent } = setup(at({ turnPoints: 600, remaining: 2 }));
     act('roll');
     expect(status()).toBe('Bust! Nothing scored, so your turn ends with no points.');
+    expect(recent()).toEqual(['You rolled 2 2: bust.']);
     vi.advanceTimersByTime(BUST_PAUSE);
     expect(stored().turn).toBe(1);
+    expect(recent()).toHaveLength(1);
+    vi.restoreAllMocks();
+    vi.advanceTimersByTime(AI_DELAY * 2);
+    expect(recent()[1]).toMatch(/^The computer rolled /);
     expect(stored().scores).toEqual([0, 0]);
   });
 

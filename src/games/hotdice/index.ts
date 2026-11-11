@@ -1,5 +1,6 @@
 import { dieFace } from '../../core/dice-view';
 import { load, save } from '../../core/storage';
+import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import { GOAL, bank, computerStep, endBust, isValidState, keep, newGame, roll, scoreDice, winner, type Level, type State } from './logic';
 import './style.css';
@@ -12,6 +13,21 @@ export const BUST_PAUSE = 1600;
 
 const face = dieFace;
 const fmt = (n: number) => n.toLocaleString('en-US');
+const spaced = (dice: number[]) => dice.join(' ');
+
+/** What a step just did, for the recent moves list; null if it says nothing new. */
+export function moveText(prev: State, next: State): string | null {
+  const who = prev.turn === 0 ? 'You' : 'The computer';
+  if (prev.phase === 'roll' && next.phase === 'bust') return `${who} rolled ${spaced(next.dice)}: bust.`;
+  if (prev.phase === 'choose' && next.phase === 'roll') {
+    const points = fmt(next.turnPoints - prev.turnPoints);
+    // Every die scored: they all go back in (hot dice), so `kept` starts again.
+    if (next.kept.length <= prev.kept.length) return `${who} rolled ${spaced(prev.dice)}, kept all for ${points}: hot dice!`;
+    return `${who} rolled ${spaced(prev.dice)}, kept ${spaced(next.kept.slice(prev.kept.length))} for ${points}.`;
+  }
+  const banked = next.scores[prev.turn] - prev.scores[prev.turn];
+  return banked > 0 ? `${who} banked ${fmt(banked)}.` : null;
+}
 
 export function mount(container: HTMLElement): () => void {
   const saved = load<unknown>(STATE_KEY, null);
@@ -27,6 +43,7 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Computer</small><b data-score="1"></b></div>
       </div>
       <div class="board-frame hd-table" data-board></div>
+      ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="segmented" aria-label="Computer player">
@@ -41,9 +58,11 @@ export function mount(container: HTMLElement): () => void {
   const actionsEl = container.querySelector<HTMLElement>('[data-actions]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const recent = recentMoves(container, 'hotdice');
 
   function update(next: State | null) {
     if (!next) return;
+    recent.add(moveText(state, next));
     state = next;
     picked = [];
     save(STATE_KEY, state);
@@ -51,6 +70,13 @@ export function mount(container: HTMLElement): () => void {
     clearTimeout(timer);
     if (state.phase === 'bust') timer = window.setTimeout(() => update(endBust(state)), BUST_PAUSE);
     else if (state.phase !== 'gameOver' && state.turn === 1) timer = window.setTimeout(() => update(computerStep(state)), AI_DELAY);
+  }
+
+  /** A new game starts with an empty list. */
+  function start(next: State) {
+    state = next;
+    recent.clear();
+    update(next);
   }
 
   const mine = () => state.turn === 0 && state.phase !== 'gameOver';
@@ -82,7 +108,7 @@ export function mount(container: HTMLElement): () => void {
           : '';
     statusEl.textContent = statusText(score);
 
-    if (state.phase === 'gameOver') showOverlay(boardEl, winner(state) === 0 ? 'You win!' : 'The computer wins', [['New game', () => update(newGame(state.level))]]);
+    if (state.phase === 'gameOver') showOverlay(boardEl, winner(state) === 0 ? 'You win!' : 'The computer wins', [['New game', () => start(newGame(state.level))]]);
     else hideOverlay(boardEl);
   }
 
@@ -111,12 +137,14 @@ export function mount(container: HTMLElement): () => void {
     else if (act === 'bank') update(bank(state));
     else if (act) {
       const kept = keep(state, picked);
-      update(kept && (act === 'keep-roll' ? roll(kept) : bank(kept)));
+      if (!kept) return;
+      update(kept); // one step at a time, so the recent moves list sees each
+      update(act === 'keep-roll' ? roll(state) : bank(state));
     }
   });
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase !== 'gameOver' && (state.scores.some((n) => n > 0) || state.turnPoints > 0 || state.dice.length > 0);
-  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => start(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   update(state);

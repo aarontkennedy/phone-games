@@ -1,12 +1,15 @@
+import { betText } from '../../core/betting';
 import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { describeHand } from '../../core/poker';
 import { load, save } from '../../core/storage';
 import { SEAT_NAMES, type Seat } from '../../core/tricks';
 import { SEAT_ORDER } from '../../core/trick-view';
+import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { confirmNew, hideOverlay, showOverlay } from '../../core/ui';
 import {
   STREETS,
   act,
+  betSize,
   bigBlind,
   chooseAction,
   handOf,
@@ -45,6 +48,7 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Pot</small><b data-pot></b></div>
       </div>
       <div class="board-frame tt-table" data-board></div>
+      ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="segmented" aria-label="Computer players">
@@ -60,16 +64,36 @@ export function mount(container: HTMLElement): () => void {
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
 
+  const recent = recentMoves(container, 'holdem');
+
   function update(next: State | null) {
     if (!next) return;
+    // A new street dealt (not the rest dealt at once when nobody can bet).
+    const dealt = next.phase === 'betting' && next.street > state.street ? `${STREETS[next.street]} is dealt.` : null;
+    recent.add(dealt);
     state = next;
     save(STATE_KEY, state);
     render();
     clearTimeout(timer);
     if (state.phase === 'betting' && state.turn !== 0) {
       const seat = state.turn;
-      timer = window.setTimeout(() => update(act(state, seat, chooseAction(state, seat))), AI_DELAY);
+      timer = window.setTimeout(() => play(seat, chooseAction(state, seat)), AI_DELAY);
     }
+  }
+
+  /** A betting action, said in the recent moves list. */
+  function play(seat: Seat, a: Action) {
+    const next = act(state, seat, a);
+    if (next) recent.add(betText(state, seat, a, betSize(state), SEAT_NAMES[seat]));
+    update(next);
+  }
+
+  /** A new hand or game starts with an empty list. */
+  function start(next: State | null) {
+    if (!next) return;
+    state = next;
+    recent.clear();
+    update(next);
   }
 
   function seatHtml(x: Seat): string {
@@ -107,7 +131,7 @@ export function mount(container: HTMLElement): () => void {
     statusEl.textContent = statusText(opts);
 
     if (state.phase === 'gameOver') {
-      showOverlay(boardEl, winner(state) ? 'You win every chip!' : 'You’re out of chips', [['New game', () => update(newGame(state.level))]]);
+      showOverlay(boardEl, winner(state) ? 'You win every chip!' : 'You’re out of chips', [['New game', () => start(newGame(state.level))]]);
     } else hideOverlay(boardEl);
   }
 
@@ -152,12 +176,12 @@ export function mount(container: HTMLElement): () => void {
   actionsEl.addEventListener('click', (e) => {
     const el = (e.target as Element).closest<HTMLButtonElement>('button');
     if (!el) return;
-    if (el.hasAttribute('data-next')) update(nextHand(state));
-    else update(act(state, 0, el.dataset.action as Action));
+    if (el.hasAttribute('data-next')) start(nextHand(state));
+    else play(0, el.dataset.action as Action);
   });
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase !== 'gameOver' && (state.hand > 1 || state.said.some((w) => w && !w.includes('blind')));
-  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => start(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   update(state);

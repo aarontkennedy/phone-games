@@ -3,6 +3,7 @@ import { cardId, cardName, sameCard, type Card } from '../../core/cards';
 import { sortHand } from '../../core/tricks';
 import { load, save } from '../../core/storage';
 import { handHtml } from '../../core/trick-view';
+import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import {
   GAME_POINTS,
@@ -29,6 +30,21 @@ export const AI_DELAY = 800;
 
 const lower = (c: Card) => cardName(c).replace(/^(Ace|Jack|Queen|King)/, (w) => w.toLowerCase());
 
+/** What a step just did, for the recent moves list; null if nobody moved. */
+export function moveText(prev: State, next: State): string | null {
+  const p = prev.turn;
+  const who = p === 0 ? 'You' : 'The computer';
+  if (prev.phase === 'draw' && next.phase === 'discard') {
+    if (next.taken) return `${who} took the ${lower(next.taken)} from the pile.`;
+    return p === 0 ? `You drew the ${lower(next.hands[0].find((c) => !prev.hands[0].some((h) => sameCard(h, c)))!)}.` : 'The computer drew from the deck.';
+  }
+  if (prev.phase !== 'discard' || next.discard.length <= prev.discard.length) return null;
+  const card = lower(next.discard.at(-1)!);
+  const ended = (next.phase === 'handOver' || next.phase === 'gameOver') && next.last!.kind !== 'draw';
+  if (!ended) return `${who} discarded the ${card}.`;
+  return `${who} ${next.last!.kind === 'gin' ? 'went gin' : 'knocked'}, discarding the ${card}.`;
+}
+
 export function mount(container: HTMLElement): () => void {
   const saved = load<unknown>(STATE_KEY, null);
   let state: State = isValidState(saved) ? saved : newGame();
@@ -43,6 +59,7 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Computer</small><b data-score="1"></b></div>
       </div>
       <div class="board-frame gin-table" data-board></div>
+      ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="segmented" aria-label="Computer player">
@@ -57,9 +74,11 @@ export function mount(container: HTMLElement): () => void {
   const knockBtn = container.querySelector<HTMLButtonElement>('[data-knock]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const recent = recentMoves(container, 'gin');
 
   function update(next: State | null) {
     if (!next) return;
+    recent.add(moveText(state, next));
     state = next;
     knocking = false;
     save(STATE_KEY, state);
@@ -68,6 +87,14 @@ export function mount(container: HTMLElement): () => void {
     if ((state.phase === 'draw' || state.phase === 'discard') && state.turn === 1) {
       timer = window.setTimeout(() => update(applyTurn(state, 1, chooseTurn(state, 1))), AI_DELAY);
     }
+  }
+
+  /** A new hand or game starts with an empty list. */
+  function start(next: State | null) {
+    if (!next) return;
+    state = next;
+    recent.clear();
+    update(next);
   }
 
   const myDraw = () => state.phase === 'draw' && state.turn === 0;
@@ -104,8 +131,8 @@ export function mount(container: HTMLElement): () => void {
     knockBtn.setAttribute('aria-pressed', String(knocking));
     statusEl.textContent = statusText(loose);
 
-    if (state.phase === 'handOver') showOverlay(boardEl, handTitle(), [['Next hand', () => update(nextHand(state))]]);
-    else if (state.phase === 'gameOver') showOverlay(boardEl, winner(state) === 0 ? 'You win!' : 'The computer wins', [['New game', () => update(newGame(state.level))]]);
+    if (state.phase === 'handOver') showOverlay(boardEl, handTitle(), [['Next hand', () => start(nextHand(state))]]);
+    else if (state.phase === 'gameOver') showOverlay(boardEl, winner(state) === 0 ? 'You win!' : 'The computer wins', [['New game', () => start(newGame(state.level))]]);
     else hideOverlay(boardEl);
   }
 
@@ -152,7 +179,7 @@ export function mount(container: HTMLElement): () => void {
   });
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase !== 'gameOver' && (state.scores.some((n) => n > 0) || state.discard.length > 1);
-  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => start(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   update(state);

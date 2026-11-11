@@ -87,6 +87,7 @@ topbar        [‹]      Title       [i]          (app shell: back, centered tit
 .screen
   .stats      [stat] [New] [stat]                score/time and the New button
   .board-frame                                   the playing surface; hosts .overlay
+  .recent                                        optional: recent moves ("Recent moves")
   .status-line                                   hint, or result (aria-live)
   .controls   [segmented options] [toggle]       optional; pinned to the bottom
 ```
@@ -146,6 +147,29 @@ Shared components live in `src/style.css` and `src/core/ui.ts`:
 | `.board-frame` | The board container. |
 | `showOverlay()` / `hideOverlay()` | Win or lose messages with actions. |
 | `.status-line` | A one-line hint or result under the board. |
+| `RECENT_HTML` / `recentMoves()` | The recent moves list (src/core/recent.ts; see "Recent moves"). |
+
+### Recent moves
+
+In games where the computer makes several moves between your turns (Go Fish, Crazy
+Eights, Rummy 500, Gin Rummy, Texas Hold'em, Five-Card Draw, Dominoes, Hot Dice), a short
+list between the board and the status line shows the last 4 moves, so none flash by
+unseen. Your own moves are in it too, so it reads in order.
+
+- **Shared:** `RECENT_HTML` for the markup and `recentMoves(container, id)` from
+  `src/core/recent.ts`. It saves the list as `${id}:recent`, so it survives leaving the game.
+- **One line per move,** written by a pure `moveText(prev, next)` (or the action itself, as
+  in the poker games' `betText`) and added in the screen's `update()`. Keep lines short
+  ("West asked North for 7s and got 2."): about 40 characters fit one line on a small phone.
+- **Cleared** at a new game, round or hand (each screen's `start()`), so it's always about
+  the play in front of you.
+- **The status line no longer repeats the last move;** it says what to do next.
+- **Steady:** the list's height comes from the screen's spare room, not from the moves, so
+  the controls don't move as moves come in. Upright it's 1 to 4 lines tall (the card games
+  leave little room on an iPhone 13, so the screen's gaps also tighten to `--space-2`);
+  sideways it takes the side bar's spare height. Older moves scroll inside it; it's a
+  reversed column (newest first in the page), so the newest move stays in view.
+- **Tested** by `e2e/recent.spec.ts`, upright and sideways, with 4 long moves.
 
 ## Touch
 

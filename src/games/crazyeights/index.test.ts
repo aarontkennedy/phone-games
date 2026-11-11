@@ -17,8 +17,9 @@ function setup(saved: unknown = null) {
   const $$ = <T extends HTMLElement = HTMLElement>(sel: string) => [...container.querySelectorAll<T>(sel)];
   const stored = () => load<State>('crazyeights:state', null as unknown as State);
   const status = () => $('[data-status]').textContent;
+  const recent = () => $$('[data-recent] li').map((li) => li.textContent).reverse();
   const tap = (id: string) => $(`[data-hand][data-card="${id}"]`).click();
-  return { container, unmount, $, $$, stored, status, tap };
+  return { container, unmount, $, $$, stored, status, recent, tap };
 }
 
 beforeEach(() => {
@@ -35,13 +36,16 @@ describe('Crazy eights screen', () => {
   });
 
   it('plays a card, then the computer players take their turns', () => {
-    const { stored, status, tap, $ } = setup(position(['7H 2C', '3H 9C', '4H 9D', '5H 9S'], '7S'));
+    const { stored, status, recent, tap, $ } = setup(position(['7H 2C', '3H 9C', '4H 9D', '5H 9S'], '7S'));
     tap('7H');
     expect(stored().turn).toBe(1);
     expect($('[data-seat="0"] .tt-play .card').dataset.card).toBe('7H');
+    expect(recent()).toEqual(['You played the 7 of hearts.']);
     expect(status()).toBe('West is playing…');
     vi.advanceTimersByTime(AI_DELAY * 3);
     expect(stored().turn).toBe(0);
+    expect(recent()).toHaveLength(4);
+    expect(recent().slice(1).map((l) => l!.split(' ')[0])).toEqual(['West', 'North', 'East']);
   });
 
   it('plays an 8 after you name the suit', () => {
@@ -54,6 +58,7 @@ describe('Crazy eights screen', () => {
     tap('8D');
     $('[data-suit="C"]').click();
     expect(stored().suit).toBe('C');
+    expect($$('[data-recent] li').map((li) => li.textContent).reverse()).toEqual(['You played the 8 of diamonds: clubs now.']);
     expect($('.ce-suit').textContent).toContain('Clubs');
   });
 
@@ -62,6 +67,9 @@ describe('Crazy eights screen', () => {
     expect(drawing.status()).toBe('You have nothing to play on the 7 of spades. Draw a card.');
     drawing.$('[data-actions] [data-draw]').click();
     expect(drawing.stored().hands[0]).toHaveLength(2);
+    expect(drawing.recent()).toEqual([expect.stringMatching(/^You drew the .+ of .+\.$/)]);
+    drawing.$('[data-level="easy"]').click(); // not a move
+    expect(drawing.recent()).toHaveLength(1);
     document.body.replaceChildren();
 
     const deck = setup(position(['2C', '3H', '4H', '5H'], 'AS'));
@@ -78,6 +86,9 @@ describe('Crazy eights screen', () => {
     expect(stuck.status()).toBe('You can’t play and the deck is empty: tap Pass.');
     stuck.$('[data-pass]').click();
     expect(stuck.stored().turn).toBe(1);
+    expect(stuck.recent().at(-1)).toBe('You passed.');
+    vi.advanceTimersByTime(AI_DELAY);
+    expect(stuck.recent().at(-1)).toMatch(/^West (played|drew)/);
   });
 
   it('says which suit to follow after an 8', () => {
@@ -97,8 +108,10 @@ describe('Crazy eights screen', () => {
     round.tap('7H');
     expect(round.$('.overlay h2').textContent).toBe('You win the round!');
     expect(round.status()).toBe('You played the last card and score 63 for the cards left in the other hands.');
+    expect(round.recent()).toEqual(['You played the 7 of hearts.']);
     round.$('.overlay .btn').click();
     expect(round.stored().phase).toBe('playing');
+    expect(round.recent()).toEqual([]); // each round starts a new list
     document.body.replaceChildren();
 
     const lost = { ...position(['7H', '', '2S', 'AH'], '7S'), phase: 'gameOver' as const, last: { seat: 1 as const, points: 40 }, scores: [10, 120, 0, 0] };

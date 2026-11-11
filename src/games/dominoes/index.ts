@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import { applyTurn, chooseTurn, draw, ends, isValidState, legalMoves, newGame, nextRound, pass, play, winner, type End, type Level, type State, type Tile } from './logic';
 import './style.css';
@@ -20,6 +21,21 @@ const half = (n: number) => `<svg viewBox="0 0 24 24" aria-hidden="true">${PIPS[
 const tileFaces = ([a, b]: Tile) => `${half(a)}<span class="dom-bar"></span>${half(b)}`;
 const key = ([a, b]: Tile) => `${a}-${b}`;
 
+/** What a turn just did, for the recent moves list; null if nobody moved. */
+export function moveText(prev: State, next: State): string | null {
+  if (prev.phase !== 'playing') return null;
+  const p = prev.turn;
+  const who = p === 0 ? 'You' : 'The computer';
+  if (next.line.length > prev.line.length) {
+    const left = prev.line.length > 0 && key(next.line[0]) !== key(prev.line[0]);
+    const [a, b] = left ? next.line[0] : next.line.at(-1)!;
+    const where = prev.line.length ? (left ? ' on the left' : ' on the right') : '';
+    return `${who} played ${a} and ${b}${where}.`;
+  }
+  if (next.hands[p].length > prev.hands[p].length) return `${who} drew a tile.`;
+  return next.turn !== p ? `${who} passed.` : null;
+}
+
 export function mount(container: HTMLElement): () => void {
   const saved = load<unknown>(STATE_KEY, null);
   let state: State = isValidState(saved) ? saved : newGame();
@@ -35,6 +51,7 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Computer</small><b data-score="1"></b></div>
       </div>
       <div class="board-frame dom-table" data-board></div>
+      ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="segmented" aria-label="Computer player">
@@ -49,9 +66,11 @@ export function mount(container: HTMLElement): () => void {
   const actionsEl = container.querySelector<HTMLElement>('[data-actions]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const recent = recentMoves(container, 'dominoes');
 
   function update(next: State | null) {
     if (!next) return;
+    recent.add(moveText(state, next));
     state = next;
     choosing = null;
     save(STATE_KEY, state);
@@ -60,6 +79,14 @@ export function mount(container: HTMLElement): () => void {
     if (state.phase === 'playing' && state.turn === 1) {
       timer = window.setTimeout(() => update(applyTurn(state, 1, chooseTurn(state, 1))), AI_DELAY);
     }
+  }
+
+  /** A new round or game starts with an empty list. */
+  function start(next: State | null) {
+    if (!next) return;
+    state = next;
+    recent.clear();
+    update(next);
   }
 
   const moves = () => legalMoves(state, 0);
@@ -99,8 +126,8 @@ export function mount(container: HTMLElement): () => void {
         : '';
     statusEl.textContent = statusText();
 
-    if (state.phase === 'roundOver') showOverlay(boardEl, roundTitle(), [['Next round', () => update(nextRound(state))]]);
-    else if (state.phase === 'gameOver') showOverlay(boardEl, winner(state) === 0 ? 'You win!' : 'The computer wins', [['New game', () => update(newGame(state.level))]]);
+    if (state.phase === 'roundOver') showOverlay(boardEl, roundTitle(), [['Next round', () => start(nextRound(state))]]);
+    else if (state.phase === 'gameOver') showOverlay(boardEl, winner(state) === 0 ? 'You win!' : 'The computer wins', [['New game', () => start(newGame(state.level))]]);
     else hideOverlay(boardEl);
   }
 
@@ -146,7 +173,7 @@ export function mount(container: HTMLElement): () => void {
   });
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase !== 'gameOver' && (state.line.length > 0 || state.scores.some((n) => n > 0));
-  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => start(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   update(state);

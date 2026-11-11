@@ -15,7 +15,8 @@ function setup(saved: unknown = null) {
   const $$ = <T extends HTMLElement = HTMLElement>(sel: string) => [...container.querySelectorAll<T>(sel)];
   const stored = () => load<State>('dominoes:state', null as unknown as State);
   const status = () => $('[data-status]').textContent;
-  return { container, unmount, $, $$, stored, status };
+  const recent = () => $$('[data-recent] li').map((li) => li.textContent).reverse();
+  return { container, unmount, $, $$, stored, status, recent };
 }
 
 function at(hands: Tile[][], line: Tile[] = [], o: Partial<State> = {}): State {
@@ -36,14 +37,17 @@ describe('Dominoes screen', () => {
   });
 
   it('plays a tile, then the computer answers', () => {
-    const { $, $$, stored, status } = setup(at([[[6, 6], [6, 2]], [[6, 1], [3, 3]]]));
+    const { $, $$, stored, status, recent } = setup(at([[[6, 6], [6, 2]], [[6, 1], [3, 3]]]));
+    expect(recent()).toEqual([]);
     $('[data-tile="6-2"]').click();
+    expect(recent()).toEqual(['You played 6 and 2.']);
     expect(stored().line).toEqual([[6, 2]]);
     expect($$('.dom-line .dom-tile.end')).toHaveLength(1);
     expect(status()).toBe('The computer is playing…');
     vi.advanceTimersByTime(AI_DELAY);
     expect(stored().line).toHaveLength(2);
-    expect(status()).toBe('Nothing matches 1 or 2. Draw a tile.'); // the computer played 6-1
+    expect(status()).toBe('Nothing matches 1 or 2. Draw a tile.');
+    expect(recent()).toEqual(['You played 6 and 2.', 'The computer played 1 and 6 on the left.']);
   });
 
   it('asks which end when a tile fits both', () => {
@@ -56,6 +60,7 @@ describe('Dominoes screen', () => {
     $('[data-tile="2-5"]').click();
     $('[data-end="right"]').click();
     expect(stored().line.at(-1)).toEqual([2, 5]);
+    expect($$('[data-recent] li').map((li) => li.textContent).reverse()).toEqual(['You played 2 and 5 on the right.']);
   });
 
   it('plays straight away when both ends show the same number', () => {
@@ -69,12 +74,16 @@ describe('Dominoes screen', () => {
     expect(drawing.status()).toBe('Nothing matches 6 or 2. Draw a tile.');
     drawing.$('[data-draw]').click();
     expect(drawing.stored().hands[0]).toHaveLength(2);
+    expect(drawing.recent()).toEqual(['You drew a tile.']);
+    drawing.$('[data-level="easy"]').click(); // not a move
+    expect(drawing.recent()).toHaveLength(1);
     document.body.replaceChildren();
     const rest = fullSet().filter((t) => !(t[0] === 1 && t[1] === 1) && !(t[0] === 2 && t[1] === 6));
     const passing = setup({ ...at([[[1, 1]], rest], [[6, 2]]), boneyard: [] });
     expect(passing.status()).toBe('Nothing matches 6 or 2, and the boneyard is empty: tap Pass.');
     passing.$('[data-pass]').click();
     expect(passing.stored().turn).toBe(1);
+    expect(passing.recent().at(-1)).toBe('You passed.');
   });
 
   it('sums up rounds and the game', () => {
@@ -85,6 +94,7 @@ describe('Dominoes screen', () => {
     expect(won.$$('.dom-row .dom-tile.small')).toHaveLength(1);
     won.$('.overlay .btn').click();
     expect(won.stored().phase).toBe('playing');
+    expect(won.recent()).toEqual([]);
     document.body.replaceChildren();
 
     const blocked = setup(r({ phase: 'roundOver', last: { winner: 1, points: 9, blocked: true } }));

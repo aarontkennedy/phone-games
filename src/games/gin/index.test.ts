@@ -14,7 +14,8 @@ function setup(saved: unknown = null) {
   const stored = () => load<State>('gin:state', null as unknown as State);
   const status = () => $('[data-status]').textContent;
   const tap = (id: string) => $(`[data-hand][data-card="${id}"]`).click();
-  return { container, unmount, $, $$, stored, status, tap };
+  const recent = () => $$('[data-recent] li').map((li) => li.textContent).reverse();
+  return { container, unmount, $, $$, stored, status, tap, recent };
 }
 
 const MINE = 'AS 2S 3S 4D 4C 4H 9H 9S 9D KC';
@@ -34,27 +35,34 @@ describe('Gin rummy screen', () => {
   });
 
   it('draws from the deck, then discards, then the computer plays', () => {
-    const { $, stored, status, tap } = setup(position([MINE, THEIRS], '5S'));
+    const { $, stored, status, tap, recent } = setup(position([MINE, THEIRS], '5S'));
     $('[data-stock]').click();
     expect(stored().hands[0]).toHaveLength(11);
+    expect(recent()).toEqual([expect.stringMatching(/^You drew the .+ of .+\.$/)]);
     expect(status()).toMatch(/^Tap a card to discard\./);
     tap('KC');
     expect(stored().turn).toBe(1);
     expect(status()).toBe('The computer is playing…');
     vi.advanceTimersByTime(AI_DELAY * 2);
     expect(stored().turn).toBe(0);
+    expect(recent()[1]).toBe('You discarded the king of clubs.');
+    expect(recent()[2]).toMatch(/^The computer (drew from the deck|took the king of clubs from the pile)\.$/);
+    expect(recent()[3]).toMatch(/^The computer discarded the /);
   });
 
   it('takes the pile card, which can’t go straight back', () => {
-    const { $, stored } = setup(position([MINE, THEIRS], '5S'));
+    const { $, stored, recent } = setup(position([MINE, THEIRS], '5S'));
     $('[data-pile]').click();
     expect(stored().taken).toEqual({ suit: 'S', rank: 5 });
+    expect(recent()).toEqual(['You took the 5 of spades from the pile.']);
+    $('[data-level="easy"]').click(); // not a move
+    expect(recent()).toHaveLength(1);
     expect($<HTMLButtonElement>('[data-hand][data-card="5S"]').disabled).toBe(true);
   });
 
   it('knocks: tap Knock, then a card that leaves 10 or less', () => {
     const s = position(['AS 2S 3S 4D 4C 4H 9H 9S 9D KC 2C', THEIRS], '5S', { phase: 'discard' });
-    const { $, stored, status, tap } = setup(s);
+    const { $, $$, stored, status, tap } = setup(s);
     expect($('[data-knock]').hidden).toBe(false);
     expect(status()).toMatch(/You can knock: tap Knock first\./);
     $('[data-knock]').click();
@@ -67,9 +75,18 @@ describe('Gin rummy screen', () => {
     expect(stored().phase).toBe('handOver');
     expect($('.overlay h2').textContent).toBe('You win the hand');
     expect(status()).toMatch(/^You knocked\. Deadwood: you 2, computer \d+, so you score \d+\.$/);
+    expect($$('[data-recent] li').map((li) => li.textContent).reverse()).toEqual(['You knocked, discarding the king of clubs.']);
     expect($('.gin-fan.open .card')).not.toBeNull();
     $('.overlay .btn').click();
     expect(stored().phase).toBe('draw');
+    expect($$('[data-recent] li')).toHaveLength(0); // each hand starts a new list
+  });
+
+  it('says when you go gin', () => {
+    const { $, $$, tap } = setup(position(['AS 2S 3S 4D 4C 4H 9H 9S 9D 9C KC', THEIRS], '5S', { phase: 'discard' }));
+    $('[data-knock]').click();
+    tap('KC');
+    expect($$('[data-recent] li').map((li) => li.textContent).reverse()).toEqual(['You went gin, discarding the king of clubs.']);
   });
 
   const over = (last: Result, o: Partial<State> = {}) => ({ ...position([MINE, THEIRS], '5S'), phase: 'handOver' as const, last, ...o });

@@ -15,7 +15,8 @@ function setup(saved: unknown = null) {
   const status = () => $('[data-status]').textContent;
   const buttons = () => $$('[data-actions] button').map((b) => b.textContent);
   const tap = (id: string) => $(`[data-hand][data-card="${id}"]`).click();
-  return { container, unmount, $, $$, stored, status, buttons, tap };
+  const recent = () => $$('[data-recent] li').map((li) => li.textContent).reverse();
+  return { container, unmount, $, $$, stored, status, buttons, tap, recent };
 }
 
 beforeEach(() => {
@@ -38,7 +39,7 @@ describe('Five-card draw screen', () => {
 
   it('picks up to three cards to swap, then draws', () => {
     const s = table(['AS AH 2C 3D 9S', 'KS KH 4C 5D 7S', '', ''], { phase: 'drawing', toAct: [false, false, false, false] }, 'AD AC 6H 8H');
-    const { $, $$, stored, status, buttons, tap } = setup(s);
+    const { $, $$, stored, status, buttons, tap, recent } = setup(s);
     expect(status()).toBe('The draw: tap up to 3 cards to swap, or tap Stand pat to keep them all.');
     expect(buttons()).toEqual(['Stand pat']);
     tap('2C');
@@ -54,18 +55,21 @@ describe('Five-card draw screen', () => {
     $('[data-swap]').click();
     expect(stored().hands[0]).toHaveLength(5);
     expect(stored().said[0]).toBe('Drew 2');
+    expect(recent()).toEqual(['You drew 2 cards.']);
     expect(status()).toBe('The draw: West is choosing cards…');
     vi.advanceTimersByTime(AI_DELAY);
+    expect(recent()[1]).toMatch(/^West (drew [123] cards?|kept all five cards)\.$/);
     expect(stored().phase).toBe('betting');
     expect(stored().round).toBe(1);
   });
 
   it('bets, then the computer players take their turns', () => {
     const s = table(['AS AH 2C 3D 9S', 'KS KH 4C 5D 7S', '', ''], { round: 1, bets: [0, 20, 0, 0], put: [0, 20, 0, 0], stacks: [1000, 980, 1000, 1000], raises: 1 });
-    const { $, stored, status, buttons } = setup(s);
+    const { $, stored, status, buttons, recent } = setup(s);
     expect(buttons()).toEqual(['Fold', 'Call', 'Raise']);
     expect(status()).toBe('After the draw, your turn: call 20, raise 40 or fold.');
     $('[data-action="raise"]').click();
+    expect(recent()).toEqual(['You raised 40.']);
     expect(status()).toBe('After the draw: West is thinking…');
     const before = JSON.stringify(stored());
     vi.advanceTimersByTime(AI_DELAY);
@@ -87,6 +91,7 @@ describe('Five-card draw screen', () => {
     expect(shown.buttons()).toEqual(['Next hand']);
     shown.$('[data-next]').click();
     expect(shown.stored().hand).toBe(2);
+    expect(shown.recent()).toEqual([]); // a new list each hand
     document.body.replaceChildren();
     expect(over({ shown: true, pots: [{ amount: 30, eligible: [0, 1], winners: [0, 1] }, { amount: 10, eligible: [1], winners: [1] }] }).status()).toBe(
       'You and West split the main pot of 30 with three aces. West wins a side pot of 10 with pair of kings.',

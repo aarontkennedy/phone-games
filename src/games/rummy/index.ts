@@ -2,6 +2,7 @@ import { cardBack, cardFace } from '../../core/card-view';
 import { cardId, cardName, sameCard, suitName, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { handColumns, handHtml } from '../../core/trick-view';
+import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { confirmNew, hideOverlay, showOverlay } from '../../core/ui';
 import {
   GAME_POINTS,
@@ -43,13 +44,20 @@ export function meldText(m: Card[]): string {
   return `the ${and(sortMeld(m).map((c) => NAMES[c.rank]))} of ${suitName(m[0].suit)}`;
 }
 
-/** What the computer just did. */
+/** What a player just did, for the recent moves list. */
 export function actionText(a: Action): string {
-  if (a.kind === 'stock') return 'The computer drew from the deck.';
-  if (a.kind === 'pile') return `The computer took the ${lower(a.cards[0])} from the pile${a.cards.length > 1 ? ` and ${a.cards.length - 1} more` : ''}.`;
-  if (a.kind === 'meld') return `The computer melded ${meldText(a.cards)}.`;
-  if (a.kind === 'layoff') return `The computer laid off the ${and(a.cards.map(lower))}.`;
-  return `The computer discarded the ${lower(a.cards[0])}.`;
+  const who = a.player === 0 ? 'You' : 'The computer';
+  if (a.kind === 'stock') return `${who} drew from the deck.`;
+  if (a.kind === 'pile') return `${who} took the ${lower(a.cards[0])} from the pile${a.cards.length > 1 ? ` and ${a.cards.length - 1} more` : ''}.`;
+  if (a.kind === 'meld') return `${who} melded ${meldText(a.cards)}.`;
+  if (a.kind === 'layoff') return `${who} laid off the ${and(a.cards.map(lower))}.`;
+  return `${who} discarded the ${lower(a.cards[0])}.`;
+}
+
+/** What a step just did, for the recent moves list; null if nobody moved. */
+export function moveText(prev: State, next: State): string | null {
+  if (next.action && next.action !== prev.action) return actionText(next.action);
+  return !next.action && prev.action?.kind === 'pile' ? 'You put the pile cards back.' : null;
 }
 
 export function mount(container: HTMLElement): () => void {
@@ -67,6 +75,7 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Computer</small><b data-score="1"></b></div>
       </div>
       <div class="board-frame rm-table" data-board></div>
+      ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="segmented" aria-label="Computer player">
@@ -81,9 +90,11 @@ export function mount(container: HTMLElement): () => void {
   const actionsEl = container.querySelector<HTMLElement>('[data-actions]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const recent = recentMoves(container, 'rummy');
 
   function update(next: State | null) {
     if (!next) return;
+    recent.add(moveText(state, next));
     state = next;
     picked = [];
     save(STATE_KEY, state);
@@ -92,6 +103,14 @@ export function mount(container: HTMLElement): () => void {
     if ((state.phase === 'draw' || state.phase === 'play') && state.turn === 1) {
       timer = window.setTimeout(() => update(applyTurn(state, 1, chooseTurn(state, 1))), AI_DELAY);
     }
+  }
+
+  /** A new hand or game starts with an empty list. */
+  function start(next: State | null) {
+    if (!next) return;
+    state = next;
+    recent.clear();
+    update(next);
   }
 
   const myDraw = () => state.phase === 'draw' && state.turn === 0;
@@ -128,8 +147,8 @@ export function mount(container: HTMLElement): () => void {
     ].join('');
     statusEl.textContent = statusText();
 
-    if (state.phase === 'handOver') showOverlay(boardEl, handTitle(), [['Next hand', () => update(nextHand(state))]]);
-    else if (state.phase === 'gameOver') showOverlay(boardEl, winner(state) === 0 ? 'You win!' : 'The computer wins', [['New game', () => update(newGame(state.level))]]);
+    if (state.phase === 'handOver') showOverlay(boardEl, handTitle(), [['Next hand', () => start(nextHand(state))]]);
+    else if (state.phase === 'gameOver') showOverlay(boardEl, winner(state) === 0 ? 'You win!' : 'The computer wins', [['New game', () => start(newGame(state.level))]]);
     else hideOverlay(boardEl);
   }
 
@@ -145,9 +164,8 @@ export function mount(container: HTMLElement): () => void {
       const end = state.phase === 'gameOver' ? ` First to ${GAME_POINTS}: ${winner(state) === 0 ? 'you win!' : 'the computer wins.'}` : '';
       return `${how} You melded ${melded[0]} and held ${held[0]}: ${points[0]}. The computer melded ${melded[1]} and held ${held[1]}: ${points[1]}.${end}`;
     }
-    const theirs = state.action?.player === 1 ? `${actionText(state.action)} ` : '';
-    if (state.turn === 1) return `${theirs}The computer is playing…`;
-    if (myDraw()) return `${theirs}Your turn: tap the deck, or a pile card you can meld. You take every card above it too.`;
+    if (state.turn === 1) return 'The computer is playing…';
+    if (myDraw()) return `Your turn: tap the deck, or a pile card you can meld. You take every card above it too.`;
     if (state.mustUse) return `Meld the ${lower(state.mustUse)} (dashed outline): tap it and the cards that go with it, then Meld or Lay off.`;
     if (picked.length) return 'Tap Meld or Lay off for a meld; Discard for one card to end your turn.';
     return 'Tap cards to meld or lay off, or tap one card and Discard to end your turn.';
@@ -173,7 +191,7 @@ export function mount(container: HTMLElement): () => void {
   });
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase !== 'gameOver' && (state.scores.some((n) => n !== 0) || state.action !== null);
-  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => update(newGame(state.level))));
+  container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => start(newGame(state.level))));
   levelBtns.forEach((b) => b.addEventListener('click', () => update({ ...state, level: b.dataset.level as Level })));
 
   update(state);
