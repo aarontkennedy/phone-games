@@ -542,13 +542,20 @@ body {
   flex: 0 0 auto;
 }
 
+/* Tight padding: CI's wider fallback font must still fit Draw / Knock beside the switch
+   in a sideways iPhone SE's side bar. */
 .segmented.fixed button {
-  padding-inline: var(--space-3);
+  padding-inline: var(--space-2);
 }
 
 .segmented.fixed ~ *,
 .segmented.fixed ~ * > .btn {
   flex: 1 1 auto;
+}
+
+.segmented.fixed ~ .btn,
+.segmented.fixed ~ * > .btn {
+  padding-inline: var(--space-3);
 }
 
 /* The playing surface. Positioned so an .overlay can cover it. */
