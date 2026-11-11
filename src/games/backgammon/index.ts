@@ -37,11 +37,11 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame bg-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
+        <div class="bg-dice" data-dice></div>
         <div class="segmented" aria-label="Computer player">
           <button data-level="easy">Easy</button>
           <button data-level="strong">Strong</button>
         </div>
-        <div class="bg-dice" data-dice></div>
         <button class="btn" data-roll>Roll</button>
         <button class="btn secondary" data-undo>Undo</button>
       </div>

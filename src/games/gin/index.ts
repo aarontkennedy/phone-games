@@ -62,7 +62,7 @@ export function mount(container: HTMLElement): () => void {
       ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer player">
+        <div class="segmented fixed" aria-label="Computer player">
           <button data-level="easy">Easy</button>
           <button data-level="strong">Strong</button>
         </div>
@@ -157,8 +157,8 @@ export function mount(container: HTMLElement): () => void {
       return `${how}. Deadwood: you ${mine}, computer ${cpu}, so ${scorer} ${r.points}.${end}`;
     }
     if (state.turn === 1) return 'The computer is playing…';
-    const tip = ` Your deadwood: ${dw}. Loose cards have a dashed outline.`;
-    if (myDraw()) return `Your turn: take the ${top()} from the pile, or draw from the deck.${tip}`;
+    const tip = ` Deadwood: ${dw}.`; // Short: sideways it shares the side bar with recent moves.
+    if (myDraw()) return `Your turn: take the ${top()} from the pile, or draw.${tip}`;
     if (knocking) return `Tap a card to discard and knock (you need ${KNOCK_AT} or less deadwood).`;
     return `Tap a card to discard.${canKnock() ? ' You can knock: tap Knock first.' : ''}${tip}`;
   }

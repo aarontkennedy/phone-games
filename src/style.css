@@ -536,6 +536,21 @@ body {
   color: var(--text);
 }
 
+/* A level switch beside a button that comes and goes (Draw, Knock): the switch keeps
+   its own width, so Easy and Strong never slide over, and the button fills the rest. */
+.segmented.fixed {
+  flex: 0 0 auto;
+}
+
+.segmented.fixed button {
+  padding-inline: var(--space-3);
+}
+
+.segmented.fixed ~ *,
+.segmented.fixed ~ * > .btn {
+  flex: 1 1 auto;
+}
+
 /* The playing surface. Positioned so an .overlay can cover it. */
 .board-frame {
   position: relative;

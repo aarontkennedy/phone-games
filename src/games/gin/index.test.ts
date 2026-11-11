@@ -31,7 +31,7 @@ describe('Gin rummy screen', () => {
     const order = $$('[data-hand]').map((c) => c.dataset.card);
     expect(order.at(-1)).toBe('KC');
     expect($$('.card.loose').map((c) => c.dataset.card)).toEqual(['KC']);
-    expect(status()).toBe('Your turn: take the 5 of spades from the pile, or draw from the deck. Your deadwood: 10. Loose cards have a dashed outline.');
+    expect(status()).toBe('Your turn: take the 5 of spades from the pile, or draw. Deadwood: 10.');
   });
 
   it('draws from the deck, then discards, then the computer plays', () => {

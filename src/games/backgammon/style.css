@@ -103,10 +103,15 @@
   cursor: pointer;
 }
 
+/* The dice have a row of their own, its height kept even with no dice, so the buttons
+   under it never move as dice come and go. */
 .bg-dice {
   display: flex;
+  flex-basis: 100%;
+  justify-content: center;
   gap: var(--space-1);
   align-items: center;
+  min-height: 40px;
 }
 
 .bg-die {

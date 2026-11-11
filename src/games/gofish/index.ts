@@ -53,7 +53,7 @@ export function mount(container: HTMLElement): () => void {
       ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer players">
+        <div class="segmented fixed" aria-label="Computer players">
           <button data-level="easy">Easy</button>
           <button data-level="strong">Strong</button>
         </div>

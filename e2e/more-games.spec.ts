@@ -164,7 +164,12 @@ test('Spider Solitaire: ten columns fit, the deck deals a card onto each', async
 test('Backgammon: roll, move a checker, the computer answers', async ({ page }) => {
   await page.goto('./#/backgammon');
   await expectGoodLayout(page);
+  // The dice have their own row: rolling doesn't move the buttons.
+  const buttons = page.locator('.controls .segmented, [data-roll], [data-undo]');
+  const before = await buttons.evaluateAll((els) => els.map((e) => e.getBoundingClientRect()).map((r) => [r.x, r.y]));
   await page.locator('[data-roll]').click();
+  await expect(page.locator('[data-dice] svg').first()).toBeVisible();
+  expect(await buttons.evaluateAll((els) => els.map((e) => e.getBoundingClientRect()).map((r) => [r.x, r.y]))).toEqual(before);
   const source = page.locator('.bg-board .source').first();
   if (await source.count()) {
     await source.click();
