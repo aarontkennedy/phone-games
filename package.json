@@ -28,6 +28,8 @@
     "vitest": "^5.0.5"
   },
   "overrides": {
-    "@trickfilm400/rollup-plugin-off-main-thread": "4.0.0"
+    "@trickfilm400/rollup-plugin-off-main-thread": "4.0.0",
+    "glob": "14.0.3",
+    "minimatch": "11.0.4"
   }
 }

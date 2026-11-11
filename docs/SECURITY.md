@@ -52,16 +52,18 @@ Recheck these at every dependency check, and remove an entry once it's resolved.
 - **Vite stays on 7.** Vite 8 requires lightningcss, which is MPL-2.0 and so not allowed
   (docs/LEGAL.md). Vite 7 is supported and has no known advisories. Dependabot is told
   to skip Vite 8.
-- **Workbox build advisories** (checked 2026-11-02): 6 low and moderate advisories in
+- **Workbox build advisories** (checked 2026-11-10): 4 low advisories (deepmerge) in
   workbox-build 7.4.1 and the packages under it (glob, minimatch, deepmerge). They run
   only while the site is built, never on a phone, and 7.4.1 is the newest Workbox.
   `npm audit` suggests a "fix" that downgrades vite-plugin-pwa; don't apply it.
   - An `overrides` entry in package.json moves `@trickfilm400/rollup-plugin-off-main-thread`
     to 4.0.0 (Apache-2.0), which drops the old ejs, jake and minimatch 5 chain. Remove it
     once workbox-build depends on 4.0.0 itself.
-  - minimatch 11.0.1+ fixes the minimatch advisory, but every fixed version was under 7
-    days old on 2026-11-02. At the next check, consider overriding glob's minimatch to
-    a fixed version that is at least 7 days old, if glob's tests and the build pass.
+  - `overrides` also move glob to 14.0.3 and minimatch to 11.0.4 (both ISC, both over 7
+    days old when chosen), which fix the glob and minimatch advisories. workbox-build asks
+    for glob ^11 but only calls `globSync`, which glob 14 still has; check that the build
+    still precaches every file in dist. Remove them once workbox-build depends on a fixed
+    glob itself.
   - deepmerge (under @rollup/plugin-node-resolve) has no fixed version. It only merges
     our own build config, so the prototype issue can't be reached.
 
