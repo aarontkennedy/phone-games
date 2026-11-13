@@ -64,7 +64,7 @@ test('New asks before throwing away a game in progress', async ({ page }) => {
   await expect(dialog).toHaveCount(0);
   await expect(page.locator('[data-cell="4"]')).toHaveAttribute('aria-label', /: X$/);
   await page.locator('[data-new]').click();
-  await page.getByRole('button', { name: 'New game' }).click();
+  await page.getByRole('alertdialog').getByRole('button', { name: 'New game' }).click();
   await expect(page.locator('[data-cell="4"]')).not.toHaveAttribute('aria-label', /: X$/);
 });
 

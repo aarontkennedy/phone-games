@@ -19,7 +19,7 @@ export const games: GameMeta[] = [
         'Tiles with different numbers never join. They just stop next to each other.',
         'After every swipe, a new 2 (or sometimes a 4) appears in an empty square.',
         'Each time tiles join, the new number is added to your <b>Score</b>. <b>Best</b> is your highest score ever.',
-        'The game is over when the board is full and no swipe can join anything. Tap <b>New</b> to start again at any time.',
+        'The game is over when the board is full and no swipe can join anything. Tap <b>New game</b> (the circular arrow at the top) to start again at any time.',
         'Your game is saved after every swipe, so you can close the app and carry on later.',
       ],
       tips: [
@@ -263,7 +263,7 @@ export const games: GameMeta[] = [
         'Tap a column to drop a disc. It falls to the lowest empty space in that column.',
         'The first to make a line of four wins. If the board fills up with no line, it’s a draw.',
         'The last disc dropped has a ring, so you can see the computer’s move. A winning line gets a thick outline.',
-        'Tap <b>New</b> for another round. Who goes first switches each round.',
+        'Tap <b>New game</b> (the circular arrow at the top) for another round. Who goes first switches each round.',
       ],
       tips: [
         '<b>Easy</b> plays loosely. <b>Strong</b> looks several moves ahead. Change it any time in <b>Settings</b> (the gear at the top).',
@@ -706,7 +706,7 @@ export const games: GameMeta[] = [
         'Every orange disc trapped that way flips to purple. One move can flip several lines at once.',
         'Squares where you can play have a light ring. Tap one to play there. The computer’s last move is outlined.',
         'If you can’t trap anything, you pass and the computer plays again. The game ends when neither side can move.',
-        'Tap <b>New</b> for another round. Who goes first switches each round.',
+        'Tap <b>New game</b> (the circular arrow at the top) for another round. Who goes first switches each round.',
       ],
       tips: [
         '<b>Easy</b> takes corners and otherwise plays at random. <b>Strong</b> looks several moves ahead and plays perfectly near the end. Change it any time in <b>Settings</b> (the gear at the top).',
@@ -731,7 +731,7 @@ export const games: GameMeta[] = [
         'If your last seed lands in <b>your store</b>, you get another turn.',
         'If your last seed lands in an <b>empty pit on your side</b>, and the computer’s pit straight across has seeds, you <b>capture</b> them: both go into your store.',
         'The game ends when either row is empty. The seeds still in the other row go to that player’s store. The most seeds wins.',
-        'The pit just played has a dashed ring, and where its last seed landed has a solid ring. Tap <b>New</b> for another round. Who goes first switches each round.',
+        'The pit just played has a dashed ring, and where its last seed landed has a solid ring. Tap <b>New game</b> (the circular arrow at the top) for another round. Who goes first switches each round.',
       ],
       tips: [
         '<b>Easy</b> often plays at random. <b>Strong</b> looks several moves ahead. Change it any time in <b>Settings</b> (the gear at the top).',
@@ -754,7 +754,7 @@ export const games: GameMeta[] = [
         'Tap a letter at the bottom to guess it. If it’s in the word, it appears in every place it belongs, and the key turns orange.',
         'If it isn’t, the key is crossed out and another part of the figure is drawn.',
         'Fill in the whole word to win. Six wrong guesses complete the figure and end the round, and the word is shown.',
-        'Tap <b>Next word</b> or <b>New</b> for another word. <b>Streak</b> counts the words you’ve found in a row.',
+        'Tap <b>Next word</b> or <b>New game</b> (the circular arrow at the top) for another word. <b>Streak</b> counts the words you’ve found in a row.',
       ],
       tips: [
         'Start with common letters: E, A, R, I, O, T, N and S.',
@@ -827,7 +827,7 @@ export const games: GameMeta[] = [
         'Draw the fourth side of a box and it’s yours: it fills purple, and you go again. One line can close two boxes at once.',
         'The computer’s boxes fill orange. The newest line is orange too, so you can see the computer’s move.',
         'When every line is drawn, whoever has more boxes wins.',
-        'Tap <b>New</b> for another round. Who goes first switches each round.',
+        'Tap <b>New game</b> (the circular arrow at the top) for another round. Who goes first switches each round.',
       ],
       tips: [
         '<b>Easy</b> takes any box it can and otherwise plays at random. <b>Strong</b> avoids giving boxes away. Change it any time in <b>Settings</b> (the gear at the top).',

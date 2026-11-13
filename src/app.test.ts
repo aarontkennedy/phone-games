@@ -108,6 +108,46 @@ describe('startApp', () => {
     stop();
   });
 
+  describe('New game in the top bar', () => {
+    it("moves the stats row's New into the top bar as an icon, still wired to the game", async () => {
+      let started = 0;
+      const { root, stop, go } = setup([
+        game('a', async () => ({
+          mount(container: HTMLElement) {
+            container.innerHTML = '<div class="screen"><div class="stats"><button class="btn" data-new>New</button></div></div>';
+            container.querySelector('[data-new]')!.addEventListener('click', () => started++);
+            return () => {};
+          },
+        })),
+      ]);
+      await go('#/a');
+      const btn = root.querySelector<HTMLButtonElement>('[data-new]')!;
+      expect(btn.closest('header')).not.toBeNull();
+      expect(root.querySelector('.stats [data-new]')).toBeNull();
+      expect(btn.getAttribute('aria-label')).toBe('New game');
+      expect(btn.querySelector('svg')).not.toBeNull();
+      expect(btn.nextElementSibling).toBe(root.querySelector('[data-help]'));
+      btn.click();
+      expect(started).toBe(1);
+      stop();
+    });
+
+    it('leaves a New outside the stats row (one tapped every round) where it is', async () => {
+      const { root, stop, go } = setup([
+        game('a', async () => ({
+          mount(container: HTMLElement) {
+            container.innerHTML = '<div class="screen"><div class="controls"><button class="btn" data-new>New</button></div></div>';
+            return () => {};
+          },
+        })),
+      ]);
+      await go('#/a');
+      expect(root.querySelector('.controls [data-new]')).not.toBeNull();
+      expect(root.querySelector('header [data-new]')).toBeNull();
+      stop();
+    });
+  });
+
   describe('settings', () => {
     const gear = (root: HTMLElement) => root.querySelector<HTMLButtonElement>('[data-settings-open]');
     const panel = (root: HTMLElement) => root.querySelector<HTMLElement>('.settings')!;

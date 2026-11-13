@@ -39,7 +39,7 @@ test('the deck turns over one card, or three in Draw 3', async ({ page }) => {
   // A card was turned, so switching asks first, over the Settings panel.
   await page.locator('[data-settings-open]').click();
   await page.locator('.settings [data-draw="3"]').click();
-  await page.getByRole('button', { name: 'New game' }).click();
+  await page.getByRole('alertdialog').getByRole('button', { name: 'New game' }).click();
   await page.locator('.settings .btn[data-settings-close]').click();
   await expect(page.locator('.settings')).toBeHidden();
   await page.locator('[data-stock]').click();

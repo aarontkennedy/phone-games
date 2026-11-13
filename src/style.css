@@ -187,34 +187,52 @@ body {
   margin-left: 0;
 }
 
-/* A game with Settings has two icons on the right (gear, Rules). Narrower gaps and side
-   padding keep the title close to its old width, so it stays on one line upright. */
-.topbar.sub:has(> [data-settings-open]) {
-  grid-template-columns: var(--tap) minmax(0, 1fr) var(--tap) var(--tap);
-  column-gap: var(--space-1);
+/* A game's top bar: back, title, then up to three icons (New game, Settings, Rules).
+   The title is body-sized and may take two lines, which still fit the 44px row, so the
+   bar never grows however long the name or wide the font. */
+.game-bar {
+  gap: var(--space-1);
   padding-inline: var(--space-2);
   container-type: inline-size;
 }
 
-.topbar.sub:has(> [data-settings-open]) > [data-settings-open] {
-  grid-column: 3;
+.game-bar .back svg {
+  width: 34px;
+  height: 34px;
 }
 
-.topbar.sub:has(> [data-settings-open]) > [data-help] {
-  grid-column: 4;
+.game-bar h1 {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--text-md);
+  line-height: 1.1;
+  text-align: center;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
-/* Sideways on a small phone the side bar is too narrow for three icons and a long word
-   like "Backgammon". The title is hidden from sight there (screen readers still read it);
+.game-bar .top-action {
+  margin-left: 0;
+}
+
+/* Sideways on a small phone the side bar is too narrow for four icons and a word like
+   "Backgammon". The title is hidden from sight there (screen readers still read it);
    the player already knows which game they opened. */
-@container (max-width: 320px) {
-  .topbar.sub > h1 {
+@container (max-width: 340px) {
+  .game-bar > h1 {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+
+  .game-bar > h1 + .top-action {
+    margin-left: auto; /* the icons stay on the right */
   }
 }
 

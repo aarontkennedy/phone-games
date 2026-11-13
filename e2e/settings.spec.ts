@@ -17,10 +17,13 @@ test.beforeEach(async ({ page }) => {
 for (const id of GAMES) {
   test(`${id}: the gear opens readable settings, and none are left on the game screen`, async ({ page }) => {
     await page.goto(`./#/${id}`);
-    // Upright the gear and Rules sit side by side, and the title stays on one line.
+    // Upright the icons sit side by side and the bar stays one row (a long title wraps inside it).
     const gear = (await page.locator('[data-settings-open]').boundingBox())!;
     const rules = (await page.locator('[data-help]').boundingBox())!;
     expect(rules.y).toBe(gear.y);
+    const newGame = page.locator('header [data-new]');
+    if (await newGame.count()) expect((await newGame.boundingBox())!.y).toBe(gear.y);
+    await expect(page.locator('.stats [data-new]')).toHaveCount(0);
     expect((await page.locator('#app > .topbar').boundingBox())!.height).toBeLessThanOrEqual(44 + 2 * 8 + 1);
     // Bet (Blackjack) changes every hand, so it stays on the game screen.
     await expect(page.locator('.game .segmented:not([aria-label="Bet"])')).toHaveCount(0);

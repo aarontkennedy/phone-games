@@ -83,9 +83,9 @@ The player needs reading glasses for small text, so this app never uses it.
 Every game screen uses this structure, top to bottom:
 
 ```
-topbar        [‹]    Title   [gear] [i]         (app shell: back, title, Settings, Rules)
+topbar        [‹] Title  [new] [gear] [i]       (app shell: back, title, New game, Settings, Rules)
 .screen
-  .stats      [stat] [New] [stat]                score/time and the New button
+  .stats      [stat] [stat]                      score/time (the game's New moves to the top bar)
   .board-frame                                   the playing surface; hosts .overlay
   .recent                                        optional: recent moves ("Recent moves")
   .status-line                                   hint, or result (aria-live)
@@ -99,8 +99,10 @@ settingsHtml(...)                                optional, after .screen: moved 
   `.controls` gets `margin-top: auto`, so it sits at the bottom of the screen even when
   the board is short. Put the markup in this order too, so screen readers and the Tab
   key follow what's on screen.
-- **New stays at the top.** New lives in `.stats`, away from the thumb, so a stray tap
-  doesn't throw away a game. And when a game is partway through, New (and switching
+- **New stays at the top.** The game puts its New button (`data-new`) in `.stats`; the app
+  (src/app.ts) moves it into the top bar as a circular-arrow icon labeled "New game", away
+  from the thumb, so a stray tap doesn't throw away a game. The game's handler still works:
+  it's the same button. And when a game is partway through, New (and switching
   difficulty when that restarts) asks first, using `confirmNew()` from `src/core/ui.ts`
   with the game's own `inProgress()` test. A fresh or finished game starts at once. A button tapped every round, like Blackjack's Deal or
   Tic-Tac-Toe's New (rounds take seconds), goes in `.controls` instead.
@@ -116,8 +118,8 @@ When a phone is turned sideways (landscape and at most 560px tall), every game s
 switches to a side bar layout automatically:
 
 ```
-|                    | [‹]    Title      [i]  |
-|      board         | [stat] [New] [stat]    |
+|                    | [‹] Title [new][gear][i]|
+|      board         | [stat] [stat]          |
 |  (fills the        | status line            |
 |   screen height)   |                        |
 |                    | [options] [toggle]     |
@@ -175,9 +177,11 @@ hand (the casino games' Bet and Chip) stay on screen.
 - **Notes say when a change applies:** the level at once ("Changes take effect right
   away."), a difficulty by starting a new game (it asks first if one is in progress, via
   `confirmNew`), Blackjack's decks only between hands (the buttons are disabled during one).
-- **Top bar:** back, title, gear, Rules, with narrower gaps so the title stays on one line
-  upright. Where the bar is under 320px wide (sideways on an iPhone SE), the title is
-  hidden from sight but still read by screen readers: three icons and "Backgammon" don't fit.
+- **Top bar** (`.game-bar`): back, title, New game, gear, Rules. The title is body-sized
+  (20px) and may wrap to two lines, which still fit the 44px row, so the bar never grows,
+  even in CI's wider font. Where the bar is under 340px wide (sideways on an iPhone SE),
+  the title is hidden from sight but still read by screen readers: four icons and
+  "Backgammon" don't fit.
 - **Rules say where it is:** "Change it any time in **Settings** (the gear at the top)."
 - **Tested** by `e2e/settings.spec.ts` for every game with settings, including the top
   bar fitting sideways on an iPhone SE with four icons.
