@@ -1,5 +1,5 @@
 import { load, save } from '../../core/storage';
-import { confirmNew } from '../../core/ui';
+import { confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import { chooseMove, isValidState, move, newGame, newRound, type Level, type Mark, type State } from './logic';
 import './style.css';
 
@@ -27,14 +27,10 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame ttt-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer player">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <!-- Tapped every round, so it's down here under the thumb (docs/DESIGN.md). -->
         <button class="btn" data-new>New</button>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting())}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;

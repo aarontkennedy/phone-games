@@ -83,13 +83,14 @@ The player needs reading glasses for small text, so this app never uses it.
 Every game screen uses this structure, top to bottom:
 
 ```
-topbar        [‹]      Title       [i]          (app shell: back, centered title, Rules)
+topbar        [‹]    Title   [gear] [i]         (app shell: back, title, Settings, Rules)
 .screen
   .stats      [stat] [New] [stat]                score/time and the New button
   .board-frame                                   the playing surface; hosts .overlay
   .recent                                        optional: recent moves ("Recent moves")
   .status-line                                   hint, or result (aria-live)
-  .controls   [segmented options] [toggle]       optional; pinned to the bottom
+  .controls   [buttons]                          optional; pinned to the bottom
+settingsHtml(...)                                optional, after .screen: moved into Settings
 ```
 
 - **Thumb first.** Most people hold the phone in their right hand and tap with the
@@ -143,7 +144,8 @@ Shared components live in `src/style.css` and `src/core/ui.ts`:
 |---|---|
 | `.btn` / `.btn.secondary` | Primary / secondary buttons. Toggles use `aria-pressed`. |
 | `.stat` | A labeled number (Score, Best, Time, Mines). |
-| `.segmented` | Mutually exclusive options (difficulty). The chosen one gets `aria-pressed="true"`. |
+| `.segmented` | Mutually exclusive options. The chosen one gets `aria-pressed="true"`. In Settings via `settingRow()`, or on screen for choices made every hand (Bet, Chip). |
+| `settingsHtml()` / `settingRow()` / `levelSetting()` | Settings behind the gear (src/core/ui.ts; see "Settings"). |
 | `.board-frame` | The board container. |
 | `showOverlay()` / `hideOverlay()` | Win or lose messages with actions. |
 | `.status-line` | A one-line hint or result under the board. |
@@ -155,12 +157,30 @@ Buttons shouldn't move while you play, because your thumb learns where they are.
 
 - **Things that come and go get their own reserved space.** Backgammon's dice have a row
   of their own above the buttons, kept at full height with no dice.
-- **A level switch beside one button that comes and goes** (Go Fish's Draw) uses `.segmented.fixed`: the switch keeps its own width and the button fills the rest of
-  the row. Only where the button fits beside the switch on every phone, upright and
-  sideways; tested by `e2e/controls.spec.ts`.
-- Not used where the buttons don't fit beside the switch sideways on an iPhone SE: Gin's Knock, Hearts'
-  Pass and Cribbage's Send to crib / Next hand, Crazy Eights' suits, Dominoes' ends, Hot
-  Dice, Rummy 500, Chess promotion, Euchre and Spades bidding, and the poker games.
+- **Settings stay off the game screen** (see "Settings"), so the game's buttons have the
+  row to themselves and never get squeezed by a switch beside them.
+
+### Settings
+
+Choices you rarely change live behind the gear beside Rules in the top bar, not on the
+game screen: the computer's level (Easy / Strong), Mines and Number Place difficulty,
+Spider's suits, Solitaire's Draw 1 / Draw 3, and Blackjack's decks. Choices made every
+hand (the casino games' Bet and Chip) stay on screen.
+
+- **How:** the game ends its template with `settingsHtml(...rows)` from src/core/ui.ts,
+  one `settingRow(label, choices, note)` per setting (`levelSetting()` for Easy / Strong).
+  The app (src/app.ts) moves the rows into a full-screen Settings panel like the Rules
+  page and adds the gear only for games that have settings. The game's own click handlers
+  keep working: they're the same buttons.
+- **Notes say when a change applies:** the level at once ("Changes take effect right
+  away."), a difficulty by starting a new game (it asks first if one is in progress, via
+  `confirmNew`), Blackjack's decks only between hands (the buttons are disabled during one).
+- **Top bar:** back, title, gear, Rules, with narrower gaps so the title stays on one line
+  upright. Where the bar is under 320px wide (sideways on an iPhone SE), the title is
+  hidden from sight but still read by screen readers: three icons and "Backgammon" don't fit.
+- **Rules say where it is:** "Change it any time in **Settings** (the gear at the top)."
+- **Tested** by `e2e/settings.spec.ts` for every game with settings, including the top
+  bar fitting sideways on an iPhone SE with four icons.
 
 ### Recent moves
 
@@ -240,8 +260,8 @@ everywhere.
 - **Tap to move:** tapping a card moves it to the best legal place. No dragging is
   needed. If it can't move, the status line says so.
 - **Undo** wherever a game has no hidden information to protect (Solitaire).
-- **Computer players** (Hearts, Spades, Euchre, Cribbage): an **Easy / Strong**
-  segmented control, like the Mines difficulty. Switching it applies at once and never
+- **Computer players** (Hearts, Spades, Euchre, Cribbage): an **Easy / Strong** choice
+  in Settings, like the Mines difficulty. Switching it applies at once and never
   restarts the game.
 - **Their turns are paced** so you can follow along: about 0.6 seconds per computer play,
   and a finished trick stays on the table about 1 second before it's collected. The

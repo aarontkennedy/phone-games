@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
+  chooseSetting,
   expectNoHorizontalOverflow,
   expectReadableText,
   expectTouchTargets,
@@ -71,7 +72,7 @@ for (const size of SIZES) {
     for (const level of ['easy', 'medium', 'hard']) {
       test(`Mines ${level}: board on the left, side bar on the right`, async ({ page }) => {
         await page.goto('./#/minesweeper');
-        await page.locator(`[data-level="${level}"]`).click();
+        await chooseSetting(page, `[data-level="${level}"]`);
         await expectSideBarLayout(page);
         const cell = (await page.locator('[data-i="0"]').boundingBox())!;
         expect(cell.width).toBeGreaterThanOrEqual(MIN_CELL_PX);
@@ -81,7 +82,7 @@ for (const size of SIZES) {
     test('Solitaire: cards on the left, side bar on the right', async ({ page }) => {
       await page.goto('./#/solitaire');
       await expectSideBarLayout(page);
-      await page.locator('[data-draw="3"]').click();
+      await chooseSetting(page, '[data-draw="3"]');
       await page.locator('[data-stock]').click();
       await expectSideBarLayout(page);
     });

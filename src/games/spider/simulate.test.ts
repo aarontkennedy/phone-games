@@ -37,7 +37,7 @@ describe('Spider Solitaire, many games of random play', () => {
       isValid: isValidState,
       steps: 100,
       starts: [oneMoveFromWinning()],
-      tries: 5,
+      tries: 10,
       stepsFromStart: 25,
     });
     expect(finishedSteps).toBeGreaterThan(0); // the check above really ran

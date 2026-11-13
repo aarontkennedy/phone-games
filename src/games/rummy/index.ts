@@ -3,7 +3,7 @@ import { cardId, cardName, sameCard, suitName, type Card } from '../../core/card
 import { load, save } from '../../core/storage';
 import { handColumns, handHtml } from '../../core/trick-view';
 import { RECENT_HTML, recentMoves } from '../../core/recent';
-import { confirmNew, hideOverlay, showOverlay } from '../../core/ui';
+import { confirmNew, hideOverlay, showOverlay, levelSetting, settingsHtml } from '../../core/ui';
 import {
   GAME_POINTS,
   applyTurn,
@@ -78,13 +78,9 @@ export function mount(container: HTMLElement): () => void {
       ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer player">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <div class="rm-actions" data-actions></div>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting())}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const actionsEl = container.querySelector<HTMLElement>('[data-actions]')!;

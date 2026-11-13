@@ -1,5 +1,5 @@
 import { load, save } from '../../core/storage';
-import { confirmNew } from '../../core/ui';
+import { confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
   canUndo,
   chooseMove,
@@ -48,13 +48,9 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame cs-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer player">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <div class="cs-actions" data-actions></div>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting())}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const actionsEl = container.querySelector<HTMLElement>('[data-actions]')!;

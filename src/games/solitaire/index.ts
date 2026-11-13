@@ -2,7 +2,7 @@ import { cardBack, cardFace, cardSlot, suitSvg } from '../../core/card-view';
 import { SUITS, cardName, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, settingRow, settingsHtml } from '../../core/ui';
 import {
   autoFinish,
   bestTarget,
@@ -48,14 +48,10 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame sol-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented">
-          <button data-draw="1">Draw 1</button>
-          <button data-draw="3">Draw 3</button>
-        </div>
         <button class="btn secondary" data-hint>Hint</button>
         <button class="btn secondary" data-undo>Undo</button>
       </div>
-    </div>`;
+    </div>${settingsHtml(settingRow('Cards turned over', '<button data-draw="1">Draw 1</button><button data-draw="3">Draw 3</button>', 'Draw 1 is easier. Starts a new game.'))}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const movesEl = container.querySelector<HTMLElement>('[data-moves]')!;

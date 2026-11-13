@@ -4,7 +4,7 @@ import { load, save } from '../../core/storage';
 import { SEAT_NAMES } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
 import { RECENT_HTML, recentMoves } from '../../core/recent';
-import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import { applyTurn, chooseTurn, draw, isValidState, newGame, nextRound, pass, play, playable, winner, type Level, type State } from './logic';
 import './style.css';
 
@@ -51,13 +51,9 @@ export function mount(container: HTMLElement): () => void {
       ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer players">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <div class="ce-actions" data-actions></div>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting('Computer players'))}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const actionsEl = container.querySelector<HTMLElement>('[data-actions]')!;

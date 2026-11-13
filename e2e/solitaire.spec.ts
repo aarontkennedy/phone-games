@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, seedRandom } from './helpers';
+import { chooseSetting, expectNoHorizontalOverflow, expectReadableText, expectTouchTargets, failOnErrors, seedRandom } from './helpers';
 
 test.beforeEach(async ({ page }) => {
   failOnErrors(page);
@@ -21,7 +21,7 @@ test('deals seven columns that fit the phone and read without glasses', async ({
 });
 
 test('every face-up card has its rank in the top corner, tappable or not', async ({ page }) => {
-  await page.locator('[data-draw="3"]').click();
+  await chooseSetting(page, '[data-draw="3"]');
   await page.locator('[data-stock]').click(); // Draw 3 fans plain (not tappable) cards under the top one
   const offsets = await page.locator('.card:not(.back)').evaluateAll((cards) =>
     cards.map((c) => ({
@@ -36,8 +36,12 @@ test('every face-up card has its rank in the top corner, tappable or not', async
 test('the deck turns over one card, or three in Draw 3', async ({ page }) => {
   await page.locator('[data-stock]').click();
   await expect(page.locator('.sol-waste .card')).toHaveCount(1);
-  await page.locator('[data-draw="3"]').click();
-  await page.getByRole('button', { name: 'New game' }).click(); // a card was turned: switching asks first
+  // A card was turned, so switching asks first, over the Settings panel.
+  await page.locator('[data-settings-open]').click();
+  await page.locator('.settings [data-draw="3"]').click();
+  await page.getByRole('button', { name: 'New game' }).click();
+  await page.locator('.settings .btn[data-settings-close]').click();
+  await expect(page.locator('.settings')).toBeHidden();
   await page.locator('[data-stock]').click();
   await expect(page.locator('.sol-waste .card')).toHaveCount(3);
   await expectNoHorizontalOverflow(page);

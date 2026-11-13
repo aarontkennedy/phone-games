@@ -4,7 +4,7 @@ import { sortHand } from '../../core/tricks';
 import { load, save } from '../../core/storage';
 import { handHtml } from '../../core/trick-view';
 import { RECENT_HTML, recentMoves } from '../../core/recent';
-import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
   GAME_POINTS,
   KNOCK_AT,
@@ -62,13 +62,9 @@ export function mount(container: HTMLElement): () => void {
       ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer player">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <button class="btn secondary" data-knock aria-pressed="false">Knock</button>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting())}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const knockBtn = container.querySelector<HTMLButtonElement>('[data-knock]')!;

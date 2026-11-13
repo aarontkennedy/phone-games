@@ -2,7 +2,7 @@ import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { cardName, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { confirmNew, hideOverlay, showOverlay } from '../../core/ui';
+import { confirmNew, hideOverlay, showOverlay, settingRow, settingsHtml } from '../../core/ui';
 import { COLUMNS, RUNS, bestTarget, cardsAt, deal, findHint, isStuck, isValidState, move, newGame, type Hint, type State, type Suits } from './logic';
 import './style.css';
 
@@ -32,15 +32,10 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame sp-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Suits">
-          <button data-suits="1">1 suit</button>
-          <button data-suits="2">2 suits</button>
-          <button data-suits="4">4 suits</button>
-        </div>
         <button class="btn secondary" data-hint>Hint</button>
         <button class="btn secondary" data-undo>Undo</button>
       </div>
-    </div>`;
+    </div>${settingsHtml(settingRow('Suits', '<button data-suits="1">1 suit</button><button data-suits="2">2 suits</button><button data-suits="4">4 suits</button>', 'Fewer suits is easier. Starts a new game.'))}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const timeEl = container.querySelector<HTMLElement>('[data-time]')!;

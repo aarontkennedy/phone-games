@@ -3,7 +3,7 @@ import { SUITS, cardId, cardName, suitName, type Suit } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { SEAT_NAMES, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
-import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
   applyBid,
   callTrump,
@@ -56,13 +56,9 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer players">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <div class="eu-bid" data-bidding></div>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting('Computer players'))}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;

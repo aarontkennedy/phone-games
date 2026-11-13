@@ -2,7 +2,7 @@ import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { cardId, sameCard, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { handHtml } from '../../core/trick-view';
-import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
   GAME_POINTS,
   PLAYER_NAMES,
@@ -78,14 +78,10 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame cb-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer player">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <button class="btn" data-crib>Send to crib</button>
         <button class="btn" data-next>Next</button>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting())}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;

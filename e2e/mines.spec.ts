@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectNoHorizontalOverflow, expectReadableText, failOnErrors, longPress, seedRandom } from './helpers';
+import { chooseSetting, expectNoHorizontalOverflow, expectReadableText, failOnErrors, longPress, seedRandom } from './helpers';
 
 /** Smallest comfortable cell for a finger on a phone grid (see docs/DESIGN.md). */
 const MIN_CELL_PX = 26;
@@ -45,13 +45,13 @@ test('progress survives a reload', async ({ page }) => {
 
 for (const level of ['easy', 'medium', 'hard']) {
   test(`${level} cells are big enough to tap`, async ({ page }) => {
-    await page.locator(`[data-level="${level}"]`).click();
+    await chooseSetting(page, `[data-level="${level}"]`);
     const box = (await cell(page, 0).boundingBox())!;
     expect(box.width).toBeGreaterThanOrEqual(MIN_CELL_PX);
   });
 
   test(`${level} numbers and text are readable without glasses`, async ({ page }) => {
-    await page.locator(`[data-level="${level}"]`).click();
+    await chooseSetting(page, `[data-level="${level}"]`);
     const size = await cell(page, 0).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
     expect(size).toBeGreaterThanOrEqual(18);
     await expectReadableText(page);

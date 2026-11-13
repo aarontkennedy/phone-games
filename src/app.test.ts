@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { startApp } from './app';
 import type { Category, GameMeta, GameModule } from './core/game';
+import { levelSetting, settingRow, settingsHtml } from './core/ui';
 import { flush } from './test/helpers';
 
 function game(id: string, load: () => Promise<GameModule>, category: Category = 'cards', title = `Title ${id}`): GameMeta {
@@ -105,6 +106,70 @@ describe('startApp', () => {
     expect(unmount).toHaveBeenCalledOnce();
     expect(root.querySelector('.home')).not.toBeNull();
     stop();
+  });
+
+  describe('settings', () => {
+    const gear = (root: HTMLElement) => root.querySelector<HTMLButtonElement>('[data-settings-open]');
+    const panel = (root: HTMLElement) => root.querySelector<HTMLElement>('.settings')!;
+    const withSettings = async () => ({
+      mount(container: HTMLElement) {
+        container.innerHTML = `<div class="screen"></div>${settingsHtml(levelSetting())}`;
+        const level = container.querySelector<HTMLButtonElement>('[data-level="strong"]')!;
+        level.addEventListener('click', () => level.setAttribute('aria-pressed', 'true'));
+        return () => {};
+      },
+    });
+
+    it('has no gear when the game has no settings', async () => {
+      const { root, stop, go } = setup([game('a', async () => ({ mount: () => () => {} }))]);
+      await go('#/a');
+      expect(gear(root)).toBeNull();
+      expect(root.querySelector('.settings')).toBeNull();
+      stop();
+    });
+
+    it('puts a gear beside Rules that opens the game’s settings, still wired to the game', async () => {
+      const { root, stop, go } = setup([game('a', withSettings)]);
+      await go('#/a');
+      const button = gear(root)!;
+      expect(button.getAttribute('aria-label')).toBe('Settings');
+      expect(button.querySelector('svg')).not.toBeNull();
+      expect(button.nextElementSibling).toBe(root.querySelector('[data-help]'));
+      expect(root.querySelector('.game [data-level]')).toBeNull(); // off the game screen
+      expect(panel(root).hidden).toBe(true);
+
+      button.click();
+      expect(panel(root).hidden).toBe(false);
+      expect(panel(root).getAttribute('role')).toBe('dialog');
+      expect(document.activeElement).toBe(panel(root).querySelector('h2'));
+      const rows = panel(root).querySelector<HTMLElement>('[data-settings]')!;
+      expect(rows.hidden).toBe(false);
+      expect(rows.querySelector('h3')!.textContent).toBe('Computer player');
+      expect(rows.querySelector('.setting-note')!.textContent).toBe('Changes take effect right away.');
+      panel(root).querySelector<HTMLButtonElement>('[data-level="strong"]')!.click();
+      expect(panel(root).querySelector('[data-level="strong"]')!.getAttribute('aria-pressed')).toBe('true');
+      stop();
+    });
+
+    it('closes with the back arrow or Done, returning focus to the gear', async () => {
+      const { root, stop, go } = setup([game('a', withSettings)]);
+      await go('#/a');
+      const [back, done] = [...panel(root).querySelectorAll<HTMLButtonElement>('[data-settings-close]')];
+      expect(back.getAttribute('aria-label')).toBe('Back to the game');
+      expect(done.textContent).toBe('Done');
+      for (const close of [back, done]) {
+        gear(root)!.click();
+        close.click();
+        expect(panel(root).hidden).toBe(true);
+        expect(document.activeElement).toBe(gear(root));
+      }
+      stop();
+    });
+
+    it('leaves the note out when a setting has none', () => {
+      expect(settingRow('Suits', '<button>1</button>')).not.toContain('setting-note');
+      expect(levelSetting('Computer players')).toContain('aria-label="Computer players"');
+    });
   });
 
   describe('how to play', () => {

@@ -1,5 +1,6 @@
 import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { load, save } from '../../core/storage';
+import { settingRow, settingsHtml } from '../../core/ui';
 import {
   BETS,
   DECK_CHOICES,
@@ -76,7 +77,13 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame bj-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls" data-controls></div>
-    </div>`;
+    </div>${settingsHtml(
+      settingRow(
+        'Decks in the shoe',
+        DECK_CHOICES.map((n) => `<button data-decks="${n}">${n}</button>`).join(''),
+        'Fewer decks is a little better for you. Changes between hands, not during one.',
+      ),
+    )}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const controlsEl = container.querySelector<HTMLElement>('[data-controls]')!;
@@ -84,6 +91,7 @@ export function mount(container: HTMLElement): () => void {
   const bestEl = container.querySelector<HTMLElement>('[data-best]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const accuracyEl = container.querySelector<HTMLElement>('[data-accuracy]')!;
+  const deckBtns = container.querySelectorAll<HTMLButtonElement>('[data-decks]');
 
   function update(next: State | null) {
     if (!next) return;
@@ -106,12 +114,9 @@ export function mount(container: HTMLElement): () => void {
     </div>`;
   }
 
-  /** The number of decks, top right of the table: a button to change it between hands. */
+  /** The number of decks, top right of the table (changed in Settings). */
   function decksHtml(): string {
-    const text = `${state.decks} ${state.decks === 1 ? 'deck' : 'decks'}`;
-    return state.phase === 'playing'
-      ? `<span class="bj-decks">${text}</span>`
-      : `<button class="btn secondary bj-decks" data-decks aria-label="${text}. Tap to change.">${text}</button>`;
+    return `<span class="bj-decks">${state.decks} ${state.decks === 1 ? 'deck' : 'decks'}</span>`;
   }
 
   function renderTable(): string {
@@ -188,6 +193,10 @@ export function mount(container: HTMLElement): () => void {
   function render() {
     boardEl.innerHTML = renderTable();
     renderControls();
+    deckBtns.forEach((b) => {
+      b.setAttribute('aria-pressed', String(Number(b.dataset.decks) === state.decks));
+      b.disabled = state.phase === 'playing';
+    });
     chipsEl.textContent = String(state.chips);
     bestEl.textContent = String(best);
     accuracyEl.textContent = accuracy.plays ? `${Math.round((100 * accuracy.right) / accuracy.plays)}%` : '–';
@@ -223,11 +232,7 @@ export function mount(container: HTMLElement): () => void {
       update(next);
     } else if (el.dataset.bet) update(setBet(state, Number(el.dataset.bet)));
   });
-  boardEl.addEventListener('click', (e) => {
-    if (!(e.target as Element).closest('[data-decks]')) return;
-    const i = DECK_CHOICES.indexOf(state.decks as (typeof DECK_CHOICES)[number]);
-    update(setDecks(state, DECK_CHOICES[(i + 1) % DECK_CHOICES.length]));
-  });
+  deckBtns.forEach((b) => b.addEventListener('click', () => update(setDecks(state, Number(b.dataset.decks)))));
 
   render();
 

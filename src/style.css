@@ -187,6 +187,37 @@ body {
   margin-left: 0;
 }
 
+/* A game with Settings has two icons on the right (gear, Rules). Narrower gaps and side
+   padding keep the title close to its old width, so it stays on one line upright. */
+.topbar.sub:has(> [data-settings-open]) {
+  grid-template-columns: var(--tap) minmax(0, 1fr) var(--tap) var(--tap);
+  column-gap: var(--space-1);
+  padding-inline: var(--space-2);
+  container-type: inline-size;
+}
+
+.topbar.sub:has(> [data-settings-open]) > [data-settings-open] {
+  grid-column: 3;
+}
+
+.topbar.sub:has(> [data-settings-open]) > [data-help] {
+  grid-column: 4;
+}
+
+/* Sideways on a small phone the side bar is too narrow for three icons and a long word
+   like "Backgammon". The title is hidden from sight there (screen readers still read it);
+   the player already knows which game they opened. */
+@container (max-width: 320px) {
+  .topbar.sub > h1 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
 /* "Something went wrong" with an Email a report link (src/report.ts). Sits at the top,
    over everything, until the player picks an action. */
 .problem-banner {
@@ -348,6 +379,27 @@ body {
   display: block;
   width: 100%;
   margin-top: var(--space-5);
+}
+
+/* Settings (src/core/ui.ts settingsHtml): one labeled switch per row, full width. */
+.settings-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.setting h3 {
+  margin: 0 0 var(--space-2);
+}
+
+.setting .segmented {
+  min-height: var(--tap);
+}
+
+.setting-note {
+  margin: var(--space-2) 0 0;
+  color: var(--muted);
+  font-size: var(--text-sm);
 }
 
 .about {
@@ -534,28 +586,6 @@ body {
 .segmented button[aria-pressed='true'] {
   background: var(--surface);
   color: var(--text);
-}
-
-/* A level switch beside a button that comes and goes (Go Fish's Draw): the switch keeps
-   its own width, so Easy and Strong never slide over, and the button fills the rest. */
-.segmented.fixed {
-  flex: 0 0 auto;
-}
-
-/* Tight padding: CI's wider fallback font must still fit Draw beside the switch
-   in a sideways iPhone SE's side bar. */
-.segmented.fixed button {
-  padding-inline: var(--space-2);
-}
-
-.segmented.fixed ~ *,
-.segmented.fixed ~ * > .btn {
-  flex: 1 1 auto;
-}
-
-.segmented.fixed ~ .btn,
-.segmented.fixed ~ * > .btn {
-  padding-inline: var(--space-3);
 }
 
 /* The playing surface. Positioned so an .overlay can cover it. */

@@ -95,7 +95,8 @@ export function stressScreen<S>(opts: ScreenStress<S>): { finishedSteps: number 
             press(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'][Math.floor(rng() * 4)]); // swipes, for 2048
           } else {
             const targets = [...document.body.querySelectorAll<HTMLElement>(TARGETS)].filter(
-              (el) => !el.closest('[hidden]') && !(el as HTMLButtonElement).disabled && !el.matches('[data-level]'),
+              // Settings count too: in the app they are in the panel behind the gear.
+              (el) => !el.closest('[hidden]:not([data-settings])') && !(el as HTMLButtonElement).disabled && !el.matches('[data-level]'),
             );
             const el = targets[Math.floor(rng() * targets.length)];
             if (el) {

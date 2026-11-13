@@ -69,3 +69,27 @@ export function confirmNew(inProgress: boolean, start: () => void): void {
 export function closeConfirm(): void {
   document.querySelector('.confirm')?.remove();
 }
+
+/**
+ * Settings that aren't changed often (the computer's level, a difficulty), kept off the
+ * game screen behind the gear in the top bar (docs/DESIGN.md, "Settings"). A game puts this
+ * after its `.screen`; the app moves it into the Settings panel and shows the gear. The
+ * game's own handlers keep working, since the buttons are the same elements.
+ */
+export function settingsHtml(...rows: string[]): string {
+  return `<div class="settings-rows" data-settings hidden>${rows.join('')}</div>`;
+}
+
+/** One setting: a label over a switch of choices, with an optional short note. */
+export function settingRow(label: string, choices: string, note = ''): string {
+  return `<section class="setting">
+    <h3>${label}</h3>
+    <div class="segmented" role="group" aria-label="${label}">${choices}</div>
+    ${note ? `<p class="setting-note">${note}</p>` : ''}
+  </section>`;
+}
+
+/** The Easy / Strong computer level, which takes effect at once. */
+export function levelSetting(label = 'Computer player'): string {
+  return settingRow(label, '<button data-level="easy">Easy</button><button data-level="strong">Strong</button>', 'Changes take effect right away.');
+}

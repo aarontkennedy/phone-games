@@ -96,11 +96,6 @@
   color: var(--muted);
 }
 
-.btn.bj-decks {
-  padding-inline: var(--space-3);
-  color: var(--text);
-}
-
 /* Hint: its own row just above the four play buttons. Tapping it shows the best play in
    the same spot, leaving the instructions in the status line alone. */
 .bj-coach {

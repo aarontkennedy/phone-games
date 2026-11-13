@@ -1,5 +1,5 @@
 import { load, save } from '../../core/storage';
-import { confirmNew } from '../../core/ui';
+import { confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import { CHECKERS, chooseTurn, isValidState, legalMoves, move, newGame, newRound, roll, undoTurn, type From, type Level, type Move, type State } from './logic';
 import './style.css';
 
@@ -38,14 +38,10 @@ export function mount(container: HTMLElement): () => void {
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
         <div class="bg-dice" data-dice></div>
-        <div class="segmented" aria-label="Computer player">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <button class="btn" data-roll>Roll</button>
         <button class="btn secondary" data-undo>Undo</button>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting())}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;

@@ -95,3 +95,11 @@ export async function openBlackjackWith(page: Page, order: string): Promise<void
   await page.evaluate((s) => localStorage.setItem('pg:blackjack:state', JSON.stringify(s)), state);
   await page.locator('a[href="#/blackjack"]').first().click(); // also under Most played by now
 }
+
+/** Opens Settings (the gear), taps a choice, and closes it with Done. */
+export async function chooseSetting(page: Page, selector: string) {
+  await page.locator('[data-settings-open]').click();
+  await page.locator(`.settings ${selector}`).click();
+  await page.locator('.settings .btn[data-settings-close]').click();
+  await expect(page.locator('.settings')).toBeHidden();
+}

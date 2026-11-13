@@ -11,6 +11,8 @@ import { mostPlayed, recordPlay } from './plays';
 const SHARE_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>';
 const BACK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg>';
+const GEAR_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linejoin="round" d="M19.8 10.3L22.4 10.6L22.4 13.4L19.8 13.7L18.7 16.3L20.4 18.3L18.3 20.4L16.3 18.7L13.7 19.8L13.4 22.4L10.6 22.4L10.3 19.8L7.7 18.7L5.7 20.4L3.6 18.3L5.3 16.3L4.2 13.7L1.6 13.4L1.6 10.6L4.2 10.3L5.3 7.7L3.6 5.7L5.7 3.6L7.7 5.3L10.3 4.2L10.6 1.6L13.4 1.6L13.7 4.2L16.3 5.3L18.3 3.6L20.4 5.7L18.7 7.7Z"/><circle cx="12" cy="12" r="3.5"/></svg>';
 const INFO_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 11v6"/><circle class="dot" cx="12" cy="7.5" r="0.6"/></svg>';
 
@@ -71,6 +73,43 @@ function setUpHelp(root: HTMLElement, meta: GameMeta): void {
   });
   // The back arrow at the top and Got it at the bottom both close the rules.
   panel.querySelectorAll('[data-help-close]').forEach((btn) =>
+    btn.addEventListener('click', () => {
+      panel.hidden = true;
+      openBtn.focus();
+    }),
+  );
+}
+
+/**
+ * Settings panel, opened by the gear beside Rules. Only for games that have settings: the
+ * game renders its rows (`settingsHtml` in src/core/ui.ts) and they're moved in here.
+ */
+function setUpSettings(root: HTMLElement, rows: HTMLElement): void {
+  root.querySelector('[data-help]')!.insertAdjacentHTML(
+    'beforebegin',
+    `<button class="top-action top-icon" data-settings-open aria-haspopup="dialog" aria-label="Settings">${GEAR_ICON}</button>`,
+  );
+  root.insertAdjacentHTML(
+    'beforeend',
+    `<div class="help settings prose" role="dialog" aria-modal="true" aria-labelledby="settings-title" hidden>
+      <header class="topbar sub help-bar">
+        <button class="back top-icon" data-settings-close aria-label="Back to the game">${BACK_ICON}</button>
+        <h2 id="settings-title" tabindex="-1">Settings</h2>
+      </header>
+      <button class="btn" data-settings-close>Done</button>
+    </div>`,
+  );
+  const panel = root.querySelector<HTMLElement>('.settings')!;
+  const openBtn = root.querySelector<HTMLButtonElement>('[data-settings-open]')!;
+  panel.querySelector('.btn')!.before(rows);
+  rows.hidden = false;
+
+  openBtn.addEventListener('click', () => {
+    panel.hidden = false;
+    panel.scrollTop = 0;
+    panel.querySelector<HTMLElement>('h2')!.focus();
+  });
+  panel.querySelectorAll('[data-settings-close]').forEach((btn) =>
     btn.addEventListener('click', () => {
       panel.hidden = true;
       openBtn.focus();
@@ -157,6 +196,8 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
     if (current !== navigation) return; // user navigated away while loading
     try {
       cleanup = module.mount(main);
+      const rows = main.querySelector<HTMLElement>('[data-settings]');
+      if (rows) setUpSettings(root, rows);
     } catch (error) {
       main.innerHTML = `<p class="status-line">This game couldn't start. Go back to Games and try again.</p>`;
       reportProblem(error);

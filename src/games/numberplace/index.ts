@@ -1,6 +1,6 @@
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, settingRow, settingsHtml } from '../../core/ui';
 import { LEVELS, clashes, enter, hintSquare, isValidState, newGame, shown, type Level, type State } from './logic';
 import './style.css';
 
@@ -25,16 +25,13 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame np-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Difficulty">
-          ${Object.entries(LEVELS).map(([id, l]) => `<button data-level="${id}">${l.label}</button>`).join('')}
-        </div>
         <div class="np-pad" aria-label="Numbers">
           ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => `<button class="btn secondary" data-num="${n}">${n}</button>`).join('')}
           <button class="btn secondary np-erase" data-num="0" aria-label="Erase"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H9l-6-7z"/><path d="M12 9.5l5 5M17 9.5l-5 5"/></svg></button>
           <button class="btn secondary np-hint" data-hint>Hint</button>
         </div>
       </div>
-    </div>`;
+    </div>${settingsHtml(settingRow('Difficulty', Object.entries(LEVELS).map(([id, l]) => `<button data-level="${id}">${l.label}</button>`).join(''), 'Starts a new game.'))}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;

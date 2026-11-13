@@ -2,7 +2,7 @@ import { cardId, cardName, sameCard, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { SEATS, SEAT_NAMES, nextSeat, trickWinner, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
-import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
   chooseCard,
   collect,
@@ -45,13 +45,9 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented" aria-label="Computer players">
-          <button data-level="easy">Easy</button>
-          <button data-level="strong">Strong</button>
-        </div>
         <button class="btn" data-pass>Pass</button>
       </div>
-    </div>`;
+    </div>${settingsHtml(levelSetting('Computer players'))}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;

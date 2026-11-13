@@ -1,5 +1,5 @@
 import { load, save } from '../../core/storage';
-import { confirmNew } from '../../core/ui';
+import { confirmNew, settingRow, settingsHtml } from '../../core/ui';
 import {
   LEVELS,
   countAt,
@@ -36,14 +36,9 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame ms-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="segmented">
-          ${Object.entries(LEVELS)
-            .map(([id, l]) => `<button data-level="${id}">${l.label}</button>`)
-            .join('')}
-        </div>
         <button class="btn secondary ms-mode" data-mode></button>
       </div>
-    </div>`;
+    </div>${settingsHtml(settingRow('Difficulty', Object.entries(LEVELS).map(([id, l]) => `<button data-level="${id}">${l.label}</button>`).join(''), 'Starts a new game.'))}`;
 
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const minesEl = container.querySelector<HTMLElement>('[data-mines]')!;

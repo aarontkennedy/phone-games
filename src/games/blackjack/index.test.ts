@@ -171,32 +171,34 @@ describe('Blackjack screen', () => {
     expect($('[data-accuracy]').textContent).toBe('–');
   });
 
-  it('shows the decks at the top of the table, changeable only between hands', () => {
+  it('shows the decks at the top of the table; Settings changes them, only between hands', () => {
     const { $, press, stored } = table('9H 7S 8C 10D');
-    expect($('[data-decks]').textContent).toBe('6 decks');
-    press('[data-decks]');
+    const pressed = () => $('[data-settings] [aria-pressed="true"]').textContent;
+    expect($('.bj-decks').textContent).toBe('6 decks');
+    expect($('[data-settings] h3').textContent).toBe('Decks in the shoe');
+    expect(pressed()).toBe('6');
+    press('[data-decks="8"]');
     expect(stored().decks).toBe(8);
     expect(stored().shoe).toHaveLength(416);
-    press('[data-decks]');
-    expect($('[data-decks]').textContent).toBe('1 deck');
-    expect($('[data-decks]').getAttribute('aria-label')).toBe('1 deck. Tap to change.');
-    press('[data-decks]');
-    press('[data-decks]');
-    expect(stored().decks).toBe(6);
+    expect(pressed()).toBe('8');
+    press('[data-decks="1"]');
+    expect($('.bj-decks').textContent).toBe('1 deck');
+    press('[data-decks="1"]'); // the same choice changes nothing
+    expect(stored().decks).toBe(1);
 
     const playing = table('9H 7S 8C 10D', { decks: 2 });
     playing.press('[data-deal]');
-    expect(playing.container.querySelector('[data-decks]')).toBeNull();
-    expect(playing.$('.bj-decks').textContent).toBe('2 decks'); // still shown, not a button
-    playing.$('[data-board]').click(); // taps elsewhere on the table do nothing
-    expect(playing.stored().phase).toBe('playing');
+    expect(playing.$<HTMLButtonElement>('[data-decks="6"]').disabled).toBe(true);
+    expect(playing.$('.bj-decks').textContent).toBe('2 decks');
+    playing.press('[data-decks="6"]');
+    expect(playing.stored().decks).toBe(2);
   });
 
   it('opens a save from before the deck choice with 6 decks and the same chips', () => {
     const { decks: _gone, ...old } = stacked('9H 7S 8C 10D', { chips: 777 });
     const { $ } = setup(old);
     expect($('[data-chips]').textContent).toBe('777');
-    expect($('[data-decks]').textContent).toBe('6 decks');
+    expect($('.bj-decks').textContent).toBe('6 decks');
   });
 
   it('offers Start over when out of chips', () => {

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import {
+  chooseSetting,
   expectNoHorizontalOverflow,
   expectReadableText,
   expectTouchTargets,
@@ -63,19 +64,22 @@ test('a play that isn’t the best is scored, and the best one named', async ({ 
   await expect(page.locator('[data-accuracy]')).toHaveText('0%');
 });
 
-test('the decks button at the top of the table changes the shoe between hands', async ({ page }) => {
-  const decks = page.locator('[data-decks]');
+test('Settings changes the decks between hands; the table shows how many', async ({ page }) => {
+  const decks = page.locator('.bj-decks');
   await expect(decks).toHaveText('6 decks');
-  await decks.click();
+  await chooseSetting(page, '[data-decks="8"]');
   await expect(decks).toHaveText('8 decks');
-  await decks.click();
+  await chooseSetting(page, '[data-decks="1"]');
   await expect(decks).toHaveText('1 deck');
   await expectNoHorizontalOverflow(page);
   await expectTouchTargets(page);
   await openBlackjackWith(page, '9H 7S 8C 10D'); // a 6-deck save, mid-hand after the deal
   await page.locator('[data-deal]').click();
-  await expect(decks).toHaveCount(0); // not changeable during a hand
-  await expect(page.locator('.bj-decks')).toHaveText('6 decks');
+  await page.locator('[data-settings-open]').click();
+  await expect(page.locator('.settings [data-decks="8"]')).toBeDisabled(); // not during a hand
+  await expectTouchTargets(page);
+  await page.locator('.settings .btn[data-settings-close]').click();
+  await expect(decks).toHaveText('6 decks');
 });
 
 test('split hands sit side by side and still fit', async ({ page }) => {
