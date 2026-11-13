@@ -49,19 +49,19 @@ describe('Four in a row screen', () => {
   it('shows a win, a loss and a draw, then a new round', () => {
     const won = setup(play([0, 0, 1, 1, 2, 2]));
     won.col(3).click();
-    expect(won.status()).toBe('You win! Tap New for another round.');
+    expect(won.status()).toBe('You win! Tap  for another round.');
     expect(won.$('.fir-space.win')).not.toBeNull();
     // The computer doesn't take a turn after your win, and the columns stay closed.
     expectStaysFinished(won.stored);
-    expect(won.status()).toBe('You win! Tap New for another round.');
+    expect(won.status()).toBe('You win! Tap  for another round.');
     expect(won.col(4).disabled).toBe(true);
     won.$('[data-new]').click();
     expect(won.stored().starter).toBe(1);
     document.body.replaceChildren();
 
-    expect(setup({ ...play([0, 1, 0, 1, 6, 1, 6, 1]) }).status()).toBe('The computer wins. Tap New for another round.');
+    expect(setup({ ...play([0, 1, 0, 1, 6, 1, 6, 1]) }).status()).toBe('The computer wins. Tap  for another round.');
     document.body.replaceChildren();
-    expect(setup({ ...newGame(), result: 'draw' }).status()).toBe('The board is full: it’s a draw. Tap New for another round.');
+    expect(setup({ ...newGame(), result: 'draw' }).status()).toBe('The board is full: it’s a draw. Tap  for another round.');
   });
 
   it('switches Easy and Strong without restarting, ignores stray taps, and stops when closed', () => {

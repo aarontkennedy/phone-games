@@ -67,13 +67,13 @@ describe('Checkers screen', () => {
     const won = setup(state([[5, 2, man(0)], [4, 3, man(1)]]));
     won.sq(5, 2).click();
     won.sq(3, 4).click();
-    expect(won.status()).toBe('You win! Tap New for another round.');
+    expect(won.status()).toBe('You win! Tap  for another round.');
     expectStaysFinished(won.stored);
-    expect(won.status()).toBe('You win! Tap New for another round.');
+    expect(won.status()).toBe('You win! Tap  for another round.');
     won.$('[data-new]').click();
     expect(won.stored().starter).toBe(1);
     document.body.replaceChildren();
-    expect(setup({ ...newGame(), result: 1 }).status()).toBe('The computer wins. Tap New for another round.');
+    expect(setup({ ...newGame(), result: 1 }).status()).toBe('The computer wins. Tap  for another round.');
     document.body.replaceChildren();
     expect(setup({ ...newGame(), result: 'draw' }).status()).toMatch(/draw/);
   });

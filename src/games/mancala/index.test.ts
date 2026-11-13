@@ -62,7 +62,7 @@ describe('Mancala screen', () => {
   it('shows the result and the rounds won, then a new round', () => {
     const won = setup({ ...newGame(), board: board([0, 0, 0, 0, 0, 1], 30, [1, 0, 0, 0, 0, 0], 16) });
     won.pit(5).click();
-    expect(won.status()).toBe('You win! Rounds won: you 1, computer 0. Tap New for another round.');
+    expect(won.status()).toBe('You win! Rounds won: you 1, computer 0. Tap  for another round.');
     won.$('[data-new]').click();
     expect(won.stored()).toMatchObject({ starter: 1, result: null });
     expect(setup({ ...newGame(), result: 1 }).status()).toMatch(/^The computer wins\./);

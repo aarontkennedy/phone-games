@@ -48,8 +48,8 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Pot</small><b data-pot></b></div>
       </div>
       <div class="board-frame tt-table" data-board></div>
-      ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
+      ${RECENT_HTML}
       <div class="controls">
         <div class="he-actions" data-actions></div>
       </div>

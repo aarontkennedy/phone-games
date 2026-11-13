@@ -33,14 +33,15 @@ async function expectNewestInView(page: Page) {
 }
 
 for (const id of GAMES) {
-  test(`${id}: recent moves sit between the board and the status line, and the controls stay on screen`, async ({ page }) => {
+  test(`${id}: the status line sits under the board, recent moves under it, and the controls stay on screen`, async ({ page }) => {
     await openWithMoves(page, id);
     const board = (await page.locator('.board-frame').boundingBox())!;
     const list = (await page.locator('[data-recent]').boundingBox())!;
     const status = (await page.locator('.status-line').boundingBox())!;
     const controls = (await page.locator('.controls').boundingBox())!;
-    expect(list.y).toBeGreaterThanOrEqual(board.y + board.height - 1);
-    expect(status.y).toBeGreaterThanOrEqual(list.y + list.height - 1);
+    expect(status.y).toBeGreaterThanOrEqual(board.y + board.height - 1);
+    expect(list.y).toBeGreaterThanOrEqual(status.y + status.height - 1);
+    expect(controls.y).toBeGreaterThanOrEqual(list.y + list.height - 1);
     const sizes = `board ${board.y}+${board.height}, list ${list.y}+${list.height}, controls ${controls.y}+${controls.height}`;
     // At least the newest move shows (older ones scroll inside the list), and the buttons
     // are still on screen.
@@ -64,6 +65,8 @@ for (const size of [
       const list = (await page.locator('[data-recent]').boundingBox())!;
       expect(list.x).toBeGreaterThanOrEqual(board.x + board.width - 1);
       expect(list.x + list.width).toBeLessThanOrEqual(size.width + 1);
+      const status = (await page.locator('.status-line').boundingBox())!;
+      expect(list.y).toBeGreaterThanOrEqual(status.y + status.height - 1); // the same order as upright
       // At least two lines of text show.
       expect(list.height).toBeGreaterThanOrEqual(2 * 18 * 1.35);
       const scrollY = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);

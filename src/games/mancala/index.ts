@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { showIcons } from '../../core/icons';
 import { confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import { STORE, choosePit, isValidState, legalPits, move, newGame, newRound, pitsOf, type Level, type State } from './logic';
 import './style.css';
@@ -66,13 +67,14 @@ export function mount(container: HTMLElement): () => void {
     container.querySelector('[data-computer]')!.textContent = String(state.board[STORE[1]]);
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
     statusEl.textContent = statusText();
+    showIcons(statusEl);
   }
 
   function statusText(): string {
     const rounds = `Rounds won: you ${state.tally.you}, computer ${state.tally.computer}.`;
-    if (state.result === 0) return `You win! ${rounds} Tap New for another round.`;
-    if (state.result === 1) return `The computer wins. ${rounds} Tap New for another round.`;
-    if (state.result === 'draw') return `It’s a draw. ${rounds} Tap New for another round.`;
+    if (state.result === 0) return `You win! ${rounds} Tap {new} for another round.`;
+    if (state.result === 1) return `The computer wins. ${rounds} Tap {new} for another round.`;
+    if (state.result === 'draw') return `It’s a draw. ${rounds} Tap {new} for another round.`;
     const last = state.last;
     const whoDid = last?.side === 0 ? 'You' : 'The computer';
     const what = !last ? '' : last.captured ? `${whoDid} captured ${seeds(last.captured)}. ` : last.again ? `${whoDid} ended in the store, so ${last.side === 0 ? 'you go' : 'it goes'} again. ` : '';

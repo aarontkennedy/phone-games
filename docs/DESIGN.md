@@ -87,8 +87,8 @@ topbar        [‹] Title  [new] [gear] [i]       (app shell: back, title, New g
 .screen
   .stats      [stat] [stat]                      score/time (the game's New moves to the top bar)
   .board-frame                                   the playing surface; hosts .overlay
+  .status-line                                   what to do now, or the result (aria-live)
   .recent                                        optional: recent moves ("Recent moves")
-  .status-line                                   hint, or result (aria-live)
   .controls   [buttons]                          optional; pinned to the bottom
 settingsHtml(...)                                optional, after .screen: moved into Settings
 ```
@@ -190,8 +190,9 @@ hand (the casino games' Bet and Chip) stay on screen.
 
 In games where the computer makes several moves between your turns (Go Fish, Crazy
 Eights, Rummy 500, Gin Rummy, Texas Hold'em, Five-Card Draw, Dominoes, Hot Dice), a short
-list between the board and the status line shows the last 4 moves, so none flash by
-unseen. Your own moves are in it too, so it reads in order.
+list under the status line shows the last 4 moves, newest at the top, so none flash by
+unseen. Your own moves are in it too. The order is board, then what to do now (the status
+line, which mostly points at the board), then what just happened, then the buttons.
 
 - **Shared:** `RECENT_HTML` for the markup and `recentMoves(container, id)` from
   `src/core/recent.ts`. It saves the list as `${id}:recent`, so it survives leaving the game.
@@ -201,11 +202,13 @@ unseen. Your own moves are in it too, so it reads in order.
 - **Cleared** at a new game, round or hand (each screen's `start()`), so it's always about
   the play in front of you.
 - **The status line no longer repeats the last move;** it says what to do next.
+  It's in full text color and the moves are muted, so what to do now reads first.
 - **Steady:** the list's height comes from the screen's spare room, not from the moves, so
   the controls don't move as moves come in. Upright it's 1 to 4 lines tall (the card games
   leave little room on an iPhone 13, so the screen's gaps also tighten to `--space-2`);
-  sideways it takes the side bar's spare height. Older moves scroll inside it; it's a
-  reversed column (newest first in the page), so the newest move stays in view.
+  sideways it takes the side bar's spare height, in the same order. Older moves scroll
+  inside it; the newest is first and the list scrolls back to the top on each move, so
+  the newest stays in view.
 - **Tested** by `e2e/recent.spec.ts`, upright and sideways, with 4 long moves.
 
 ## Touch
@@ -286,7 +289,10 @@ Every game has a **How to play** page, written for someone who has never played 
 - **Content:** the `howToPlay` field in `src/games/index.ts`: a one-sentence `goal`,
   at least 3 `steps` and optional `tips`.
 - **Steps:** explain a turn in the order a new player needs it. Name the on-screen
-  buttons and numbers exactly as they appear (**New**, **Best**, **Flag**). Say what
+  buttons and numbers exactly as they appear (**Undo**, **Best**, **Flag**). An icon-only
+  button is shown as its icon, not named in words: `${NEW_GAME}` and `${SETTINGS}` from
+  src/core/icons.ts (screen readers read the button's name). Status lines do the same
+  with `{new}` and `showIcons(statusEl)`. Say what
   ends the game and how you win. Use plain words, not jargon (say "join", not "merge").
 - **Tips:** a few beginner strategies.
 - **Enforced by tests:** `src/games/index.test.ts` requires rules for every game, with

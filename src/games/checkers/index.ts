@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { showIcons } from '../../core/icons';
 import { confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import { chooseMove, isDark, isValidState, legalMoves, move, newGame, newRound, type Level, type Move, type State } from './logic';
 import './style.css';
@@ -67,11 +68,11 @@ export function mount(container: HTMLElement): () => void {
     const mustJump = moves.some((m) => m.captured.length);
     statusEl.textContent =
       state.result === 0
-        ? 'You win! Tap New for another round.'
+        ? 'You win! Tap {new} for another round.'
         : state.result === 1
-          ? 'The computer wins. Tap New for another round.'
+          ? 'The computer wins. Tap {new} for another round.'
           : state.result === 'draw'
-            ? 'Fifty moves each with no capture: it’s a draw. Tap New for another round.'
+            ? 'Fifty moves each with no capture: it’s a draw. Tap {new} for another round.'
             : state.turn === 1
               ? 'The computer is thinking…'
               : selected !== null
@@ -79,6 +80,7 @@ export function mount(container: HTMLElement): () => void {
                 : mustJump
                   ? 'Your turn. You must jump: tap a piece that can take one.'
                   : 'Your turn: tap one of your purple pieces.';
+    showIcons(statusEl);
   }
 
   boardEl.addEventListener('click', (e) => {

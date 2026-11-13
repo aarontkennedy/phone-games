@@ -50,8 +50,8 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Deck</small><b data-stock></b></div>
       </div>
       <div class="board-frame tt-table" data-board></div>
-      ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
+      ${RECENT_HTML}
       <div class="controls">
         <div class="gf-actions" data-actions></div>
       </div>

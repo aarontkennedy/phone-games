@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { showIcons } from '../../core/icons';
 import { confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import { COLS, ROWS, chooseColumn, drop, isValidState, landingRow, newGame, newRound, type Level, type State } from './logic';
 import './style.css';
@@ -58,14 +59,15 @@ export function mount(container: HTMLElement): () => void {
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
     statusEl.textContent =
       state.result === 0
-        ? 'You win! Tap New for another round.'
+        ? 'You win! Tap {new} for another round.'
         : state.result === 1
-          ? 'The computer wins. Tap New for another round.'
+          ? 'The computer wins. Tap {new} for another round.'
           : state.result === 'draw'
-            ? 'The board is full: it’s a draw. Tap New for another round.'
+            ? 'The board is full: it’s a draw. Tap {new} for another round.'
             : state.turn === 0
               ? 'Your turn: tap a column to drop a purple disc.'
               : 'The computer is thinking…';
+    showIcons(statusEl);
   }
 
   boardEl.addEventListener('click', (e) => {

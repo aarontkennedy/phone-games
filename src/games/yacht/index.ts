@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { showIcons } from '../../core/icons';
 import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
 import {
   BOXES,
@@ -127,6 +128,7 @@ export function mount(container: HTMLElement): () => void {
     container.querySelector('[data-score]')!.textContent = String(total(state));
     container.querySelector('[data-best]')!.textContent = String(best);
     statusEl.textContent = statusText();
+    showIcons(statusEl);
 
     if (isGameOver(state)) {
       const score = total(state);
@@ -135,7 +137,7 @@ export function mount(container: HTMLElement): () => void {
   }
 
   function statusText(): string {
-    if (isGameOver(state)) return `Game over. You scored ${total(state)}. Tap New game to play again.`;
+    if (isGameOver(state)) return `Game over. You scored ${total(state)}. Tap {new} to play again.`;
     const turn = `Turn ${turnNumber(state)} of ${BOXES.length}.`;
     if (state.rolls === 0) return `${turn} Tap Roll.`;
     if (earnsYachtBonus(state)) return `Another yacht: ${YACHT_BONUS} bonus points! Pick a box for it.`;

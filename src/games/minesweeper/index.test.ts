@@ -191,7 +191,7 @@ describe('Mines screen', () => {
     expect(mark(1)).toBe('Flag');
     expect(mark(5)).toBe('Wrong flag');
     expect(cell(5).classList.contains('wrong')).toBe(true);
-    expect($('[data-status]').textContent).toBe('Boom! Tap New to try again.');
+    expect($('[data-status]').textContent).toBe('Boom! Tap  to try again.');
 
     vi.advanceTimersByTime(5000);
     expect($('[data-time]').textContent).toBe('2');

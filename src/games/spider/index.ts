@@ -1,4 +1,5 @@
 import { cardBack, cardFace, cardSlot } from '../../core/card-view';
+import { showIcons } from '../../core/icons';
 import { cardName, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
@@ -103,7 +104,7 @@ export function mount(container: HTMLElement): () => void {
 
   function showHint() {
     hint = findHint(state);
-    if (!hint) message = 'No moves left. Tap Undo to try another way, or New for a new deal.';
+    if (!hint) message = 'No moves left. Tap Undo to try another way, or {new} for a new deal.';
     else if ('deal' in hint) message = 'Hint: tap the deck to deal a card onto every column.';
     else {
       const cards = cardsAt(state, hint.src);
@@ -146,8 +147,9 @@ export function mount(container: HTMLElement): () => void {
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} moves!${bestText}`
       : message ||
         (isStuck(state)
-          ? 'No moves left. Tap Undo to try another way, or New for a new deal.'
+          ? 'No moves left. Tap Undo to try another way, or {new} for a new deal.'
           : `Build runs from King down to Ace in one suit. Tap a card to move it.${bestText}`);
+    showIcons(statusEl);
     if (state.won) showOverlay(boardEl, 'You win!', [['New game', () => startNew(state.suits)]]);
     else hideOverlay(boardEl);
     fitColumns();

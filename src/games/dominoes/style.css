@@ -19,6 +19,35 @@
   color: var(--muted);
 }
 
+/* The computer's row and the boneyard's sit close together, as one group. */
+.dom-counts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Each row's label takes the same width, so the face-down tiles line up. */
+.dom-label {
+  min-width: 5.5em;
+}
+
+/* The computer's hand and the boneyard: one tiny white upright tile per tile, face down. */
+.dom-backs {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+  gap: 3px;
+}
+
+.dom-back {
+  width: 11px;
+  height: 20px;
+  border: 1.5px solid var(--dom-edge);
+  border-radius: 2px;
+  background: var(--dom-back);
+}
+
 .dom-line,
 .dom-hand {
   display: flex;
@@ -102,6 +131,7 @@ button.dom-tile:disabled {
 
 .dom {
   --dom-edge: #6e6690;
+  --dom-back: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {

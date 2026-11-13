@@ -1,4 +1,5 @@
 import { cardFace, cardSlot, suitSvg } from '../../core/card-view';
+import { showIcons } from '../../core/icons';
 import { SUITS, cardName, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
@@ -92,8 +93,9 @@ export function mount(container: HTMLElement): () => void {
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} move${state.moves === 1 ? '' : 's'}!${bestText}`
       : message ||
         (isStuck(state)
-          ? 'No moves left. Tap Undo to try another way, or New for a new deal.'
+          ? 'No moves left. Tap Undo to try another way, or {new} for a new deal.'
           : `Tap a card to move it. The four spaces on the left hold one card each.${bestText}`);
+    showIcons(statusEl);
     if (hint) {
       const src = hint.src;
       boardEl.querySelector(src.from === 'cell' ? `[data-src="cell:${src.i}"]` : `[data-src="col:${src.col}:${src.index}"]`)?.classList.add('hint');
@@ -122,7 +124,7 @@ export function mount(container: HTMLElement): () => void {
   /** What Hint suggests, in words; the card is outlined on the board. */
   function showHint() {
     hint = findHint(state);
-    if (!hint) message = 'No moves left. Tap Undo to try another way, or New for a new deal.';
+    if (!hint) message = 'No moves left. Tap Undo to try another way, or {new} for a new deal.';
     else {
       const cards = cardsAt(state, hint.src);
       const what = `the ${cardName(cards[0]).toLowerCase()}${cards.length > 1 ? ` and the ${cards.length - 1} below it` : ''}`;

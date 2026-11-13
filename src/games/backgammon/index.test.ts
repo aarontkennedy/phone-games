@@ -94,7 +94,7 @@ describe('Backgammon screen', () => {
 
   it('shows a win, and New starts again (asking first mid-game)', () => {
     const won = setup({ ...newGame(), result: 0, gammon: true, tally: { you: 2, computer: 0 } });
-    expect(won.status()).toBe('You win a gammon, worth 2! Tap New for another game.');
+    expect(won.status()).toBe('You win a gammon, worth 2! Tap  for another game.');
     won.$<HTMLButtonElement>('[data-new]').click();
     expect(won.stored().result).toBeNull();
     won.unmount();

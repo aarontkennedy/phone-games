@@ -177,6 +177,27 @@ body {
   stroke-linecap: round;
 }
 
+/* A button's icon inside text (rules, status lines): the same drawing the player taps,
+   sized to the text around it (src/core/icons.ts). */
+.inline-icon {
+  display: inline-block;
+  vertical-align: -0.25em;
+}
+
+.inline-icon svg {
+  display: block;
+  width: 1.3em;
+  height: 1.3em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.inline-icon + b {
+  margin-left: 0.2em;
+}
+
 .top-icon .dot {
   fill: currentColor;
   stroke-width: 2.4;
@@ -658,22 +679,23 @@ body {
   font-size: var(--text-2xl);
 }
 
+/* What to do now: full text color, so it stands out over the recent moves (muted). */
 .status-line {
   min-height: 1.4em;
   margin: 0;
-  color: var(--muted);
+  color: var(--text);
   font-size: var(--text-sm);
   text-align: center;
 }
 
-/* Recent moves (src/core/recent.ts): the newest (first in the page) at the bottom, in full
-   text color. Its height comes from the screen's spare room, not from the moves (1 to 4
+/* Recent moves (src/core/recent.ts): the newest first, at the top, all in muted text so
+   the status line above reads first. Its height comes from the screen's spare room, not from the moves (1 to 4
    lines; the rest scrolls inside it), so the controls don't move as moves come in and stay
    on screen on short phones. */
 .recent {
   --recent-line: 1.35em;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   flex: 1 1 0;
   min-height: calc(var(--recent-line) + 2 * var(--space-1) + 2px);
   max-height: calc(4 * var(--recent-line) + 2 * var(--space-1) + 2px);
@@ -687,10 +709,6 @@ body {
   color: var(--muted);
   font-size: var(--text-sm);
   line-height: var(--recent-line);
-}
-
-.recent li:first-child {
-  color: var(--text);
 }
 
 .recent:empty::before {
@@ -752,18 +770,14 @@ body {
   /* With recent moves, the list takes the side bar's spare height and scrolls inside
      itself when that's less than its moves (it keeps the newest in view). */
   #app:has(> .game .recent) {
-    grid-template-rows: repeat(2, auto) minmax(0, 1fr) repeat(2, auto);
+    grid-template-rows: repeat(3, auto) minmax(0, 1fr) auto;
   }
 
   .game .recent {
     grid-column: 2;
-    grid-row: 3;
+    grid-row: 4;
     min-height: 0;
     max-height: none;
-  }
-
-  #app:has(> .game .recent) .game .status-line {
-    grid-row: 4;
   }
 
   #app:has(> .game .recent) .game .controls {

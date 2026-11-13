@@ -102,9 +102,9 @@ describe('Chess screen', () => {
       document.body.replaceChildren();
       return t;
     };
-    expect(ended({ result: 'w', reason: 'checkmate' })).toBe('Checkmate: you win! Tap New for another game.');
-    expect(ended({ result: 'b', reason: 'checkmate' })).toBe('Checkmate: the computer wins. Tap New for another game.');
-    expect(ended({ result: 'draw', reason: 'stalemate' })).toBe('Stalemate: the player to move has no legal move but isn’t in check, so it’s a draw. Tap New for another game.');
+    expect(ended({ result: 'w', reason: 'checkmate' })).toBe('Checkmate: you win! Tap  for another game.');
+    expect(ended({ result: 'b', reason: 'checkmate' })).toBe('Checkmate: the computer wins. Tap  for another game.');
+    expect(ended({ result: 'draw', reason: 'stalemate' })).toBe('Stalemate: the player to move has no legal move but isn’t in check, so it’s a draw. Tap  for another game.');
     expect(ended({ result: 'draw', reason: 'repetition' })).toMatch(/^The same position came up three times/);
     expect(ended({ result: 'draw', reason: 'fifty' })).toMatch(/^50 moves each/);
     expect(ended({ result: 'draw', reason: 'material' })).toMatch(/^Neither side/);

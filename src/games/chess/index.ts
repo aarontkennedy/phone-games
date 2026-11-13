@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { showIcons } from '../../core/icons';
 import { confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
   canUndo,
@@ -104,6 +105,7 @@ export function mount(container: HTMLElement): () => void {
         ? '<button class="btn secondary" data-undo>Undo</button>'
         : '';
     statusEl.textContent = statusText();
+    showIcons(statusEl);
   }
 
   /** What the computer's last move did, in words. */
@@ -117,7 +119,7 @@ export function mount(container: HTMLElement): () => void {
   }
 
   function statusText(): string {
-    const again = ' Tap New for another game.';
+    const again = ' Tap {new} for another game.';
     if (state.result !== null) {
       if (state.reason === 'checkmate') return state.result === state.you ? `Checkmate: you win!${again}` : `Checkmate: the computer wins.${again}`;
       const why = {

@@ -1,13 +1,13 @@
-// Recent moves: a short list under the board of what just happened, so moves the
+// Recent moves: a short list under the status line of what just happened, so moves the
 // computer makes between your turns don't flash by unseen (docs/DESIGN.md, "Recent moves").
-// On screen the oldest is at the top and the newest at the bottom, just above the status
-// line; in the page (for screen readers) the newest comes first.
+// The newest is first, at the top, right under the status line; older ones follow and
+// scroll inside the list when it's short on room.
 import { load, save } from './storage';
 
 /** How many moves the list keeps. */
 export const RECENT_LINES = 4;
 
-/** The list's markup: put it between `.board-frame` and `.status-line`. */
+/** The list's markup: put it between `.status-line` and `.controls`. */
 export const RECENT_HTML = '<ol class="recent" data-recent role="log" aria-label="Recent moves"></ol>';
 
 export interface Recent {
@@ -32,9 +32,8 @@ export function recentMoves(container: HTMLElement, id: string): Recent {
 
   function show() {
     save(key, lines);
-    // Newest first in the page; CSS (column-reverse) shows it at the bottom. Sideways, the
-    // list can be shorter than its moves, and a reversed column stays scrolled to its end,
-    // so the newest move stays in view however the layout changes.
+    // Newest first, at the top; scrolled back to the top so it's in view even when the
+    // list is shorter than its moves.
     el.replaceChildren(
       ...[...lines].reverse().map((text) => {
         const li = document.createElement('li');
@@ -42,6 +41,7 @@ export function recentMoves(container: HTMLElement, id: string): Recent {
         return li;
       }),
     );
+    el.scrollTop = 0;
   }
 
   show();

@@ -1,5 +1,6 @@
 import { mountAbout } from './about';
 import { storageWorks } from './core/storage';
+import { BACK_ICON, GEAR_ICON, INFO_ICON, NEW_ICON } from './core/icons';
 import { closeConfirm } from './core/ui';
 import { reportProblem } from './report';
 import { openShareSheet, shareLinks } from './share';
@@ -10,14 +11,6 @@ import { mostPlayed, recordPlay } from './plays';
 // a square with an arrow, so it isn't confused with Safari's own Share button.
 const SHARE_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>';
-const BACK_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4.5 7.5 12l7.5 7.5"/></svg>';
-const GEAR_ICON =
-  '<svg viewBox="0 0 24 24" aria-hidden="true"><path stroke-linejoin="round" d="M19.8 10.3L22.4 10.6L22.4 13.4L19.8 13.7L18.7 16.3L20.4 18.3L18.3 20.4L16.3 18.7L13.7 19.8L13.4 22.4L10.6 22.4L10.3 19.8L7.7 18.7L5.7 20.4L3.6 18.3L5.3 16.3L4.2 13.7L1.6 13.4L1.6 10.6L4.2 10.3L5.3 7.7L3.6 5.7L5.7 3.6L7.7 5.3L10.3 4.2L10.6 1.6L13.4 1.6L13.7 4.2L16.3 5.3L18.3 3.6L20.4 5.7L18.7 7.7Z"/><circle cx="12" cy="12" r="3.5"/></svg>';
-// A circular arrow: start over. Drawn here (no icon library).
-const NEW_ICON =
-  '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12a7.5 7.5 0 1 1-2.2-5.3"/><path stroke-linejoin="round" d="M18.5 3v4.5H14"/></svg>';
-const INFO_ICON =
-  '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 11v6"/><circle class="dot" cx="12" cy="7.5" r="0.6"/></svg>';
 
 const card = (g: GameMeta) => `
   <a class="game-card" href="#/${g.id}">

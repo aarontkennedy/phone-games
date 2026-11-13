@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { showIcons } from '../../core/icons';
 import { confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import { CHECKERS, chooseTurn, isValidState, legalMoves, move, newGame, newRound, roll, undoTurn, type From, type Level, type Move, type State } from './logic';
 import './style.css';
@@ -127,13 +128,14 @@ export function mount(container: HTMLElement): () => void {
     container.querySelector('[data-computer]')!.textContent = String(state.tally.computer);
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
     statusEl.textContent = statusText();
+    showIcons(statusEl);
   }
 
   function statusText(): string {
     const rolled = state.lastRoll.length ? `${state.lastRoll[0]} and ${state.lastRoll[1]}` : '';
     if (state.result !== null) {
       const who = state.result === 0 ? 'You win' : 'The computer wins';
-      return `${who}${state.gammon ? ' a gammon, worth 2' : ''}! Tap New for another game.`;
+      return `${who}${state.gammon ? ' a gammon, worth 2' : ''}! Tap {new} for another game.`;
     }
     if (state.turn === 1) return note + (state.dice.length ? `The computer rolled ${rolled}…` : 'The computer is rolling…');
     if (!state.dice.length) return state.lastRoll.length ? 'Your turn: tap Roll.' : 'Your turn: tap Roll. You move counter-clockwise, toward your home at the bottom right.';

@@ -72,8 +72,15 @@ describe('Dominoes screen', () => {
   it('draws when stuck, and passes when the boneyard is empty', () => {
     const drawing = setup(at([[[1, 1]], [[5, 5]]], [[6, 2]]));
     expect(drawing.status()).toBe('Nothing matches 6 or 2. Draw a tile.');
+    // The computer's hand and the boneyard show as face-down tiles, one per tile.
+    const [hand, yard] = drawing.$$('.dom-backs');
+    expect(hand.getAttribute('aria-label')).toBe('1 tile');
+    expect(hand.querySelectorAll('.dom-back')).toHaveLength(1);
+    expect(yard.getAttribute('aria-label')).toBe('25 tiles');
+    expect(yard.querySelectorAll('.dom-back')).toHaveLength(25);
     drawing.$('[data-draw]').click();
     expect(drawing.stored().hands[0]).toHaveLength(2);
+    expect(drawing.$$('.dom-backs')[1].querySelectorAll('.dom-back')).toHaveLength(24);
     expect(drawing.recent()).toEqual(['You drew a tile.']);
     drawing.$('[data-level="easy"]').click(); // not a move
     expect(drawing.recent()).toHaveLength(1);
@@ -81,6 +88,7 @@ describe('Dominoes screen', () => {
     const rest = fullSet().filter((t) => !(t[0] === 1 && t[1] === 1) && !(t[0] === 2 && t[1] === 6));
     const passing = setup({ ...at([[[1, 1]], rest], [[6, 2]]), boneyard: [] });
     expect(passing.status()).toBe('Nothing matches 6 or 2, and the boneyard is empty: tap Pass.');
+    expect(passing.$$('.dom-row')[1].textContent).toBe('BoneyardEmpty');
     passing.$('[data-pass]').click();
     expect(passing.stored().turn).toBe(1);
     expect(passing.recent().at(-1)).toBe('You passed.');

@@ -1,9 +1,14 @@
 import type { GameMeta } from '../core/game';
+import { BULB_ICON, ERASE_ICON, NEW_GAME, SETTINGS, inlineIcon } from '../core/icons';
 import { chartHtml as blackjackChart } from './blackjack/strategy';
 import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon, rouletteIcon, crapsIcon, paiGowIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
+/** Hint as its button shows it: the light bulb, then the word. */
+const HINT = `<span class="inline-icon" aria-hidden="true">${BULB_ICON}</span><b>Hint</b>`;
+const ERASE = inlineIcon(ERASE_ICON, 'Erase');
+
 export const games: GameMeta[] = [
   {
     id: '2048',
@@ -19,7 +24,7 @@ export const games: GameMeta[] = [
         'Tiles with different numbers never join. They just stop next to each other.',
         'After every swipe, a new 2 (or sometimes a 4) appears in an empty square.',
         'Each time tiles join, the new number is added to your <b>Score</b>. <b>Best</b> is your highest score ever.',
-        'The game is over when the board is full and no swipe can join anything. Tap <b>New game</b> (the circular arrow at the top) to start again at any time.',
+        `The game is over when the board is full and no swipe can join anything. Tap ${NEW_GAME} at the top to start again at any time.`,
         'Your game is saved after every swipe, so you can close the app and carry on later.',
       ],
       tips: [
@@ -45,7 +50,7 @@ export const games: GameMeta[] = [
         'An open square with no number has no mines around it, so its neighbors open by themselves.',
         'When you’re sure a square hides a mine, flag it: press and hold it, or switch the <b>Dig</b> button to <b>Flag</b> and tap it. Do the same again to remove a flag.',
         'Opening a mine ends the game. You win when every square without a mine is open.',
-        '<b>Mines</b> shows how many mines are left to flag. <b>Time</b> counts the seconds. In <b>Settings</b> (the gear at the top), choose <b>Easy</b>, <b>Medium</b> or <b>Hard</b> for a bigger board with more mines.',
+        `<b>Mines</b> shows how many mines are left to flag. <b>Time</b> counts the seconds. With ${SETTINGS} at the top, choose <b>Easy</b>, <b>Medium</b> or <b>Hard</b> for a bigger board with more mines.`,
       ],
       tips: [
         'If a 1 touches only one closed square, that square is a mine.',
@@ -76,7 +81,7 @@ export const games: GameMeta[] = [
         'Not sure what to do? Tap <b>Hint</b>: it outlines a good card to move and says where. If no moves are left, the line under the cards says so.',
       ],
       tips: [
-        'In <b>Settings</b> (the gear at the top): <b>Draw 1</b> turns over one card at a time and is easier. <b>Draw 3</b> turns over three, and you can only play the top one.',
+        `Choose with ${SETTINGS} at the top: <b>Draw 1</b> turns over one card at a time and is easier. <b>Draw 3</b> turns over three, and you can only play the top one.`,
         'Turning over face-down cards in the columns matters most. Work on the longest columns first.',
         'Don\'t empty a column unless you have a king ready to move into it.',
         'Once every card is face up, the game finishes itself.',
@@ -102,11 +107,11 @@ export const games: GameMeta[] = [
         'When you’re done, the dealer turns over the face-down card and must take cards until reaching 17 or more.',
         'You win if the dealer busts or you’re closer to 21. A win pays even money (a 20 bet wins 20). A tie is a <b>push</b>: your bet comes back.',
         'These are play chips, not money. If you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve ever had.',
-        'The dealer deals from a shoe of 6 decks. Between hands, choose 1, 2, 6 or 8 decks in <b>Settings</b> (the gear at the top); the table shows how many. Each change starts a freshly shuffled shoe.',
+        `The dealer deals from a shoe of 6 decks. Between hands, choose 1, 2, 6 or 8 decks with ${SETTINGS} at the top; the table shows how many. Each change starts a freshly shuffled shoe.`,
         '<b>Right</b> is how often your play matched the best play in the chart below. After a play that wasn’t the best, the line above the buttons says what was. Plays you make after tapping <b>Hint</b> don’t count.',
       ],
       tips: [
-        'Not sure? Tap <b>Hint</b> above the buttons to see the best play for that moment. It only shows when you ask.',
+        `Not sure? Tap ${HINT} above the buttons to see the best play for that moment. It only shows when you ask.`,
         'Always split aces and eights. Never split tens or fives.',
         'Stand on 13 to 16 when the dealer shows 2 to 6 (the dealer is likely to bust), and hit when the dealer shows 7 or higher. Stand on 12 only against 4 to 6.',
         'Double on 11 unless the dealer shows an ace.',
@@ -135,7 +140,7 @@ export const games: GameMeta[] = [
         'Cards you can play right now sit a little higher. Tap one to play it.',
       ],
       tips: [
-        '<b>Easy</b> computer players play almost at random. <b>Strong</b> ones dodge points and remember what’s been played. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> computer players play almost at random. <b>Strong</b> ones dodge points and remember what’s been played. Change it any time with ${SETTINGS} at the top.`,
         'Pass the queen of spades, and the ace and king of spades unless you have plenty of low spades to protect them.',
         'Try to run out of a suit early. Then you can throw away hearts or the queen when that suit is led.',
         'When you can’t win a trick safely, play the highest card that still loses.',
@@ -164,7 +169,7 @@ export const games: GameMeta[] = [
         'Each seat shows its bid and how many tricks it has won so far. Cards you can play right now sit a little higher.',
       ],
       tips: [
-        '<b>Easy</b> computer players bid loosely and play at random. <b>Strong</b> ones bid carefully, help their partner and avoid bags. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> computer players bid loosely and play at random. <b>Strong</b> ones bid carefully, help their partner and avoid bags. Change it any time with ${SETTINGS} at the top.`,
         'Aces usually win a trick. Kings often do. Each spade beyond your third is likely to win one too.',
         'Once your team has made its bid, play low to avoid bags.',
         'If North bids nil, help out: win the tricks North might otherwise be stuck with.',
@@ -192,7 +197,7 @@ export const games: GameMeta[] = [
         'The strip above the seats shows the turned-up card, then the trump suit and who picked it.',
       ],
       tips: [
-        '<b>Easy</b> computer players pick trump loosely and play at random. <b>Strong</b> ones weigh their hands and play as a team. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> computer players pick trump loosely and play at random. <b>Strong</b> ones weigh their hands and play as a team. Change it any time with ${SETTINGS} at the top.`,
         'Three trump cards, or two with a side ace, is usually enough to pick trump.',
         'If your partner is already winning a trick, play your lowest card.',
         'When your team picked trump, lead your highest trump to pull out the others’ trumps.',
@@ -220,7 +225,7 @@ export const games: GameMeta[] = [
         'Scores are pegged on the <b>board</b> at the top: your track is the lower one, in purple; the computer’s is above, in orange. Each player has two pegs. The solid peg is the score, and the hollow peg shows where it was before the last points, so you can see each move. The first peg to reach the last hole wins.',
       ],
       tips: [
-        '<b>Easy</b> plays at random. <b>Strong</b> picks the best cards to keep and pegs carefully. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> plays at random. <b>Strong</b> picks the best cards to keep and pegs carefully. Change it any time with ${SETTINGS} at the top.`,
         'Keep cards that add up to 15, pairs, and cards in a row. Fives are valuable: so many cards are worth 10.',
         'When it’s not your crib, don’t give it fives or pairs.',
         'Try not to make the count 5 or 21: a 10-point card lets the other player make 15 or 31.',
@@ -243,7 +248,7 @@ export const games: GameMeta[] = [
         'Tap <b>New</b>, below the board, for another round. <b>Ties</b> counts the rounds nobody won. Who goes first switches each round.',
       ],
       tips: [
-        '<b>Easy</b> mostly plays at random. <b>Strong</b> never loses: the best you can do is a tie. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> mostly plays at random. <b>Strong</b> never loses: the best you can do is a tie. Change it any time with ${SETTINGS} at the top.`,
         'Taking the middle square first gives you the most ways to win.',
         'Watch for two Os in a row and block the third square.',
       ],
@@ -263,10 +268,10 @@ export const games: GameMeta[] = [
         'Tap a column to drop a disc. It falls to the lowest empty space in that column.',
         'The first to make a line of four wins. If the board fills up with no line, it’s a draw.',
         'The last disc dropped has a ring, so you can see the computer’s move. A winning line gets a thick outline.',
-        'Tap <b>New game</b> (the circular arrow at the top) for another round. Who goes first switches each round.',
+        `Tap ${NEW_GAME} at the top for another round. Who goes first switches each round.`,
       ],
       tips: [
-        '<b>Easy</b> plays loosely. <b>Strong</b> looks several moves ahead. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> plays loosely. <b>Strong</b> looks several moves ahead. Change it any time with ${SETTINGS} at the top.`,
         'The middle column is part of the most possible lines. Start there.',
         'Watch for three in a row with an open space at either end, and block it.',
       ],
@@ -291,7 +296,7 @@ export const games: GameMeta[] = [
         'Made a mistake? Tap <b>Undo</b> to take back your last move and the computer’s reply.',
       ],
       tips: [
-        '<b>Easy</b> looks one move ahead and often blunders. <b>Strong</b> looks three moves ahead. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> looks one move ahead and often blunders. <b>Strong</b> looks three moves ahead. Change it any time with ${SETTINGS} at the top.`,
         'Bring your knights and bishops out early, castle to keep your king safe, and don’t move your queen out too soon.',
         'Before every move, check what the computer’s last move attacks.',
       ],
@@ -316,7 +321,7 @@ export const games: GameMeta[] = [
         'The computer’s last move is outlined so you can see what changed.',
       ],
       tips: [
-        '<b>Easy</b> plays at random. <b>Strong</b> looks ahead. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> plays at random. <b>Strong</b> looks ahead. Change it any time with ${SETTINGS} at the top.`,
         'Keep your back row filled as long as you can: it stops the computer from making kings.',
         'Trading pieces when you’re ahead brings you closer to winning.',
       ],
@@ -333,12 +338,12 @@ export const games: GameMeta[] = [
       goal: 'Fill every empty square so that each row, each column and each 3 by 3 box has the numbers 1 to 9 exactly once.',
       steps: [
         'Some numbers are given at the start, in bold. You can’t change those.',
-        'Tap an empty square, then tap a number on the pad to put it there. The <b>erase key</b> (an arrow with an X, like a phone keyboard’s) clears it.',
+        `Tap an empty square, then tap a number on the pad to put it there. The erase key ${ERASE} clears it.`,
         'Stuck? Tap <b>Hint</b> to fill in one square: the one you picked, a wrong one, or the easiest one to work out.',
         'Your numbers are purple. When you pick a square, the same number is shaded everywhere else, to help you spot where it can’t go.',
         'If a number repeats in a row, column or box, both copies turn red and get underlined.',
         'Every puzzle has exactly one answer. Fill the whole grid correctly to solve it.',
-        'In <b>Settings</b> (the gear at the top), choose <b>Easy</b>, <b>Medium</b> or <b>Hard</b>: harder puzzles start with fewer numbers. The clock pauses when you leave, and your best time is kept for each level.',
+        `With ${SETTINGS} at the top, choose <b>Easy</b>, <b>Medium</b> or <b>Hard</b>: harder puzzles start with fewer numbers. The clock pauses when you leave, and your best time is kept for each level.`,
       ],
       tips: [
         'Look for a row, column or box that’s nearly full: the missing number is often easy to see.',
@@ -417,7 +422,7 @@ export const games: GameMeta[] = [
         'Each seat shows how many cards it has left, its score and the last card it played.',
       ],
       tips: [
-        '<b>Easy</b> plays any card it can. <b>Strong</b> saves its 8s and picks suits it holds. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> plays any card it can. <b>Strong</b> saves its 8s and picks suits it holds. Change it any time with ${SETTINGS} at the top.`,
         'Save your 8s for when you have no other play, or to change the suit when someone is about to go out.',
         'Get rid of high cards early: they count against you if someone else goes out.',
       ],
@@ -441,7 +446,7 @@ export const games: GameMeta[] = [
         'If you run out of cards, tap <b>Draw</b> to take one and carry on. When all 13 books are made, the most books wins.',
       ],
       tips: [
-        '<b>Easy</b> asks at random. <b>Strong</b> remembers what everyone asked for. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> asks at random. <b>Strong</b> remembers what everyone asked for. Change it any time with ${SETTINGS} at the top.`,
         'Listen to the others: a player who asks for 9s is holding at least one 9. Ask them for it on your turn.',
         'Ask for the rank you hold most of: one more card might make a book.',
       ],
@@ -465,7 +470,7 @@ export const games: GameMeta[] = [
         'The hand ends when someone has no cards left, or the deck runs out. You score the points of every card you melded and lose the points of the cards still in your hand: aces 15 (1 in A, 2, 3), 10s and picture cards 10, others their number.',
       ],
       tips: [
-        '<b>Easy</b> only takes the top of the pile and never lays off. <b>Strong</b> looks deep into the pile and lays off whenever it can. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> only takes the top of the pile and never lays off. <b>Strong</b> looks deep into the pile and lays off whenever it can. Change it any time with ${SETTINGS} at the top.`,
         'A big pile can be worth taking: every card you meld from it scores. Cards you can’t use count against you if the hand ends.',
         'Meld early. Points in your hand count against you when someone goes out.',
       ],
@@ -513,7 +518,7 @@ export const games: GameMeta[] = [
         'Blinds double every 10 hands. The game ends when you have every chip, or none.',
       ],
       tips: [
-        '<b>Easy</b> players call a lot and rarely raise. <b>Strong</b> players weigh their chances against the pot and bluff now and then. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> players call a lot and rarely raise. <b>Strong</b> players weigh their chances against the pot and bluff now and then. Change it any time with ${SETTINGS} at the top.`,
         'Fold most weak starting hands. Pairs, aces and two high cards are worth playing.',
         'A bet that’s small next to the pot is often worth calling, even with a long shot.',
       ],
@@ -537,7 +542,7 @@ export const games: GameMeta[] = [
         'If you run out of chips mid-hand you’re <b>all in</b>: you can still win what you matched, and the rest makes a side pot for the others. Blinds double every 10 hands. The game ends when you have every chip, or none.',
       ],
       tips: [
-        '<b>Easy</b> players call a lot and swap cards carelessly. <b>Strong</b> players weigh their chances, draw by the book and bluff now and then. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> players call a lot and swap cards carelessly. <b>Strong</b> players weigh their chances, draw by the book and bluff now and then. Change it any time with ${SETTINGS} at the top.`,
         'Keep any pair and swap the other three. With four cards of a flush or four in a row, swap just one.',
         'A player who stands pat probably has a strong hand, or is bluffing.',
       ],
@@ -561,7 +566,7 @@ export const games: GameMeta[] = [
         'Keep all six dice and you get to roll all six again, still adding to this turn.',
       ],
       tips: [
-        '<b>Easy</b> plays loosely. <b>Strong</b> banks at good moments and keeps fewer dice to roll more. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> plays loosely. <b>Strong</b> banks at good moments and keeps fewer dice to roll more. Change it any time with ${SETTINGS} at the top.`,
         'The fewer dice you roll, the more likely a bust. With one or two dice left, banking is usually wise.',
         'With a 1 and a 5, keeping just the 1 and rolling five dice often pays off.',
       ],
@@ -587,7 +592,7 @@ export const games: GameMeta[] = [
         'If the deck gets down to two cards, nobody scores that hand.',
       ],
       tips: [
-        '<b>Easy</b> takes cards only for an obvious meld. <b>Strong</b> plays carefully and knocks early. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> takes cards only for an obvious meld. <b>Strong</b> plays carefully and knocks early. Change it any time with ${SETTINGS} at the top.`,
         'Throw away high loose cards first: they cost the most.',
         'Watch what the computer takes from the pile, and don’t give it cards it needs.',
       ],
@@ -612,7 +617,7 @@ export const games: GameMeta[] = [
         'The winner of a round starts the next one.',
       ],
       tips: [
-        '<b>Easy</b> plays any tile that fits. <b>Strong</b> plays heavy tiles first and tries to block you. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> plays any tile that fits. <b>Strong</b> plays heavy tiles first and tries to block you. Change it any time with ${SETTINGS} at the top.`,
         'Play heavy tiles early: they cost you if the computer goes out first.',
         'Keep a mix of numbers in your hand so you can match more ends.',
       ],
@@ -706,10 +711,10 @@ export const games: GameMeta[] = [
         'Every orange disc trapped that way flips to purple. One move can flip several lines at once.',
         'Squares where you can play have a light ring. Tap one to play there. The computer’s last move is outlined.',
         'If you can’t trap anything, you pass and the computer plays again. The game ends when neither side can move.',
-        'Tap <b>New game</b> (the circular arrow at the top) for another round. Who goes first switches each round.',
+        `Tap ${NEW_GAME} at the top for another round. Who goes first switches each round.`,
       ],
       tips: [
-        '<b>Easy</b> takes corners and otherwise plays at random. <b>Strong</b> looks several moves ahead and plays perfectly near the end. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> takes corners and otherwise plays at random. <b>Strong</b> looks several moves ahead and plays perfectly near the end. Change it any time with ${SETTINGS} at the top.`,
         'Corners can never be flipped. Try to take them.',
         'Avoid the squares right next to an empty corner: they often hand the corner to the computer.',
         'Flipping lots of discs early isn’t always good. Having more places to play matters more.',
@@ -731,10 +736,10 @@ export const games: GameMeta[] = [
         'If your last seed lands in <b>your store</b>, you get another turn.',
         'If your last seed lands in an <b>empty pit on your side</b>, and the computer’s pit straight across has seeds, you <b>capture</b> them: both go into your store.',
         'The game ends when either row is empty. The seeds still in the other row go to that player’s store. The most seeds wins.',
-        'The pit just played has a dashed ring, and where its last seed landed has a solid ring. Tap <b>New game</b> (the circular arrow at the top) for another round. Who goes first switches each round.',
+        `The pit just played has a dashed ring, and where its last seed landed has a solid ring. Tap ${NEW_GAME} at the top for another round. Who goes first switches each round.`,
       ],
       tips: [
-        '<b>Easy</b> often plays at random. <b>Strong</b> looks several moves ahead. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> often plays at random. <b>Strong</b> looks several moves ahead. Change it any time with ${SETTINGS} at the top.`,
         'A pit with exactly the right number of seeds to reach your store gives you a free turn. Count before you tap.',
         'Watch for empty pits on the computer’s side across from your full ones: they’re at risk of capture.',
       ],
@@ -754,7 +759,7 @@ export const games: GameMeta[] = [
         'Tap a letter at the bottom to guess it. If it’s in the word, it appears in every place it belongs, and the key turns orange.',
         'If it isn’t, the key is crossed out and another part of the figure is drawn.',
         'Fill in the whole word to win. Six wrong guesses complete the figure and end the round, and the word is shown.',
-        'Tap <b>Next word</b> or <b>New game</b> (the circular arrow at the top) for another word. <b>Streak</b> counts the words you’ve found in a row.',
+        `Tap <b>Next word</b> or ${NEW_GAME} at the top for another word. <b>Streak</b> counts the words you’ve found in a row.`,
       ],
       tips: [
         'Start with common letters: E, A, R, I, O, T, N and S.',
@@ -773,7 +778,7 @@ export const games: GameMeta[] = [
     howToPlay: {
       goal: 'Clear the table by building eight runs from King down to Ace, each all one suit.',
       steps: [
-        'In <b>Settings</b> (the gear at the top), pick <b>1 suit</b> (easiest), <b>2 suits</b> or <b>4 suits</b> (hardest). Two decks are dealt into ten columns.',
+        `With ${SETTINGS} at the top, pick <b>1 suit</b> (easiest), <b>2 suits</b> or <b>4 suits</b> (hardest). Two decks are dealt into ten columns.`,
         'Tap a face-up card to move it onto a card one rank higher, in any column. A 7 can go on any 8. Tap a card in the middle of a column to move it with the cards below it, but only if they’re all one suit, counting down.',
         'Any card, or run, can go into an empty column.',
         'When a column’s face-up cards are gone, its next card turns over.',
@@ -807,7 +812,7 @@ export const games: GameMeta[] = [
         'Win with none of the computer’s checkers off and it’s a <b>gammon</b>, worth 2.',
       ],
       tips: [
-        '<b>Easy</b> plays any legal move. <b>Strong</b> races, hits and keeps its checkers safe. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> plays any legal move. <b>Strong</b> races, hits and keeps its checkers safe. Change it any time with ${SETTINGS} at the top.`,
         'Two checkers on a point are safe. A lone checker (a blot) can be hit.',
         'Making points in your home makes it hard for hit checkers to come back in.',
       ],
@@ -827,10 +832,10 @@ export const games: GameMeta[] = [
         'Draw the fourth side of a box and it’s yours: it fills purple, and you go again. One line can close two boxes at once.',
         'The computer’s boxes fill orange. The newest line is orange too, so you can see the computer’s move.',
         'When every line is drawn, whoever has more boxes wins.',
-        'Tap <b>New game</b> (the circular arrow at the top) for another round. Who goes first switches each round.',
+        `Tap ${NEW_GAME} at the top for another round. Who goes first switches each round.`,
       ],
       tips: [
-        '<b>Easy</b> takes any box it can and otherwise plays at random. <b>Strong</b> avoids giving boxes away. Change it any time in <b>Settings</b> (the gear at the top).',
+        `<b>Easy</b> takes any box it can and otherwise plays at random. <b>Strong</b> avoids giving boxes away. Change it any time with ${SETTINGS} at the top.`,
         'Avoid drawing the third side of a box: that hands it to the computer.',
         'Late in the game someone has to give boxes away. Give away the shortest chain you can.',
       ],

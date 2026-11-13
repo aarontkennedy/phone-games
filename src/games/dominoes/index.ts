@@ -19,6 +19,9 @@ const PIPS: Record<number, [number, number][]> = {
 };
 const half = (n: number) => `<svg viewBox="0 0 24 24" aria-hidden="true">${PIPS[n].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.4"/>`).join('')}</svg>`;
 const tileFaces = ([a, b]: Tile) => `${half(a)}<span class="dom-bar"></span>${half(b)}`;
+/** Face-down tiles, one tiny upright tile each, so a count reads at a glance. */
+const backs = (n: number) =>
+  `<span class="dom-backs" role="img" aria-label="${n} tile${n === 1 ? '' : 's'}">${'<span class="dom-back"></span>'.repeat(n)}</span>`;
 const key = ([a, b]: Tile) => `${a}-${b}`;
 
 /** What a turn just did, for the recent moves list; null if nobody moved. */
@@ -51,8 +54,8 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Computer</small><b data-score="1"></b></div>
       </div>
       <div class="board-frame dom-table" data-board></div>
-      ${RECENT_HTML}
       <p class="status-line" data-status aria-live="polite"></p>
+      ${RECENT_HTML}
       <div class="controls">
         <div class="dom-actions" data-actions></div>
       </div>
@@ -104,10 +107,13 @@ export function mount(container: HTMLElement): () => void {
       })
       .join('');
     const theirs = state.phase === 'playing'
-      ? `<span class="dom-count">${state.hands[1].length} tiles</span>`
+      ? backs(state.hands[1].length)
       : state.hands[1].map((t) => `<span class="dom-tile small" role="img" aria-label="${t[0]} and ${t[1]}">${tileFaces(t)}</span>`).join('');
     boardEl.innerHTML = `
-      <div class="dom-row"><span>Computer</span>${theirs}<span class="dom-count">Boneyard ${state.boneyard.length}</span></div>
+      <div class="dom-counts">
+        <div class="dom-row"><span class="dom-label">Computer</span>${theirs}</div>
+        <div class="dom-row"><span class="dom-label">Boneyard</span>${state.boneyard.length ? backs(state.boneyard.length) : '<span class="dom-count">Empty</span>'}</div>
+      </div>
       <div class="dom-line" aria-label="Line of play">${line}</div>
       <div class="dom-hand" aria-label="Your tiles">${hand}</div>`;
     container.querySelectorAll<HTMLElement>('[data-score]').forEach((el, p) => (el.textContent = String(state.scores[p])));

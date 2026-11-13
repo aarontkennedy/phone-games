@@ -60,7 +60,7 @@ describe('Reversi screen', () => {
   it('shows the result and the rounds won, then a new round', () => {
     const won = setup({ ...newGame(), board: board(['.xo.....', ...empty]) });
     won.sq(0, 0).click();
-    expect(won.status()).toBe('You win! Rounds won: you 1, computer 0. Tap New for another round.');
+    expect(won.status()).toBe('You win! Rounds won: you 1, computer 0. Tap  for another round.');
     won.$('[data-new]').click();
     expect(won.stored()).toMatchObject({ starter: 1, turn: 1, result: null });
 

@@ -1,4 +1,5 @@
 import { cardBack, cardFace, cardSlot, suitSvg } from '../../core/card-view';
+import { showIcons } from '../../core/icons';
 import { SUITS, cardName, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
@@ -155,7 +156,7 @@ export function mount(container: HTMLElement): () => void {
   /** What Hint suggests, in words; the card (or the deck) is outlined on the board. */
   function showHint() {
     hint = findHint(state);
-    if (!hint) message = 'No moves left. Tap Undo to try another way, or New for a new deal.';
+    if (!hint) message = 'No moves left. Tap Undo to try another way, or {new} for a new deal.';
     else if ('draw' in hint) message = 'Turn over the deck: a card in it can be played.';
     else {
       const card = cardName(cardsAt(state, hint.src)[0]).toLowerCase(); // "queen of hearts"
@@ -251,8 +252,9 @@ export function mount(container: HTMLElement): () => void {
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} moves!${bestText}`
       : message ||
         (isStuck(state)
-          ? 'No moves left. Tap Undo to try another way, or New for a new deal.'
+          ? 'No moves left. Tap Undo to try another way, or {new} for a new deal.'
           : `Tap a card to move it. Tap the deck to turn cards over.${bestText}`);
+    showIcons(statusEl);
     markHint();
 
     if (state.won) showOverlay(boardEl, 'You win!', [['New game', () => newGame(state.draw)]]);

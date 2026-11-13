@@ -88,7 +88,7 @@ describe('Yacht screen', () => {
     box('chance').click();
     expect(load('yacht:best', 0)).toBe(29);
     expect($('.overlay h2').textContent).toBe('New best: 29!');
-    expect(status()).toBe('Game over. You scored 29. Tap New game to play again.');
+    expect(status()).toBe('Game over. You scored 29. Tap  to play again.');
     expect($<HTMLButtonElement>('[data-roll]').disabled).toBe(true);
     $<HTMLButtonElement>('.overlay .btn').click();
     expect(stored().scores.chance).toBeNull();

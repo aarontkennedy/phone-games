@@ -1,4 +1,5 @@
 import { load, save } from '../../core/storage';
+import { showIcons } from '../../core/icons';
 import { confirmNew, settingRow, settingsHtml } from '../../core/ui';
 import {
   LEVELS,
@@ -174,8 +175,9 @@ export function mount(container: HTMLElement): () => void {
       state.status === 'won'
         ? `Cleared in ${Math.floor(state.elapsed / 1000)}s!${bestText}`
         : lost
-          ? 'Boom! Tap New to try again.'
+          ? 'Boom! Tap {new} to try again.'
           : `Tap to dig. Long-press to flag.${bestText}`;
+    showIcons(statusEl);
   }
 
   // --- Input: tap to dig, long-press (or right-click) to flag ---
