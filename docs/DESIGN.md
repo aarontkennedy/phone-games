@@ -202,7 +202,8 @@ line, which mostly points at the board), then what just happened, then the butto
 - **Cleared** at a new game, round or hand (each screen's `start()`), so it's always about
   the play in front of you.
 - **The status line no longer repeats the last move;** it says what to do next.
-  It's in full text color and the moves are muted, so what to do now reads first.
+  It's in full text color and the moves are muted, so what to do now reads first. Both
+  are left-aligned, and the list has no box around it, so they read as one column of text.
 - **Steady:** the list's height comes from the screen's spare room, not from the moves, so
   the controls don't move as moves come in. Upright it's 1 to 4 lines tall (the card games
   leave little room on an iPhone 13, so the screen's gaps also tighten to `--space-2`);

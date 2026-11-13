@@ -685,7 +685,7 @@ body {
   margin: 0;
   color: var(--text);
   font-size: var(--text-sm);
-  text-align: center;
+  text-align: left;
 }
 
 /* Recent moves (src/core/recent.ts): the newest first, at the top, all in muted text so
@@ -701,11 +701,9 @@ body {
   max-height: calc(4 * var(--recent-line) + 2 * var(--space-1) + 2px);
   overflow-y: auto;
   margin: 0;
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-1) 0; /* no box: it lines up with the status line above */
   list-style: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
+  border: 1px solid transparent; /* kept, so the height rules above still add up */
   color: var(--muted);
   font-size: var(--text-sm);
   line-height: var(--recent-line);
