@@ -49,7 +49,7 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame cs-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="cs-actions" data-actions></div>
+        <div class="cs-actions actions" data-actions></div>
       </div>
     </div>${settingsHtml(levelSetting())}`;
 

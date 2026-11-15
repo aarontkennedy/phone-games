@@ -96,12 +96,6 @@ button.cs-sq:not(:disabled) {
   stroke: none;
 }
 
-.cs-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
 /* Promotion choices: a piece drawing on a light tile, so both colors read. */
 .cs-promo {
   width: var(--tap);

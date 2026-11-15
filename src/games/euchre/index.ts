@@ -56,7 +56,7 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="eu-bid" data-bidding></div>
+        <div class="eu-bid actions" data-bidding></div>
       </div>
     </div>${settingsHtml(levelSetting('Computer players'))}`;
 

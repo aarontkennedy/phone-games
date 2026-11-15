@@ -92,10 +92,6 @@
   outline-offset: 2px;
 }
 
-.ya-roll {
-  flex: 1;
-}
-
 .ya {
   --ya-edge: #6e6690;
 }

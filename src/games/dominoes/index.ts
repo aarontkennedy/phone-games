@@ -57,7 +57,7 @@ export function mount(container: HTMLElement): () => void {
       <p class="status-line" data-status aria-live="polite"></p>
       ${RECENT_HTML}
       <div class="controls">
-        <div class="dom-actions" data-actions></div>
+        <div class="dom-actions actions" data-actions></div>
       </div>
     </div>${settingsHtml(levelSetting())}`;
 

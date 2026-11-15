@@ -161,6 +161,13 @@ Buttons shouldn't move while you play, because your thumb learns where they are.
   of their own above the buttons, kept at full height with no dice.
 - **Settings stay off the game screen** (see "Settings"), so the game's buttons have the
   row to themselves and never get squeezed by a switch beside them.
+- **Buttons share the row equally.** One button fills the width, two take half each,
+  and so on, so each is as big a target as the row allows. Put buttons straight in
+  `.controls`, or in a `.actions` row when the game redraws them each turn; both get
+  `flex: 1 1 0`. A row that can't fit its labels wraps, and each line shares its own
+  width. Small square pickers beside text buttons (Euchre's suits, Spades' − and +) keep
+  `flex: none`. The casino Bet and Chip switches keep their width and the button beside
+  them takes the rest.
 
 ### Settings
 

@@ -551,6 +551,22 @@ body {
   flex-wrap: wrap;
 }
 
+/* A game's row of action buttons (often redrawn each turn) fills the controls' width. */
+.actions {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Bottom buttons share their row equally, so each is as big a thumb target as it can be:
+   one button fills the row, two take half each, and so on. A row that can't fit its
+   labels wraps, and each line shares its own width. */
+.controls > .btn,
+.actions > .btn {
+  flex: 1 1 0;
+}
+
 .stat {
   flex: 1;
   padding: var(--space-1) var(--space-3);
@@ -576,7 +592,8 @@ body {
 .btn {
   min-height: var(--tap);
   padding: var(--space-2) var(--space-4);
-  border: 0;
+  /* Transparent, so filled and outlined buttons are the same size and share a row equally. */
+  border: 1px solid transparent;
   border-radius: var(--radius);
   background: var(--accent);
   color: var(--on-accent);

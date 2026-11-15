@@ -50,7 +50,7 @@ export function mount(container: HTMLElement): () => void {
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       <div class="controls">
-        <div class="spd-bid" data-bidding>
+        <div class="spd-bid actions" data-bidding>
           <button class="btn secondary" data-step="-1" aria-label="Bid fewer">−</button>
           <output class="spd-amount" data-amount aria-live="polite"></output>
           <button class="btn secondary" data-step="1" aria-label="Bid more">+</button>

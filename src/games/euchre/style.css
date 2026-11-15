@@ -42,7 +42,9 @@
   padding-inline: var(--space-2);
 }
 
-.eu-call {
+/* Suit choices stay square beside Alone and Pass, which share the rest of the row. */
+.eu-bid > .eu-call {
+  flex: none;
   width: var(--tap);
   padding: var(--space-2);
 }
