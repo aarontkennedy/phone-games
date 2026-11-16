@@ -124,12 +124,12 @@ button.dom-tile:disabled {
 }
 
 .dom {
-  --dom-edge: #6e6690;
+  --dom-edge: #5f7069;
   --dom-back: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   .dom {
-    --dom-edge: #a29fb8;
+    --dom-edge: #9fb2aa;
   }
 }

@@ -17,12 +17,17 @@ describe.each([
     ['muted', 'surface'],
     ['link', 'bg'],
     ['on-accent', 'accent'],
+    ['on-tint', 'tint'],
   ])('%s on %s meets WCAG AA (4.5:1)', (fg, bg) => {
     expect(contrast(t[fg], t[bg])).toBeGreaterThanOrEqual(4.5);
   });
 
   it('muted text on surface-2 (segmented control labels) meets 4.5:1', () => {
     expect(contrast(t.muted, t['surface-2'])).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it.each(['bg', 'surface', 'board'])('the highlight (picked or tappable) stands out on %s (3:1)', (bg) => {
+    expect(contrast(t.highlight, t[bg])).toBeGreaterThanOrEqual(3);
   });
 });
 

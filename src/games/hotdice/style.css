@@ -64,11 +64,11 @@
 }
 
 .hd {
-  --hd-edge: #6e6690;
+  --hd-edge: #5f7069;
 }
 
 @media (prefers-color-scheme: dark) {
   .hd {
-    --hd-edge: #a29fb8;
+    --hd-edge: #9fb2aa;
   }
 }

@@ -58,7 +58,7 @@
 }
 
 button.mc-pit:not(:disabled) {
-  border-color: var(--accent);
+  border-color: var(--highlight);
   border-width: 3px;
   cursor: pointer;
 }

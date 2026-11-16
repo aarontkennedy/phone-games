@@ -2,11 +2,11 @@
    Faces stay light in both themes, like real cards. Put .cards on the game's .screen. */
 .cards {
   --card-face: #ffffff;
-  --card-edge: #6e6690;
+  --card-edge: #5f7069;
   --card-red: #c62828;
-  --card-black: #1d1a2b;
+  --card-black: #15201c;
   --card-back: #5b4fd6;
-  --card-slot: #625d78;
+  --card-slot: #61746c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -14,9 +14,9 @@
     --card-face: #f4f1fb;
     --card-edge: #f4f1fb;
     --card-red: #c62828;
-    --card-black: #1d1a2b;
+    --card-black: #15201c;
     --card-back: #9d94ff;
-    --card-slot: #a29fb8;
+    --card-slot: #9fb2aa;
   }
 }
 
@@ -101,12 +101,12 @@ button.card {
 /* The card (or deck) a Hint suggests moving: dashed, so it's not mistaken for a pick. */
 .card.hint,
 .card-slot.hint {
-  outline: 3px dashed var(--accent);
+  outline: 3px dashed var(--highlight);
   outline-offset: 1px;
 }
 
 /* Highlights the card or pile the player picked. */
 .card.picked {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--highlight);
   outline-offset: 1px;
 }

@@ -114,14 +114,14 @@
   --cb-you: #5b4fd6;
   --cb-them: #9a4100;
   --cb-track: #f4f1fb;
-  --cb-hole: #7d7796;
+  --cb-hole: #7c9188;
 }
 
 @media (prefers-color-scheme: dark) {
   .cb {
     --cb-you: #9d94ff;
     --cb-them: #ffb347;
-    --cb-track: #221f33;
-    --cb-hole: #8a84a6;
+    --cb-track: #18211e;
+    --cb-hole: #89a197;
   }
 }

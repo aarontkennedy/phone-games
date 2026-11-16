@@ -60,7 +60,7 @@
 }
 
 .db-line.last::before {
-  background: var(--accent);
+  background: var(--highlight);
 }
 
 .db-box {
@@ -89,13 +89,13 @@
 .db {
   --db-you: #5b4fd6;
   --db-them: #9a4100;
-  --db-guide: #6e6690;
+  --db-guide: #5f7069;
 }
 
 @media (prefers-color-scheme: dark) {
   .db {
     --db-you: #9d94ff;
     --db-them: #ffb347;
-    --db-guide: #a29fb8;
+    --db-guide: #9fb2aa;
   }
 }

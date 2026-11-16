@@ -52,8 +52,10 @@
   gap: var(--space-1);
 }
 
+/* Keys, like a phone keyboard's: rounded squares, not the usual pill buttons. */
 .hm-keys .btn {
   padding: 0;
+  border-radius: var(--radius-sm);
 }
 
 .hm-keys .btn.hm-right {

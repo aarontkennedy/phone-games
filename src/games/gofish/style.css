@@ -2,5 +2,5 @@
 /* With a card picked, the players you can ask are buttons: tap one to ask. */
 .gf-target {
   cursor: pointer;
-  border: 2px dashed var(--accent);
+  border: 2px dashed var(--highlight);
 }

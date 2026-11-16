@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#f6f4fb" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#15131f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f3f5f4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e1312" media="(prefers-color-scheme: dark)" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -12,6 +12,18 @@
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" href="icons/icon-192.png" />
     <title>Phone Games</title>
+    <script>
+      // The Appearance choice (Settings), applied before anything draws so the screen
+      // never flashes the wrong colors. Same key and values as src/core/theme.ts.
+      try {
+        var choice = JSON.parse(localStorage.getItem('pg:appearance'));
+        if (choice === 'light' || choice === 'dark') {
+          document.documentElement.dataset.theme = choice;
+          var bar = choice === 'dark' ? '#0e1312' : '#f3f5f4';
+          document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) { m.content = bar; });
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <noscript><p style="font: 20px/1.4 system-ui, sans-serif; padding: 16px">Games needs JavaScript. Turn it on in your browser’s settings, then reload this page.</p></noscript>

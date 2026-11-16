@@ -28,7 +28,7 @@
 
 /* The hand you're playing now. Also named in the label ("Hand 1"), not by color alone. */
 .bj-hand.active {
-  border-color: var(--accent);
+  border-color: var(--highlight);
 }
 
 .bj-label {

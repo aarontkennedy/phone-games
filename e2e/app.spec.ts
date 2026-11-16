@@ -142,6 +142,6 @@ for (const scheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme: scheme });
     await page.goto('./');
     const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    expect(bg).toBe(scheme === 'light' ? 'rgb(246, 244, 251)' : 'rgb(21, 19, 31)');
+    expect(bg).toBe(scheme === 'light' ? 'rgb(243, 245, 244)' : 'rgb(14, 19, 18)');
   });
 }

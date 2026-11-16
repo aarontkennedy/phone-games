@@ -27,7 +27,7 @@
 
 /* Whose turn it is. The status line also says it in words. */
 .tt-seat.turn {
-  border-color: var(--accent);
+  border-color: var(--highlight);
 }
 
 .tt-name {
@@ -65,7 +65,7 @@
 }
 
 .tt-hand .card.received {
-  outline: 3px dashed var(--accent);
+  outline: 3px dashed var(--highlight);
   outline-offset: -3px;
 }
 

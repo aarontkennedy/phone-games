@@ -334,6 +334,40 @@ describe('startApp', () => {
     });
   });
 
+  describe('app settings', () => {
+    afterEach(() => {
+      localStorage.clear();
+      delete document.documentElement.dataset.theme;
+    });
+
+    it('is linked from the home screen by a gear', () => {
+      const { root, stop } = setup([game('a', vi.fn())]);
+      const gear = root.querySelector('.topbar a[href="#/settings"]')!;
+      expect(gear.getAttribute('aria-label')).toBe('Settings');
+      expect(gear.querySelector('svg')).not.toBeNull();
+      stop();
+    });
+
+    it('chooses Automatic, Light or Dark, shows it at once and remembers it', async () => {
+      const { root, stop, go } = setup([game('a', vi.fn())]);
+      await go('#/settings');
+      expect(root.querySelector('h1')!.textContent).toBe('Settings');
+      expect(root.querySelector('.back')!.getAttribute('href')).toBe('#/');
+      const pick = (id: string) => root.querySelector<HTMLButtonElement>(`[data-appearance="${id}"]`)!;
+      const pressed = () => [...root.querySelectorAll('[aria-pressed="true"]')].map((b) => b.textContent);
+      expect(pressed()).toEqual(['Automatic']);
+      pick('dark').click();
+      expect(document.documentElement.dataset.theme).toBe('dark');
+      expect(pressed()).toEqual(['Dark']);
+      await go('#/');
+      await go('#/settings');
+      expect(pressed()).toEqual(['Dark']); // remembered
+      pick('auto').click();
+      expect(document.documentElement.dataset.theme).toBeUndefined();
+      stop();
+    });
+  });
+
   it('opens the game in the URL on startup', async () => {
     history.replaceState(null, '', '#/a');
     const mount = vi.fn(() => () => {});

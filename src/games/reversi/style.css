@@ -53,8 +53,8 @@
 
 /* The board looks the same in light and dark mode. */
 .rv {
-  --rv-square: #4a4560;
-  --rv-line: #2b283a;
+  --rv-square: #3d4d47;
+  --rv-line: #2b3732;
   --rv-mark: #f4f1fb;
   --rv-you: #9d94ff;
   --rv-computer: #ffb347;

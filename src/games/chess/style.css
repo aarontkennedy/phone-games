@@ -110,11 +110,11 @@ button.cs-sq:not(:disabled) {
 
 /* The board looks the same in light and dark mode. */
 .cs {
-  --cs-light: #e9e4f5;
-  --cs-dark: #6f66a8;
+  --cs-light: #eaf0ec;
+  --cs-dark: #557d6c;
   --cs-last-light: #f2d98a;
   --cs-last-dark: #8f7a2e;
   --cs-check: #e05050;
   --cs-white: #ffffff;
-  --cs-edge: #1f1b2e;
+  --cs-edge: #1e2b26;
 }

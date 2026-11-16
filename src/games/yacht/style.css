@@ -38,7 +38,7 @@
 }
 
 .ya-box.open {
-  border: 2px solid var(--accent);
+  border: 2px solid var(--highlight);
   cursor: pointer;
 }
 
@@ -93,11 +93,11 @@
 }
 
 .ya {
-  --ya-edge: #6e6690;
+  --ya-edge: #5f7069;
 }
 
 @media (prefers-color-scheme: dark) {
   .ya {
-    --ya-edge: #a29fb8;
+    --ya-edge: #9fb2aa;
   }
 }

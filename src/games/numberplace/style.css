@@ -65,8 +65,10 @@
   flex: 1 1 100%;
 }
 
+/* Keys, like a phone keyboard's: rounded squares, not the usual pill buttons. */
 .np-pad .btn {
   padding-inline: 0;
+  border-radius: var(--radius-sm);
 }
 
 /* Erase is a backspace key, like a phone keyboard's, so it fits the narrowest pad. */
@@ -95,13 +97,13 @@
 .np {
   --np-mine: #4a3fc0;
   --np-clash: #b3141b;
-  --np-same: #e6e1f5;
+  --np-same: #dbe8e3;
 }
 
 @media (prefers-color-scheme: dark) {
   .np {
     --np-mine: #b3acff;
     --np-clash: #ff8a80;
-    --np-same: #34304a;
+    --np-same: #2d3d36;
   }
 }

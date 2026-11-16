@@ -47,9 +47,9 @@ and number colors) live in the game's own CSS, defined for both themes.
 
 | Group | Tokens |
 |---|---|
-| Color | `--bg --surface --surface-2 --border --text --muted --accent --on-accent --link --danger --danger-soft --board --cell-empty --scrim` |
+| Color | `--bg --surface --surface-2 --border --text --muted --accent --on-accent --tint --on-tint --highlight --link --danger --danger-soft --board --cell-empty --scrim` |
 | Spacing (4px scale) | `--space-1` (4) `--space-2` (8) `--space-3` (12) `--space-4` (16) `--space-5` (24) `--space-6` (32) |
-| Radius | `--radius-sm` (6) `--radius` (10) `--radius-lg` (16) |
+| Radius | `--radius-sm` (6) `--radius` (14) `--radius-lg` (20) `--radius-pill` (buttons, switches) |
 | Type | `--text-sm` (18) `--text-md` (20, body) `--text-lg` (22) `--text-xl` (28) `--text-2xl` (36) |
 | Layout | `--tap` (44px touch target), `--content-max` (480px) |
 | Motion | `--dur` (150ms) |
@@ -75,7 +75,34 @@ The player needs reading glasses for small text, so this app never uses it.
 
 ## Theme
 
-- Light and dark follow the phone's setting (`prefers-color-scheme`).
+The look is "card table": cool, slightly green greys with a deep felt green accent
+(a brighter mint in dark mode). Modern and flat:
+
+- **No outlines.** Things are set apart by fill color and space, not 1px borders.
+- **Buttons are pills.** The main action is filled with `--accent`; the others use the soft
+  `--tint` wash with `--on-tint` text. Keypads (Number Place, Hangman) use rounded squares.
+- **Switches** (`.segmented`) are a pill track; the chosen option is filled with the accent.
+- **Stats are bare numbers** under a quiet label, with no boxes.
+- **Top bar icons** (New game, Settings, Rules, Share, About) are round `--tint` buttons;
+  the back arrow stays bare.
+- **Home tiles** have no outline; the game's drawing sits on a soft rounded square.
+- **`--highlight`** (amber) marks what you picked or can tap on a board: selected cards,
+  move targets, the last line drawn. It's kept apart from the green accent so it shows on
+  green felt, dark squares and white cards alike. Filled badges (dealer button, the point
+  in Craps) use `--accent` with `--on-accent`.
+
+Light and dark:
+
+- **Automatic** follows the phone (`prefers-color-scheme`). The player can choose Light or
+  Dark instead in the app's Settings (the gear on the home screen, `#/settings`,
+  src/core/theme.ts), saved as `pg:appearance`.
+- **How the choice works:** write dark colors the plain way, in
+  `@media (prefers-color-scheme: dark) { ... }` blocks. At build time
+  scripts/theme-choice.mjs (a PostCSS plugin in vite.config.ts) guards each block with
+  `:root:not([data-theme='light'])` and copies it under `:root[data-theme='dark']`, so
+  the choice on `<html>` wins either way. Don't write `[data-theme]` selectors by hand.
+- **No flash:** index.html applies a saved choice before anything draws, and sets the
+  browser bar color (`theme-color`) to match.
 - Every themed color token has a dark value. `src/design.test.ts` enforces this.
 
 ## Screen layout

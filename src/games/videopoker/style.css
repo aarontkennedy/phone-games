@@ -49,7 +49,7 @@
 /* A held card sits higher with an outline; "Held" under it says so in words. */
 .vp-slot > .card.held {
   transform: translateY(-6px);
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--highlight);
   outline-offset: -3px;
 }
 

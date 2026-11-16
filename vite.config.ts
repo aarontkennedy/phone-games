@@ -1,10 +1,13 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { themeChoice } from './scripts/theme-choice.mjs';
 
 export default defineConfig({
   // Relative base so the build works at any path (e.g. username.github.io/phone-games/).
   base: './',
   server: { host: true }, // reachable from your phone on the same Wi-Fi
+  // Dark blocks also follow the Appearance choice in Settings (scripts/theme-choice.mjs).
+  css: { postcss: { plugins: [themeChoice()] } },
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
@@ -13,8 +16,8 @@ export default defineConfig({
         name: 'Phone Games',
         short_name: 'Games',
         description: 'Offline games. No ads, no accounts.',
-        theme_color: '#15131f',
-        background_color: '#15131f',
+        theme_color: '#0e1312',
+        background_color: '#0e1312',
         display: 'standalone',
         orientation: 'any', // landscape has its own layout (docs/DESIGN.md)
         start_url: './',

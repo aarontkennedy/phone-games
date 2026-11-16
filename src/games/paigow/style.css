@@ -44,7 +44,7 @@
 
 .pg-slot > .card.picked {
   transform: translateY(-6px);
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--highlight);
   outline-offset: -3px;
 }
 

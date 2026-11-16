@@ -1,7 +1,8 @@
 import { mountAbout } from './about';
 import { storageWorks } from './core/storage';
 import { BACK_ICON, GEAR_ICON, INFO_ICON, NEW_ICON } from './core/icons';
-import { closeConfirm } from './core/ui';
+import { closeConfirm, settingRow } from './core/ui';
+import { getAppearance, setAppearance, type Appearance } from './core/theme';
 import { reportProblem } from './report';
 import { openShareSheet, shareLinks } from './share';
 import { CATEGORIES, type GameMeta } from './core/game';
@@ -125,8 +126,8 @@ function moveNewToTopBar(root: HTMLElement, btn: HTMLButtonElement): void {
 }
 
 /**
- * Hash router: `#/` shows the game list, `#/about` the About page, and `#/<id>` opens a
- * game. Returns a stop function.
+ * Hash router: `#/` shows the game list, `#/about` the About page, `#/settings` the
+ * app's settings (Appearance), and `#/<id>` opens a game. Returns a stop function.
  */
 export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
   let cleanup: (() => void) | null = null;
@@ -138,6 +139,7 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
       <header class="topbar">
         <h1>Games</h1>
         <button class="top-action top-icon" data-share aria-label="Share" aria-expanded="false">${SHARE_ICON}</button>
+        <a class="top-action top-icon" href="#/settings" aria-label="Settings">${GEAR_ICON}</a>
         <a class="top-action top-icon" href="#/about" aria-label="About">${INFO_ICON}</a>
       </header>
       <div class="share-menu" data-share-menu hidden>
@@ -164,6 +166,28 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
     mountAbout(root.querySelector<HTMLElement>('.about')!);
   }
 
+  function renderSettings() {
+    const choices: [Appearance, string][] = [['auto', 'Automatic'], ['light', 'Light'], ['dark', 'Dark']];
+    const now = getAppearance();
+    root.innerHTML = `
+      <header class="topbar sub">
+        <a class="back top-icon" href="#/" aria-label="Back to games">${BACK_ICON}</a>
+        <h1>Settings</h1>
+      </header>
+      <main class="app-settings settings-rows">${settingRow(
+        'Appearance',
+        choices.map(([id, label]) => `<button data-appearance="${id}" aria-pressed="${id === now}">${label}</button>`).join(''),
+        'Automatic follows your phone’s light or dark mode.',
+      )}</main>`;
+    const buttons = root.querySelectorAll<HTMLButtonElement>('[data-appearance]');
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        setAppearance(btn.dataset.appearance as Appearance);
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+      }),
+    );
+  }
+
   async function route() {
     const current = ++navigation;
     closeConfirm(); // a pending "Start a new game?" belongs to the game being left
@@ -173,6 +197,10 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
     const id = location.hash.replace(/^#\/?/, '');
     if (id === 'about') {
       renderAbout();
+      return;
+    }
+    if (id === 'settings') {
+      renderSettings();
       return;
     }
     const meta = games.find((g) => g.id === id);

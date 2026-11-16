@@ -3,21 +3,25 @@
 :root {
   color-scheme: light dark;
 
-  /* Color: light theme (default) */
-  --bg: #f6f4fb;
+  /* Color: light theme (default). "Card table": cool green-tinted greys and a deep felt
+     green (docs/DESIGN.md, "Color"). */
+  --bg: #f3f5f4;
   --surface: #ffffff;
-  --surface-2: #ebe7f5;
-  --border: #ddd7ec;
-  --text: #1d1a2b;
-  --muted: #5c5772;
-  --accent: #f2a65a;
-  --on-accent: #2b1a0c;
-  --link: #a14a0b;
+  --surface-2: #e3ebe8;
+  --border: #d3dfda;
+  --text: #15201c;
+  --muted: #52615b;
+  --accent: #1d6b55; /* filled buttons, chosen options */
+  --on-accent: #ffffff;
+  --tint: #dbe8e3; /* second buttons and top bar icons: a soft wash of the accent */
+  --on-tint: #134536;
+  --highlight: #c4610a; /* what you picked or can tap on a board: a bright marker color */
+  --link: #1a6450;
   --danger: #d64541;
   --danger-soft: #f3c4c2;
-  --board: #d9d3ea;
-  --cell-empty: rgba(29, 26, 43, 0.07);
-  --scrim: rgba(246, 244, 251, 0.85);
+  --board: #dce5e1;
+  --cell-empty: rgba(21, 32, 28, 0.07);
+  --scrim: rgba(243, 245, 244, 0.85);
   --tile-ink-dark: #2a2238;
   --tile-ink-light: #ffffff;
 
@@ -31,8 +35,9 @@
 
   /* Shape */
   --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 16px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px; /* buttons and switches */
 
   /* Type */
   --font: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -51,21 +56,34 @@
   font-family: var(--font);
 }
 
+/* Dark theme: follows the phone, or the player's choice in Settings (src/core/theme.ts
+   sets data-theme on <html>; vite.config.ts copies every dark block for that). */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #15131f;
-    --surface: #221f33;
-    --surface-2: #2e2a45;
-    --border: #3a3550;
-    --text: #f3f1fa;
-    --muted: #a29fb8;
-    --link: #f2b179;
+    color-scheme: dark;
+    --bg: #0e1312;
+    --surface: #18211e;
+    --surface-2: #22302b;
+    --border: #2f3f39;
+    --text: #eef4f1;
+    --muted: #9fb2aa;
+    --accent: #5cc4a3;
+    --on-accent: #05241a;
+    --tint: #1f3029;
+    --on-tint: #bfeadb;
+    --highlight: #f2a65a;
+    --link: #6fd0b0;
     --danger: #e0524d;
     --danger-soft: #5a2a3a;
-    --board: #3a3550;
+    --board: #22302b;
     --cell-empty: rgba(255, 255, 255, 0.06);
-    --scrim: rgba(21, 19, 31, 0.82);
+    --scrim: rgba(14, 19, 18, 0.82);
   }
+}
+
+/* A light choice in Settings wins over a dark phone. */
+:root[data-theme='light'] {
+  color-scheme: light;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -161,11 +179,22 @@ body {
   cursor: pointer;
 }
 
-/* An icon-only top bar action (Share, About), named by its aria-label. */
+/* An icon-only top bar action (Share, About), named by its aria-label: a round button
+   in the soft accent wash. The back arrow stays bare. */
 .top-icon {
   justify-content: center;
   min-width: var(--tap);
   padding: 0;
+}
+
+.top-action.top-icon {
+  border-radius: var(--radius-pill);
+  background: var(--tint);
+  color: var(--on-tint);
+}
+
+.top-action.top-icon:active {
+  transform: scale(0.94);
 }
 
 .top-icon svg {
@@ -445,6 +474,13 @@ body {
   padding: 0 var(--space-4) var(--space-6);
 }
 
+/* The app's own settings (#/settings), from the gear on the home screen. */
+.app-settings {
+  width: min(100%, var(--content-max));
+  margin-inline: auto;
+  padding: var(--space-2) var(--space-4) var(--space-6);
+}
+
 .home {
   padding: var(--space-2) var(--space-4) var(--space-5);
 }
@@ -463,9 +499,13 @@ body {
   margin-top: var(--space-5);
 }
 
+/* Group names are quiet labels, so the games stand out. */
 .home-group h2 {
   margin: 0 0 var(--space-2);
-  font-size: var(--text-lg);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .home-grid {
@@ -482,12 +522,22 @@ body {
   padding: var(--space-3);
   border-radius: var(--radius-lg);
   background: var(--surface);
-  border: 1px solid var(--border);
   color: inherit;
   text-decoration: none;
+  transition: transform var(--dur) ease;
 }
 
 .game-card:active {
+  transform: scale(0.97);
+}
+
+/* The game's drawing on a soft rounded square, like an app icon. */
+.game-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius);
   background: var(--surface-2);
 }
 
@@ -567,12 +617,10 @@ body {
   flex: 1 1 0;
 }
 
+/* A stat is a bare number under a quiet label: no box, so the numbers read first. */
 .stat {
   flex: 1;
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  padding: var(--space-1) 0;
   text-align: center;
 }
 
@@ -580,8 +628,6 @@ body {
   display: block;
   color: var(--muted);
   font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .stat b {
@@ -592,9 +638,9 @@ body {
 .btn {
   min-height: var(--tap);
   padding: var(--space-2) var(--space-4);
-  /* Transparent, so filled and outlined buttons are the same size and share a row equally. */
+  /* Transparent, so every kind of button is the same size and they share a row equally. */
   border: 1px solid transparent;
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
   background: var(--accent);
   color: var(--on-accent);
   font: inherit;
@@ -603,19 +649,22 @@ body {
 }
 
 .btn:active {
-  opacity: 0.85;
+  transform: scale(0.97);
 }
 
+.btn {
+  transition: transform var(--dur) ease;
+}
+
+/* The second kind of button: a soft wash of the accent, not an outline. */
 .btn.secondary {
-  background: var(--surface);
-  color: var(--text);
-  border: 1px solid var(--border);
+  background: var(--tint);
+  color: var(--on-tint);
 }
 
 .btn.secondary[aria-pressed='true'] {
   background: var(--accent);
   color: var(--on-accent);
-  border-color: transparent;
 }
 
 /* A row of mutually exclusive options. Mark the chosen one with aria-pressed="true". */
@@ -623,7 +672,7 @@ body {
   flex: 1;
   display: flex;
   padding: 3px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-pill);
   background: var(--surface-2);
 }
 
@@ -632,7 +681,7 @@ body {
   min-height: calc(var(--tap) - 6px);
   padding: var(--space-1);
   border: 0;
-  border-radius: calc(var(--radius) - 3px);
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--muted);
   font: inherit;
@@ -640,8 +689,8 @@ body {
 }
 
 .segmented button[aria-pressed='true'] {
-  background: var(--surface);
-  color: var(--text);
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 /* The playing surface. Positioned so an .overlay can cover it. */

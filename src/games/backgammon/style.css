@@ -65,7 +65,7 @@
   place-items: center;
   aspect-ratio: 1;
   border-radius: 50%;
-  color: #1d1a2b;
+  color: #15201c;
   font-size: var(--text-sm);
   font-weight: 700;
   line-height: 1;
@@ -86,7 +86,7 @@
 }
 
 .bg-board .selected {
-  outline: 3px solid var(--accent);
+  outline: 3px solid var(--highlight);
   outline-offset: -3px;
 }
 
@@ -139,9 +139,9 @@
 
 /* The board looks the same in light and dark mode. */
 .bg {
-  --bg-felt: #2b283a;
-  --bg-point-a: #6e6690;
-  --bg-point-b: #3d3852;
+  --bg-felt: #2b3732;
+  --bg-point-a: #5f7069;
+  --bg-point-b: #3c4e46;
   --bg-you: #c9c3ff;
   --bg-them: #ffbe5c;
   --bg-mark: #f4f1fb;

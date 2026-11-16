@@ -1,5 +1,5 @@
 .ms {
-  --ms-hidden: #b9b0d8;
+  --ms-hidden: #b6d2c6;
   --ms-open: #f4f1fb;
   --ms-n1: #1f5fd1;
   --ms-n2: #23803a;
@@ -7,16 +7,16 @@
   --ms-n4: #6a3fc0;
   --ms-n5: #a35200;
   --ms-n6: #00777a;
-  --ms-n7: #1d1a2b;
-  --ms-n8: #625d78;
+  --ms-n7: #15201c;
+  --ms-n8: #61746c;
   --ms-flag: #b3141b;
   --ms-flag-edge: #b3141b; /* deep enough red that no edge is needed */
 }
 
 @media (prefers-color-scheme: dark) {
   .ms {
-    --ms-hidden: #6a6390;
-    --ms-open: #2a263d;
+    --ms-hidden: #6a897c;
+    --ms-open: #293a33;
     --ms-n1: #6fa8ff;
     --ms-n2: #6cd17a;
     --ms-n3: #ff7070;
@@ -24,7 +24,7 @@
     --ms-n5: #ffb347;
     --ms-n6: #4fd6d6;
     --ms-n7: #f3f1fa;
-    --ms-n8: #a29fb8;
+    --ms-n8: #9fb2aa;
     --ms-flag: #ff5a4f;
     --ms-flag-edge: #f3f1fa; /* a light edge keeps the red flag 3:1 on the purple square */
   }

@@ -128,7 +128,7 @@
    is marked the same way until you bet again. */
 .rl-spot.bet,
 .rl-spot.won {
-  outline: 4px solid var(--accent);
+  outline: 4px solid var(--highlight);
   outline-offset: -4px;
 }
 
