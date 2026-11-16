@@ -68,14 +68,9 @@
   gap: var(--space-2);
 }
 
-.bj {
-  --bj-won: #17692c;
-}
-
-@media (prefers-color-scheme: dark) {
-  .bj {
-    --bj-won: #6cd17a;
-  }
+/* A win on the green felt: pale green (the result says it in words too). */
+.bj .board-frame {
+  --bj-won: #b8f5c2;
 }
 
 /* The label row of a hand; the dealer's also shows the decks, on the right. */

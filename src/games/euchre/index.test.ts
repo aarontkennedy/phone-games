@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import css from './style.css?raw';
 import appCss from '../../style.css?raw';
+import cardsCss from '../../core/cards.css?raw';
 import { load, save } from '../../core/storage';
-import { contrast, themes } from '../../test/contrast';
+import { contrast, readVars, themes } from '../../test/contrast';
 import { makeContainer, track, answerNewGame } from '../../test/helpers';
 import { AI_DELAY, TRICK_PAUSE, mount } from './index';
 import type { HandResult, State } from './logic';
@@ -194,12 +195,14 @@ describe('Euchre screen', () => {
 describe('Euchre colors', () => {
   const eu = themes(css, '.eu');
   const app = themes(appCss, ':root');
+  const felt = themes(cardsCss, '.cards .board-frame');
+  const onFelt = readVars(css, /\n\.eu \.board-frame\s*{([^}]*)}/)['eu-red'];
   it.each([
-    ['light', eu.light, app.light],
-    ['dark', eu.dark, app.dark],
-  ])('red suit shapes stand out in the %s theme (3:1)', (_name, t, a) => {
-    expect(contrast(t['eu-red'], a.board)).toBeGreaterThanOrEqual(3);
-    expect(contrast(t['eu-red'], a.surface)).toBeGreaterThanOrEqual(3);
-    expect(contrast(a.text, a.surface)).toBeGreaterThanOrEqual(3);
+    ['light', eu.light, app.light, felt.light],
+    ['dark', eu.dark, app.dark, felt.dark],
+  ])('red suit shapes stand out in the %s theme (3:1)', (_name, t, a, f) => {
+    expect(contrast(t['eu-red'], a.tint), 'suit buttons').toBeGreaterThanOrEqual(3);
+    expect(contrast(onFelt, f.board), 'trump, on the felt').toBeGreaterThanOrEqual(3);
+    expect(contrast(onFelt, f.surface), 'trump, on a panel on the felt').toBeGreaterThanOrEqual(3);
   });
 });

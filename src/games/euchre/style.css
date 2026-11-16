@@ -58,3 +58,8 @@
     --eu-red: #ff7070;
   }
 }
+
+/* On the green felt, a light red. */
+.eu .board-frame {
+  --eu-red: #ffa69e;
+}

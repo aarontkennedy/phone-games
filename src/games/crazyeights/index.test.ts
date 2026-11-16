@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import css from './style.css?raw';
 import appCss from '../../style.css?raw';
+import cardsCss from '../../core/cards.css?raw';
 import { load, save } from '../../core/storage';
-import { contrast, themes } from '../../test/contrast';
+import { contrast, readVars, themes } from '../../test/contrast';
 import { makeContainer, track } from '../../test/helpers';
 import { AI_DELAY, mount } from './index';
 import type { State } from './logic';
@@ -146,11 +147,13 @@ describe('Crazy eights screen', () => {
 describe('Crazy eights colors', () => {
   const t = themes(css, '.ce');
   const app = themes(appCss, ':root');
+  const felt = themes(cardsCss, '.cards .board-frame');
+  const onFelt = readVars(css, /\n\.ce \.board-frame\s*{([^}]*)}/)['ce-red'];
   it.each([
-    ['light', t.light, app.light],
-    ['dark', t.dark, app.dark],
-  ])('red suit shapes stand out in the %s theme (3:1)', (_n, c, a) => {
-    expect(contrast(c['ce-red'], a.board)).toBeGreaterThanOrEqual(3);
-    expect(contrast(c['ce-red'], a.surface)).toBeGreaterThanOrEqual(3);
+    ['light', t.light, app.light, felt.light],
+    ['dark', t.dark, app.dark, felt.dark],
+  ])('red suit shapes stand out in the %s theme (3:1)', (_n, c, a, f) => {
+    expect(contrast(c['ce-red'], a.tint), 'suit buttons').toBeGreaterThanOrEqual(3);
+    expect(contrast(onFelt, f.board), 'the suit to follow, on the felt').toBeGreaterThanOrEqual(3);
   });
 });

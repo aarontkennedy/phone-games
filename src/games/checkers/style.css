@@ -66,7 +66,7 @@ button.ck-sq:not(:disabled) {
 /* The board looks the same in light and dark mode. */
 .ck {
   --ck-dark: #3d4d47;
-  --ck-light: #f4f1fb;
+  --ck-light: #f4f7f6;
   --ck-you: #9d94ff;
   --ck-computer: #ffb347;
 }

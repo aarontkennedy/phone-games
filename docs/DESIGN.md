@@ -292,13 +292,21 @@ everywhere.
   spoken name ("Queen of hearts"). Put the `cards` class on the game's `.screen` for the
   card color tokens.
 - **Look:** flat, light card faces in both themes (like real cards), a 1px solid edge,
-  a solid purple back, and our own simple suit shapes. No pictures on court cards: the
-  rank letter and suit say it all.
+  a solid red back inside a light edge, and our own simple suit shapes. No pictures on
+  court cards: the rank letter and suit say it all.
+- **Green felt table:** a card game's `.board-frame` is green felt in both themes
+  (`.cards .board-frame` in `src/core/cards.css`). That block redefines the shared tokens
+  for everything on the table: white `--text`, light `--muted`, darker green `--surface`
+  panels, a white `--accent` badge, a brighter `--highlight` and a green `--scrim`. Use
+  those tokens on the table and it reads automatically. A game color drawn on the table
+  needs its own felt value (Crazy Eights' and Euchre's red suits, Blackjack's win color).
 - **Readable:** the corner rank is `--text-md` (20px). When cards overlap, at least
   24px of each card must show so the rank stays readable. Squeeze overlaps to fit the
   screen, but never below that.
-- **Contrast:** card text 4.5:1 on the face. Card edges, backs and empty-pile outlines
-  3:1 against the table. Tested in `src/core/card-view.test.ts`.
+- **Contrast:** card text 4.5:1 on the face; faces and empty-pile outlines 3:1 against
+  the felt; the edge between overlapping cards and a back inside its edge 3:1 against the
+  face; text, panels and the highlight on the felt as anywhere else. Tested in
+  `src/core/card-view.test.ts`.
 - **Tap to move:** tapping a card moves it to the best legal place. No dragging is
   needed. If it can't move, the status line says so.
 - **Undo** wherever a game has no hidden information to protect (Solitaire).

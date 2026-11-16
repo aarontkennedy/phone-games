@@ -43,6 +43,11 @@
   }
 }
 
+/* On the green felt, a light red. */
+.ce .board-frame {
+  --ce-red: #ffa69e;
+}
+
 /* Sideways, the extra deck row would push the table past the screen: smaller pile cards,
    and smaller cards in the seats, so a two-row hand still fits on the smallest phones. */
 @media (orientation: landscape) and (max-height: 560px) {

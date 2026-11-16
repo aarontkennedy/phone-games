@@ -5,18 +5,52 @@
   --card-edge: #5f7069;
   --card-red: #c62828;
   --card-black: #15201c;
-  --card-back: #5b4fd6;
+  --card-back: #b4473a;
   --card-slot: #61746c;
 }
 
 @media (prefers-color-scheme: dark) {
   .cards {
-    --card-face: #f4f1fb;
-    --card-edge: #f4f1fb;
+    --card-face: #f4f7f6;
+    --card-edge: #5f7069;
     --card-red: #c62828;
     --card-black: #15201c;
-    --card-back: #9d94ff;
+    --card-back: #b4473a;
     --card-slot: #9fb2aa;
+  }
+}
+
+/* The card table: green felt in both themes, like a real one. Everything drawn on it
+   reads from these local tokens, so text is light, panels are a darker green, and the
+   highlight is a brighter amber that shows on green (docs/DESIGN.md, "Playing cards"). */
+.cards .board-frame {
+  --board: #2a6a54;
+  --text: #ffffff;
+  --muted: #d3e8df;
+  --surface: #215846;
+  --surface-2: #1c4d3d;
+  --border: #4a8670;
+  --accent: #ffffff;
+  --on-accent: #1c4d3d;
+  --tint: #1c4d3d;
+  --on-tint: #ffffff;
+  --highlight: #ffc266;
+  --scrim: rgba(28, 77, 61, 0.92);
+  --card-slot: #a9cfc0;
+  color: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+  .cards .board-frame {
+    --board: #18473a;
+    --muted: #b9d8cb;
+    --surface: #12382d;
+    --surface-2: #0f3127;
+    --border: #2f6655;
+    --on-accent: #12382d;
+    --tint: #12382d;
+    --scrim: rgba(15, 49, 39, 0.92);
+    --card-slot: #8fbcaa;
   }
 }
 

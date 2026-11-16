@@ -65,14 +65,32 @@ describe('card colors', () => {
   const cards = themes(css, '.cards');
   const app = themes(appCss, ':root');
 
+  const felt = themes(css, '.cards .board-frame');
+  const table = (n: 'light' | 'dark') => ({ ...app[n], ...cards[n], ...felt[n] });
+
   it.each([
-    ['light', cards.light, app.light],
-    ['dark', cards.dark, app.dark],
-  ])('meet contrast in the %s theme', (_name, c, a) => {
-    expect(contrast(c['card-red'], c['card-face']), 'red rank on the face').toBeGreaterThanOrEqual(4.5);
-    expect(contrast(c['card-black'], c['card-face']), 'black rank on the face').toBeGreaterThanOrEqual(4.5);
-    expect(contrast(c['card-edge'], a.board), 'card edge on the table').toBeGreaterThanOrEqual(3);
-    expect(contrast(c['card-back'], a.board), 'card back on the table').toBeGreaterThanOrEqual(3);
-    expect(contrast(c['card-slot'], a.board), 'empty pile outline on the table').toBeGreaterThanOrEqual(3);
+    ['light', table('light')],
+    ['dark', table('dark')],
+  ])('meet contrast on the green felt in the %s theme', (_name, t) => {
+    expect(contrast(t['card-red'], t['card-face']), 'red rank on the face').toBeGreaterThanOrEqual(4.5);
+    expect(contrast(t['card-black'], t['card-face']), 'black rank on the face').toBeGreaterThanOrEqual(4.5);
+    expect(contrast(t['card-face'], t.board), 'a card on the felt').toBeGreaterThanOrEqual(3);
+    expect(contrast(t['card-edge'], t['card-face']), 'the edge between overlapping cards').toBeGreaterThanOrEqual(3);
+    // A card back is outlined in the face color, which stands out on the felt (above).
+    expect(contrast(t['card-back'], t['card-face']), 'a card back inside its light edge').toBeGreaterThanOrEqual(3);
+    expect(contrast(t['card-slot'], t.board), 'empty pile outline on the felt').toBeGreaterThanOrEqual(3);
+  });
+
+  it.each([
+    ['light', table('light')],
+    ['dark', table('dark')],
+  ])('text, panels and marks on the felt meet contrast in the %s theme', (_name, t) => {
+    for (const bg of [t.board, t.surface, t['surface-2'], t.tint]) {
+      expect(contrast(t.text, bg), `text on ${bg}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(t.muted, bg), `muted text on ${bg}`).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(contrast(t['on-tint'], t.tint), 'second buttons on the felt').toBeGreaterThanOrEqual(4.5);
+    expect(contrast(t['on-accent'], t.accent), 'main buttons and badges on the felt').toBeGreaterThanOrEqual(4.5);
+    expect(contrast(t.highlight, t.board), 'what you picked, on the felt').toBeGreaterThanOrEqual(3);
   });
 });

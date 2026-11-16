@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import css from './style.css?raw';
-import appCss from '../../style.css?raw';
+import cardsCss from '../../core/cards.css?raw';
 import { load, save } from '../../core/storage';
-import { contrast, themes } from '../../test/contrast';
+import { contrast, readVars, themes } from '../../test/contrast';
 import { makeContainer, track } from '../../test/helpers';
 import { mount } from './index';
 import type { State } from './logic';
@@ -239,15 +239,15 @@ describe('Blackjack screen', () => {
 });
 
 describe('Blackjack colors', () => {
-  const bj = themes(css, '.bj');
-  const app = themes(appCss, ':root');
+  const felt = themes(cardsCss, '.cards .board-frame');
+  const won = readVars(css, /\n\.bj \.board-frame\s*{([^}]*)}/)['bj-won'];
 
   it.each([
-    ['light', bj.light, app.light],
-    ['dark', bj.dark, app.dark],
-  ])('table text is readable in the %s theme (4.5:1)', (_name, t, a) => {
-    expect(contrast(t['bj-won'], a.board), 'win amount').toBeGreaterThanOrEqual(4.5);
-    expect(contrast(a.muted, a.board), 'bet amount').toBeGreaterThanOrEqual(4.5);
-    expect(contrast(a.text, a.board), 'labels').toBeGreaterThanOrEqual(4.5);
+    ['light', felt.light],
+    ['dark', felt.dark],
+  ])('table text is readable on the felt in the %s theme (4.5:1)', (_name, f) => {
+    expect(contrast(won, f.board), 'win amount').toBeGreaterThanOrEqual(4.5);
+    expect(contrast(f.muted, f.board), 'bet amount').toBeGreaterThanOrEqual(4.5);
+    expect(contrast(f.text, f.board), 'labels').toBeGreaterThanOrEqual(4.5);
   });
 });
