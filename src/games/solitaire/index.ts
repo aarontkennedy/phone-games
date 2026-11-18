@@ -3,7 +3,7 @@ import { showIcons } from '../../core/icons';
 import { SUITS, cardName, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { showOverlay, hideOverlay, confirmNew, settingRow, settingsHtml } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, settingRow, settingsHtml, stuckText } from '../../core/ui';
 import {
   autoFinish,
   bestTarget,
@@ -155,8 +155,8 @@ export function mount(container: HTMLElement): () => void {
 
   /** What Hint suggests, in words; the card (or the deck) is outlined on the board. */
   function showHint() {
-    hint = findHint(state);
-    if (!hint) message = 'No moves left. Tap Undo to try another way, or {new} for a new deal.';
+    hint = findHint(state, history);
+    if (!hint) message = stuckText(isStuck(state));
     else if ('draw' in hint) message = 'Turn over the deck: a card in it can be played.';
     else {
       const card = cardName(cardsAt(state, hint.src)[0]).toLowerCase(); // "queen of hearts"
@@ -251,8 +251,8 @@ export function mount(container: HTMLElement): () => void {
     statusEl.textContent = state.won
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} moves!${bestText}`
       : message ||
-        (isStuck(state)
-          ? 'No moves left. Tap Undo to try another way, or {new} for a new deal.'
+        (isStuck(state, history)
+          ? stuckText(isStuck(state))
           : `Tap a card to move it. Tap the deck to turn cards over.${bestText}`);
     showIcons(statusEl);
     markHint();

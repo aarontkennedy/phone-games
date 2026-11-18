@@ -115,17 +115,25 @@ export function move(s: State, src: Source, tgt: Target): State | null {
  * that already starts its column moving to another empty column.
  */
 export function bestTarget(s: State, src: Source): Target | null {
-  if (isLegal(s, src, { to: 'foundation' })) return { to: 'foundation' };
+  return targets(s, src)[0] ?? null;
+}
+
+/** Every useful place for the cards at `src`, in bestTarget's order. */
+function targets(s: State, src: Source): Target[] {
+  const out: Target[] = isLegal(s, src, { to: 'foundation' }) ? [{ to: 'foundation' }] : [];
   const kingAlreadyAtBottom = src.from === 'tableau' && src.index === 0 && !s.tableau[src.col].down.length;
-  let empty: Target | null = null;
+  const empty: Target[] = [];
   for (let col = 0; col < COLUMNS; col++) {
     const tgt: Target = { to: 'tableau', col };
     if (!isLegal(s, src, tgt)) continue;
-    if (s.tableau[col].up.length) return tgt;
-    if (!kingAlreadyAtBottom) empty ??= tgt;
+    if (s.tableau[col].up.length) out.push(tgt);
+    else if (!kingAlreadyAtBottom) empty.push(tgt);
   }
-  return empty;
+  return [...out, ...empty];
 }
+
+/** A board position, ignoring the move count and clock. */
+const positionKey = (s: State): string => JSON.stringify([s.stock, s.waste, s.foundations, s.tableau]);
 
 export type Hint = { src: Source; tgt: Target } | { draw: true };
 
@@ -165,9 +173,11 @@ const deckUseful = (s: State) => reachable(s).some((c) => canFound(s, c) || s.ta
 /**
  * A move to suggest, most useful first: a card up to its pile, a move that turns over a
  * face-down card, the turned-over card onto a column, turning the deck (when it holds a
- * card that could be played), then any other legal move. Null when there's none at all.
+ * card that could be played), then any other legal move. That last kind can go back to a
+ * position in `seen` (the game so far), like a card moved between two matching cards, so
+ * those are skipped: Hint never sends you in circles. Null when there's no new move.
  */
-export function findHint(s: State): Hint | null {
+export function findHint(s: State, seen: State[] = []): Hint | null {
   if (s.won) return null;
   const all = sources(s);
   const foundation = all.find((src) => isLegal(s, src, { to: 'foundation' }));
@@ -180,15 +190,19 @@ export function findHint(s: State): Hint | null {
   const fromWaste = s.waste.length ? bestTarget(s, { from: 'waste' }) : null;
   if (fromWaste) return { src: { from: 'waste' }, tgt: fromWaste };
   if ((s.stock.length || s.waste.length) && deckUseful(s)) return { draw: true };
+  const old = new Set([s, ...seen].map(positionKey));
   for (const src of all) {
-    const tgt = bestTarget(s, src);
+    const tgt = targets(s, src).find((t) => !old.has(positionKey(move(s, src, t)!)));
     if (tgt) return { src, tgt };
   }
   return null;
 }
 
-/** No legal move, and no card in the deck that could ever be played: the deal is lost. */
-export const isStuck = (s: State): boolean => findHint(s) === null && !s.won;
+/**
+ * No new move (none, or only ones back to a position in `seen`), and no card in the deck
+ * that could ever be played: the deal is lost.
+ */
+export const isStuck = (s: State, seen: State[] = []): boolean => findHint(s, seen) === null && !s.won;
 
 /** True when every card is face up and out of the stock, so the game can finish itself. */
 export function canAutoFinish(s: State): boolean {

@@ -37,7 +37,8 @@ describe('Pai Gow Poker, many hands', () => {
     // Pushes are the most common result in pai gow (about 4 in 10 hands).
     expect(results.push / 6_000).toBeGreaterThan(0.3);
     expect(results.push / 6_000).toBeLessThan(0.5);
-  }, 16_000);
+  }, 60_000); // like the other simulations: about 8s alone, 20s with every simulation at once
+
 
   // Its own command (npm run test:stress), so it doesn't slow the simulations down.
   it.skipIf(!stressRun)('survives random tapping on the screen, and a finished hand stays finished', () => {

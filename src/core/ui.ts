@@ -93,3 +93,12 @@ export function settingRow(label: string, choices: string, note = ''): string {
 export function levelSetting(label = 'Computer player'): string {
   return settingRow(label, '<button data-level="easy">Easy</button><button data-level="strong">Strong</button>', 'Changes take effect right away.');
 }
+
+/**
+ * The status line when Hint has nothing new for a solitaire game: no move at all, or only
+ * moves back to a position the player has had (Hint never sends you in circles).
+ */
+export function stuckText(noMoveAtAll: boolean): string {
+  const why = noMoveAtAll ? 'No moves left.' : 'No new moves left: every move goes back to a position you’ve had.';
+  return `${why} Tap Undo to try another way, or {new} for a new deal.`;
+}

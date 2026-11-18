@@ -110,32 +110,43 @@ export function deal(s: State): State | null {
  * move, like a whole column into an empty one.
  */
 export function bestTarget(s: State, src: Source): number | null {
+  return targets(s, src)[0] ?? null;
+}
+
+/** Every useful column for the cards at `src`, in bestTarget's order. */
+function targets(s: State, src: Source): number[] {
   const cards = cardsAt(s, src);
-  if (!cards.length || !isRun(cards)) return null;
+  if (!cards.length || !isRun(cards)) return [];
   const legal = Array.from({ length: COLUMNS }, (_, i) => i).filter((i) => canMove(s, src, i));
   const withCards = legal.filter((i) => s.tableau[i].up.length);
-  const sameSuit = withCards.find((i) => s.tableau[i].up.at(-1)!.suit === cards[0].suit);
-  if (sameSuit !== undefined) return sameSuit;
-  if (withCards.length) return withCards[0];
+  const sameSuit = withCards.filter((i) => s.tableau[i].up.at(-1)!.suit === cards[0].suit);
+  const otherSuit = withCards.filter((i) => s.tableau[i].up.at(-1)!.suit !== cards[0].suit);
   const wholeColumn = src.index === 0 && !s.tableau[src.col].down.length;
-  return wholeColumn ? null : (legal[0] ?? null);
+  const empty = wholeColumn ? [] : legal.filter((i) => !s.tableau[i].up.length);
+  return [...sameSuit, ...otherSuit, ...empty];
 }
+
+/** A board position, ignoring the move count and clock. */
+const positionKey = (s: State): string => JSON.stringify([s.stock.length, s.done, s.tableau]);
 
 export type Hint = { src: Source; to: number } | { deal: true };
 
 /**
  * A move to suggest, most useful first: one that builds a same-suit run, one that turns
  * over a face-down card or empties a column, then dealing, then any other move. Cards
- * already sitting on their own suit aren't shuffled around. Null when nothing is left.
+ * already sitting on their own suit aren't shuffled around. Moves back to a position in
+ * `seen` (the game so far) are skipped, so Hint never sends you in circles. Null when no
+ * new move is left.
  */
-export function findHint(s: State): Hint | null {
+export function findHint(s: State, seen: State[] = []): Hint | null {
   if (s.won) return null;
+  const old = new Set([s, ...seen].map(positionKey));
   const options: { src: Source; to: number; score: number }[] = [];
   s.tableau.forEach((col, c) =>
     col.up.forEach((card, index) => {
       const src = { col: c, index };
-      const to = bestTarget(s, src);
-      if (to === null) return;
+      const to = targets(s, src).find((t) => !old.has(positionKey(move(s, src, t)!)));
+      if (to === undefined) return;
       const below = col.up[index - 1];
       const settled = below && below.suit === card.suit && below.rank === card.rank + 1;
       if (settled) return;
@@ -151,8 +162,8 @@ export function findHint(s: State): Hint | null {
   return options.length ? { src: options[0].src, to: options[0].to } : null;
 }
 
-/** No move and no deal left: the game is lost. */
-export const isStuck = (s: State): boolean => !s.won && findHint(s) === null;
+/** No new move (none, or only ones back to a position in `seen`) and no deal left: the game is lost. */
+export const isStuck = (s: State, seen: State[] = []): boolean => !s.won && findHint(s, seen) === null;
 
 const key = (c: Card) => `${c.rank}${c.suit}`;
 

@@ -331,6 +331,23 @@ describe('hints', () => {
     expect(findHint(s)).toEqual({ src: { from: 'tableau', col: 0, index: 1 }, tgt: { to: 'tableau', col: 1 } });
   });
 
+  it('never sends you in circles: moves back to a position you had are skipped', () => {
+    // The only move swaps the 7 of hearts between the two black 8s, over and over.
+    const s = blank();
+    s.tableau[0].up = cards('8S 7H');
+    s.tableau[1].up = cards('8C');
+    const there = { src: { from: 'tableau' as const, col: 0, index: 1 }, tgt: { to: 'tableau' as const, col: 1 } };
+    expect(findHint(s)).toEqual(there);
+    const next = move(s, there.src, there.tgt)!;
+    expect(findHint(next)).toEqual({ src: { from: 'tableau', col: 1, index: 1 }, tgt: { to: 'tableau', col: 0 } });
+    expect(findHint(next, [s])).toBeNull();
+    expect(isStuck(next, [s])).toBe(true);
+    // With a third black 8, the 7 can still go somewhere new.
+    s.tableau[2].up = cards('8C');
+    next.tableau[2].up = cards('8C');
+    expect(findHint(next, [s])).toEqual({ src: { from: 'tableau', col: 1, index: 1 }, tgt: { to: 'tableau', col: 2 } });
+  });
+
   it('says stuck when nothing can move and the deck holds nothing playable', () => {
     const s = blank();
     s.tableau[0].up = cards('KH');

@@ -91,6 +91,21 @@ describe('hints', () => {
     expect(isStuck({ ...t, stock: [] })).toBe(true);
     expect(findHint({ ...s, won: true })).toBeNull();
   });
+
+  it('never sends you in circles: moves back to a position you had are skipped', () => {
+    // No deck left, and the only move swaps the 7 of hearts between two 8s of other suits.
+    const s = blank();
+    s.tableau.forEach((c) => (c.up = cards('KS')));
+    s.tableau[0].up = cards('8S 7H');
+    s.tableau[1].up = cards('8C');
+    const there = { src: { col: 0, index: 1 }, to: 1 };
+    expect(findHint(s)).toEqual(there);
+    const next = move(s, there.src, there.to)!;
+    expect(findHint(next)).toEqual({ src: { col: 1, index: 1 }, to: 0 });
+    expect(findHint(next, [s])).toBeNull();
+    expect(isStuck(next, [s])).toBe(true);
+    expect(isStuck(next)).toBe(false);
+  });
 });
 
 describe('saves', () => {

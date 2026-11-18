@@ -3,7 +3,7 @@ import { showIcons } from '../../core/icons';
 import { SUITS, cardName, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
+import { showOverlay, hideOverlay, confirmNew, stuckText } from '../../core/ui';
 import { bestTarget, cardsAt, findHint, isStuck, isValidState, move, newGame, whyCantMove, type Source, type State } from './logic';
 import './style.css';
 
@@ -93,7 +93,7 @@ export function mount(container: HTMLElement): () => void {
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} move${state.moves === 1 ? '' : 's'}!${bestText}`
       : message ||
         (isStuck(state, history)
-          ? stuckText()
+          ? stuckText(isStuck(state))
           : `Tap a card to move it. The four spaces on the left hold one card each.${bestText}`);
     showIcons(statusEl);
     if (hint) {
@@ -121,16 +121,10 @@ export function mount(container: HTMLElement): () => void {
     });
   }
 
-  /** No new move: none at all, or only moves back to a position you've had. */
-  function stuckText() {
-    const why = isStuck(state) ? 'No moves left.' : 'No new moves left: every move goes back to a position you’ve had.';
-    return `${why} Tap Undo to try another way, or {new} for a new deal.`;
-  }
-
   /** What Hint suggests, in words; the card is outlined on the board. */
   function showHint() {
     hint = findHint(state, history);
-    if (!hint) message = stuckText();
+    if (!hint) message = stuckText(isStuck(state));
     else {
       const cards = cardsAt(state, hint.src);
       const what = `the ${cardName(cards[0]).toLowerCase()}${cards.length > 1 ? ` and the ${cards.length - 1} below it` : ''}`;

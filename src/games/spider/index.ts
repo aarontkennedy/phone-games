@@ -3,7 +3,7 @@ import { showIcons } from '../../core/icons';
 import { cardName, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
-import { confirmNew, hideOverlay, showOverlay, settingRow, settingsHtml } from '../../core/ui';
+import { confirmNew, hideOverlay, showOverlay, settingRow, settingsHtml, stuckText } from '../../core/ui';
 import { COLUMNS, RUNS, bestTarget, cardsAt, deal, findHint, isStuck, isValidState, move, newGame, type Hint, type State, type Suits } from './logic';
 import './style.css';
 
@@ -103,8 +103,8 @@ export function mount(container: HTMLElement): () => void {
   }
 
   function showHint() {
-    hint = findHint(state);
-    if (!hint) message = 'No moves left. Tap Undo to try another way, or {new} for a new deal.';
+    hint = findHint(state, history);
+    if (!hint) message = stuckText(isStuck(state));
     else if ('deal' in hint) message = 'Hint: tap the deck to deal a card onto every column.';
     else {
       const cards = cardsAt(state, hint.src);
@@ -146,8 +146,8 @@ export function mount(container: HTMLElement): () => void {
     statusEl.textContent = state.won
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} moves!${bestText}`
       : message ||
-        (isStuck(state)
-          ? 'No moves left. Tap Undo to try another way, or {new} for a new deal.'
+        (isStuck(state, history)
+          ? stuckText(isStuck(state))
           : `Build runs from King down to Ace in one suit. Tap a card to move it.${bestText}`);
     showIcons(statusEl);
     if (state.won) showOverlay(boardEl, 'You win!', [['New game', () => startNew(state.suits)]]);
