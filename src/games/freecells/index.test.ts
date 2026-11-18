@@ -42,7 +42,7 @@ describe('Free cells screen', () => {
     s.columns[2] = [];
     const { $, stored, status } = setup(s);
     $('[data-src="col:0:0"]').click(); // king under the queen: not a run, can't move
-    expect(status()).toBe("That card can't move right now.");
+    expect(status()).toMatch(/^The king of clubs can't move yet: the cards on top of it aren't in order/);
     $('[data-src="col:0:1"]').click(); // queen of clubs up, then everything else follows
     expect(stored().won).toBe(true);
   });
@@ -131,5 +131,42 @@ describe('Free cells hints', () => {
     $<HTMLButtonElement>('[data-hint]').click();
     expect(status()).toMatch(/^Hint: move the .+ (onto the .+|to a free space|up to its pile|to the empty column)\.$/);
     expect($('.hint')).not.toBeNull();
+  });
+
+  // A full deck (or the save is thrown away): the given free cells and column tops, with
+  // the rest buried under the tops. Each column's next card is the same color as the
+  // bottom of its top run, so nothing underneath can ever move.
+  type Id = [number, 'S' | 'H' | 'D' | 'C'];
+  function board(cells: Id[], tops: Id[][]): State {
+    const c = ([rank, suit]: Id) => ({ rank, suit });
+    const used = new Set([...cells, ...tops.flat()].map(([r, su]) => `${r}${su}`));
+    const rest = (['S', 'H', 'D', 'C'] as const).flatMap((suit) => upTo(suit, 13)).filter((x) => !used.has(`${x.rank}${x.suit}`));
+    const red = (x: { suit: string }) => x.suit === 'H' || x.suit === 'D';
+    const columns = tops.map((top) => {
+      const under = rest.splice(rest.findIndex((x) => red(x) === red(c(top[0]))), 1);
+      return [...under, ...top.map(c)];
+    });
+    rest.forEach((x, i) => columns[i % 8].unshift(x));
+    return { ...nearlyWon(), foundations: [[], [], [], []], cells: cells.map(c), columns };
+  }
+  const reds = (ranks: number[]): Id[][] => (['H', 'D'] as const).flatMap((suit) => ranks.map((r): Id[] => [[r, suit]]));
+
+  it('won’t send you in circles, and says when every move goes back', () => {
+    const { $, $$, status } = setup(board([[5, 'C'], [6, 'C'], [7, 'C'], [8, 'C']], [[[3, 'C'], [2, 'H']], [[3, 'S']], ...reds([13, 12, 11])]));
+    $<HTMLButtonElement>('[data-hint]').click();
+    expect(status()).toBe('Hint: move the 2 of hearts onto the 3 of spades.');
+    $$('[data-col="0"] .card').at(-1)!.click();
+    // Its only move is straight back: no hint, and the line says so.
+    expect(status()).toMatch(/^No new moves left: every move goes back to a position you’ve had\. Tap Undo/);
+    $<HTMLButtonElement>('[data-hint]').click();
+    expect(status()).toMatch(/^No new moves left/);
+    expect($('.hint')).toBeNull();
+  });
+
+  it('says when no card can move at all', () => {
+    const { $, status } = setup(board([[2, 'C'], [3, 'C'], [4, 'C'], [5, 'C']], reds([13, 12, 11, 9])));
+    expect(status()).toMatch(/^No moves left\. Tap Undo/);
+    $<HTMLButtonElement>('[data-hint]').click();
+    expect(status()).toMatch(/^No moves left\./);
   });
 });

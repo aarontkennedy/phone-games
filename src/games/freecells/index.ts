@@ -4,7 +4,7 @@ import { SUITS, cardName, suitName } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { formatTime } from '../../core/time';
 import { showOverlay, hideOverlay, confirmNew } from '../../core/ui';
-import { bestTarget, cardsAt, findHint, isStuck, isValidState, move, newGame, type Source, type State } from './logic';
+import { bestTarget, cardsAt, findHint, isStuck, isValidState, move, newGame, whyCantMove, type Source, type State } from './logic';
 import './style.css';
 
 const STATE_KEY = 'freecells:state';
@@ -92,8 +92,8 @@ export function mount(container: HTMLElement): () => void {
     statusEl.textContent = state.won
       ? `You won in ${formatTime(state.elapsed)} with ${state.moves} move${state.moves === 1 ? '' : 's'}!${bestText}`
       : message ||
-        (isStuck(state)
-          ? 'No moves left. Tap Undo to try another way, or {new} for a new deal.'
+        (isStuck(state, history)
+          ? stuckText()
           : `Tap a card to move it. The four spaces on the left hold one card each.${bestText}`);
     showIcons(statusEl);
     if (hint) {
@@ -121,10 +121,16 @@ export function mount(container: HTMLElement): () => void {
     });
   }
 
+  /** No new move: none at all, or only moves back to a position you've had. */
+  function stuckText() {
+    const why = isStuck(state) ? 'No moves left.' : 'No new moves left: every move goes back to a position you’ve had.';
+    return `${why} Tap Undo to try another way, or {new} for a new deal.`;
+  }
+
   /** What Hint suggests, in words; the card is outlined on the board. */
   function showHint() {
-    hint = findHint(state);
-    if (!hint) message = 'No moves left. Tap Undo to try another way, or {new} for a new deal.';
+    hint = findHint(state, history);
+    if (!hint) message = stuckText();
     else {
       const cards = cardsAt(state, hint.src);
       const what = `the ${cardName(cards[0]).toLowerCase()}${cards.length > 1 ? ` and the ${cards.length - 1} below it` : ''}`;
@@ -158,7 +164,7 @@ export function mount(container: HTMLElement): () => void {
     const [kind, a, b] = el.dataset.src!.split(':');
     const src: Source = kind === 'cell' ? { from: 'cell', i: Number(a) } : { from: 'col', col: Number(a), index: Number(b) };
     const tgt = bestTarget(state, src);
-    commit(tgt && move(state, src, tgt), "That card can't move right now.");
+    commit(tgt && move(state, src, tgt), whyCantMove(state, src));
   });
   undoBtn.addEventListener('click', () => {
     stopClock();

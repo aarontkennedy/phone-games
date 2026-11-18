@@ -136,27 +136,9 @@ function rowCells(chart: Chart, row: string): Cell[] {
 
 const PLAY_TEXT: Record<Cell, string> = { H: 'Hit', S: 'Stand', Dh: 'Double', Ds: 'Double', P: 'Split', '-': '' };
 const SHORT: Record<Cell, string> = { H: 'H', S: 'S', Dh: 'D', Ds: 'Ds', P: 'P', '-': '' };
-const upName = (up: number) => (up === 11 ? 'an ace' : up === 8 ? 'an 8' : `a ${up}`);
-const rowName = (row: string) => {
-  const [kind, n] = row.split(' ');
-  if (kind === 'pair') return Number(n) === 11 ? 'aces' : `${n}s`;
-  return kind === 'soft' ? `A,${Number(n) - 11}` : `hard ${n}`;
-};
-
-/** "With 2 decks: double hard 9 against a 2; split 6s against a 7; ..." */
-export function changesText(decks: 1 | 2): string {
-  const groups = new Map<string, number[]>();
-  for (const [row, up, cell] of FEWER_DECKS[decks]) {
-    const key = `${PLAY_TEXT[cell].toLowerCase()} ${row.startsWith('pair') ? '' : 'on '}${rowName(row)}`.replace('double on', 'double');
-    groups.set(key, [...(groups.get(key) ?? []), up]);
-  }
-  const parts = [...groups].map(([what, ups]) => `${what} against ${ups.map(upName).join(' or ').replace(/ or a /g, ' or ')}`);
-  return `With ${decks === 1 ? '1 deck' : '2 decks'}: ${parts.join('; ')}.`;
-}
-
-/** The chart as an HTML table, for the rules page, with a key and the changes for fewer decks. */
-export function chartHtml(): string {
-  const chart = chartFor(6);
+/** One chart as an HTML table. */
+function tableHtml(decks: number): string {
+  const chart = chartFor(decks);
   const head = `<tr><td></td>${UP_NAMES.map((u) => `<th scope="col">${u}</th>`).join('')}</tr>`;
   const body = ROWS.map(([row, label]) =>
     label
@@ -165,11 +147,18 @@ export function chartHtml(): string {
           .join('')}</tr>`
       : `<tr><th scope="rowgroup" colspan="11" class="bs-group">${row}</th></tr>`,
   ).join('');
+  return `<table class="bs-chart"><thead>${head}</thead><tbody>${body}</tbody></table>`;
+}
+
+/** The charts for the rules page: a key, then one titled table per number of decks. */
+export function chartHtml(): string {
+  const tables = ([[6, '6 or 8 decks'], [2, '2 decks'], [1, '1 deck']] as const)
+    .map(([decks, title]) => `<h3>Best plays: ${title}</h3>${tableHtml(decks)}`)
+    .join('');
   return `
-    <h3>Best plays</h3>
     <p>Across the top is the dealer’s face-up card. Find your hand down the side.
       <b>H</b> hit, <b>S</b> stand, <b>D</b> double (or hit if you can’t), <b>Ds</b> double (or stand if you can’t),
-      <b>P</b> split. A blank pair square means don’t split: play the total instead.</p>
-    <table class="bs-chart"><thead>${head}</thead><tbody>${body}</tbody></table>
-    <p>This chart is for 6 or 8 decks. ${changesText(2)} ${changesText(1)}</p>`;
+      <b>P</b> split. A blank pair square means don’t split: play the total instead.
+      Use the chart for the number of decks in the shoe.</p>
+    ${tables}`;
 }

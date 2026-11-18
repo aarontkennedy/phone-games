@@ -108,7 +108,7 @@ export const games: GameMeta[] = [
         'You win if the dealer busts or you’re closer to 21. A win pays even money (a 20 bet wins 20). A tie is a <b>push</b>: your bet comes back.',
         'These are play chips, not money. If you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve ever had.',
         `The dealer deals from a shoe of 6 decks. Between hands, choose 1, 2, 6 or 8 decks with ${SETTINGS} at the top; the table shows how many. Each change starts a freshly shuffled shoe.`,
-        '<b>Right</b> is how often your play matched the best play in the chart below. After a play that wasn’t the best, the line above the buttons says what was. Plays you make after tapping <b>Hint</b> don’t count.',
+        '<b>Right</b> is how often your play matched the best play in the charts below. After a play that wasn’t the best, the line above the buttons says what was. Plays you make after tapping <b>Hint</b> don’t count.',
       ],
       tips: [
         `Not sure? Tap ${HINT} above the buttons to see the best play for that moment. It only shows when you ask.`,

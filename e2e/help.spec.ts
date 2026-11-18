@@ -52,6 +52,13 @@ for (const g of GAMES) {
     await expectReadableText(page);
     await expectTouchTargets(page);
     await expectNoHorizontalOverflow(page);
+    // The top bar spans the whole width, so list numbers in the margin scroll behind it.
+    const [barLeft, barRight, pageLeft, pageRight] = await help.evaluate((el) => {
+      const bar = el.querySelector('.help-bar')!.getBoundingClientRect();
+      return [bar.left, bar.right, el.getBoundingClientRect().left, el.getBoundingClientRect().left + el.clientWidth];
+    });
+    expect(barLeft).toBeCloseTo(pageLeft, 0);
+    expect(barRight).toBeCloseTo(pageRight, 0);
 
     await help.getByRole('button', { name: 'Got it' }).click();
     await expect(help).toBeHidden();

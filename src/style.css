@@ -392,13 +392,15 @@ body {
   color: var(--text);
 }
 
-/* The rules' top bar: a back arrow like the game screen's, staying put while you scroll. */
+/* The rules' top bar: a back arrow like the game screen's, staying put while you scroll.
+   It reaches past .help's side padding to the screen edges, so list numbers (which hang
+   out to the left of their text) scroll behind it like everything else. */
 .help-bar {
   position: sticky;
   top: 0;
   z-index: 1;
-  margin-bottom: var(--space-2);
-  padding: calc(env(safe-area-inset-top) + var(--space-2)) 0 var(--space-2);
+  margin: 0 calc(-1 * var(--space-4)) var(--space-2);
+  padding: calc(env(safe-area-inset-top) + var(--space-2)) var(--space-4) var(--space-2);
   background: var(--bg);
 }
 

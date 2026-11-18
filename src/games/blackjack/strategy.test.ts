@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DECK_CHOICES, UPCARDS, bestPlay, changesText, chartFor, chartHtml } from './strategy';
+import { DECK_CHOICES, UPCARDS, bestPlay, chartFor, chartHtml } from './strategy';
 
 // The full chart for each number of decks, from an exact calculation of each play's
 // expected value for these rules (dealer stands on soft 17 and checks for blackjack,
@@ -187,29 +187,38 @@ describe('basic strategy', () => {
     expect(chartFor(8)).toBe(chartFor(6));
   });
 
-  it('says in words what fewer decks change', () => {
-    expect(changesText(2)).toBe('With 2 decks: double hard 9 against a 2; split 6s against a 7; split 7s against an 8.');
-    expect(changesText(1)).toBe(
-      'With 1 deck: double hard 8 against a 5 or 6; double hard 9 against a 2; double hard 11 against an ace; double A,2 against a 4; double A,3 against a 4; double A,6 against a 2; stand on A,7 against an ace; double A,8 against a 6; split 3s against an 8; split 4s against a 4; split 6s against a 7; split 7s against an 8.',
-    );
-  });
-
-  it('draws the chart for the rules, with every row and a name for every square', () => {
-    const table = document.createElement('div');
-    table.innerHTML = chartHtml();
-    const body = [...table.querySelectorAll('tbody tr')];
-    const labels = body.map((r) => r.querySelector('th')!.textContent);
-    expect(labels).toEqual([
-      'Hard', '5–7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17+',
-      'Soft', 'A,2', 'A,3', 'A,4', 'A,5', 'A,6', 'A,7', 'A,8', 'A,9',
-      'Pairs', '2,2', '3,3', '4,4', '5,5', '6,6', '7,7', '8,8', '9,9', '10,10', 'A,A',
+  it('draws a titled chart for each number of decks, with every row and a name for every square', () => {
+    const page = document.createElement('div');
+    page.innerHTML = chartHtml();
+    expect([...page.querySelectorAll('h3')].map((h) => h.textContent)).toEqual([
+      'Best plays: 6 or 8 decks', 'Best plays: 2 decks', 'Best plays: 1 deck',
     ]);
-    const row = (label: string) => [...body[labels.indexOf(label)].querySelectorAll('td')].map((td) => td.textContent);
-    expect(row('11')).toEqual(['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'H']);
-    expect(row('A,7')).toEqual(['S', 'Ds', 'Ds', 'Ds', 'Ds', 'S', 'S', 'H', 'H', 'H']);
-    expect(row('9,9')).toEqual(['P', 'P', 'P', 'P', 'P', '', 'P', 'P', '', '']);
-    expect(row('A,9').every((c) => c === 'S')).toBe(true);
-    for (const td of table.querySelectorAll('tbody td')) expect(td.getAttribute('aria-label')).toMatch(/^(Hit|Stand|Double|Split|Play the total)$/);
-    expect(table.textContent).toContain('With 1 deck:');
+    const tables = [...page.querySelectorAll('table')];
+    expect(tables).toHaveLength(3);
+    // Each title sits right above its table.
+    for (const t of tables) expect(t.previousElementSibling!.tagName).toBe('H3');
+    const rows = (table: Element) => [...table.querySelectorAll('tbody tr')];
+    const labels = (table: Element) => rows(table).map((r) => r.querySelector('th')!.textContent);
+    const row = (table: Element, label: string) =>
+      [...rows(table)[labels(table).indexOf(label)].querySelectorAll('td')].map((td) => td.textContent);
+    const [shoe, two, one] = tables;
+    for (const t of tables) {
+      expect(labels(t)).toEqual([
+        'Hard', '5–7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17+',
+        'Soft', 'A,2', 'A,3', 'A,4', 'A,5', 'A,6', 'A,7', 'A,8', 'A,9',
+        'Pairs', '2,2', '3,3', '4,4', '5,5', '6,6', '7,7', '8,8', '9,9', '10,10', 'A,A',
+      ]);
+      expect(row(t, 'A,9').every((c) => c === 'S')).toBe(true);
+    }
+    expect(row(shoe, '11')).toEqual(['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'H']);
+    expect(row(shoe, 'A,7')).toEqual(['S', 'Ds', 'Ds', 'Ds', 'Ds', 'S', 'S', 'H', 'H', 'H']);
+    expect(row(shoe, '9,9')).toEqual(['P', 'P', 'P', 'P', 'P', '', 'P', 'P', '', '']);
+    expect(row(shoe, '9')[0]).toBe('H');
+    expect(row(two, '9')[0]).toBe('D');
+    expect(row(two, '11')[9]).toBe('H');
+    expect(row(one, '11')[9]).toBe('D');
+    expect(row(one, 'A,7')[9]).toBe('S');
+    for (const td of page.querySelectorAll('tbody td')) expect(td.getAttribute('aria-label')).toMatch(/^(Hit|Stand|Double|Split|Play the total)$/);
+    expect(page.textContent).not.toContain('With 1 deck:');
   });
 });

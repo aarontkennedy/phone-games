@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { isFullDeck, type Card, type Suit } from '../../core/cards';
 import { seededRng } from '../../core/random';
-import { bestTarget, cardsAt, findHint, isLegal, isRun, isStuck, isValidState, maxMove, move, newGame, type State } from './logic';
+import { bestTarget, cardsAt, findHint, isLegal, isRun, isStuck, isValidState, maxMove, move, newGame, whyCantMove, type State } from './logic';
 
 const RANKS: Record<string, number> = { A: 1, J: 11, Q: 12, K: 13 };
 const card = (id: string): Card => ({ suit: id.slice(-1) as Suit, rank: RANKS[id.slice(0, -1)] ?? Number(id.slice(0, -1)) });
@@ -118,6 +118,52 @@ describe('free cells', () => {
   });
 });
 
+describe('why a card can’t move', () => {
+  // Fills every column with a lone card that takes nothing, so no column is empty.
+  const full = (): State => {
+    const s = blank();
+    s.columns = Array.from({ length: 8 }, () => cards('2H'));
+    return s;
+  };
+
+  it('says the cards on top are out of order', () => {
+    const s = full();
+    s.columns[0] = cards('JS 5D');
+    expect(whyCantMove(s, { from: 'col', col: 0, index: 0 })).toBe(
+      "The jack of spades can't move yet: the cards on top of it aren't in order. Cards move together only when they go down in alternating colors.",
+    );
+  });
+
+  it('says how many cards the free spaces allow, onto a card or into an empty column', () => {
+    const s = full();
+    s.cells = [card('2C'), card('3C'), card('4C'), null];
+    s.columns[0] = cards('JS 10H 9C');
+    s.columns[1] = cards('QD');
+    expect(whyCantMove(s, { from: 'col', col: 0, index: 0 })).toBe(
+      "The jack of spades can't move onto the queen of diamonds: that's 3 cards, and with your free spaces you can move 2 at a time. Empty a free space or a column first.",
+    );
+    s.columns[1] = [];
+    s.cells[3] = card('5C');
+    expect(whyCantMove(s, { from: 'col', col: 0, index: 0 })).toBe(
+      "The jack of spades can't move to the empty column: that's 3 cards, and with your free spaces you can move 1 at a time. Empty a free space or a column first.",
+    );
+  });
+
+  it('says what the card needs, and that free spaces hold no cards on top', () => {
+    const s = full();
+    s.cells = [card('QD'), card('3C'), card('4C'), card('5C')];
+    s.columns[0] = cards('JS');
+    expect(whyCantMove(s, { from: 'col', col: 0, index: 0 })).toBe(
+      "The jack of spades can't move right now: it needs a red queen at the bottom of a column, or an empty column or a free space (the queen of diamonds is in a free space, and cards there can't hold others).",
+    );
+    expect(whyCantMove(s, { from: 'cell', i: 0 })).toBe(
+      "The queen of diamonds can't move right now: it needs a black king at the bottom of a column, or an empty column.",
+    );
+    s.columns[0] = cards('KS QH');
+    expect(whyCantMove(s, { from: 'col', col: 0, index: 0 })).toBe("The king of spades can't move right now: it needs an empty column.");
+  });
+});
+
 describe('hints', () => {
   it('suggests, in order: foundation, onto a card, an empty column, a free cell', () => {
     const s = blank();
@@ -148,5 +194,21 @@ describe('hints', () => {
     expect(isStuck({ ...s, won: true })).toBe(false);
     s.columns[7] = cards('10C'); // now the 9 of hearts fits on it
     expect(findHint(s)).toEqual({ src: { from: 'col', col: 6, index: 0 }, tgt: { to: 'col', col: 7 } });
+  });
+
+  it('never sends you in circles: moves back to a position you had are skipped', () => {
+    // The only move swaps the 2 of hearts between two black 3s, over and over.
+    const s = blank();
+    s.cells = cards('5C 6C 7C 8C');
+    s.columns = Array.from({ length: 8 }, (_, i) => cards(['3C 2H', '3S', 'KH', 'KD', 'QH', 'QD', 'JH', 'JD'][i]));
+    const there = { src: { from: 'col' as const, col: 0, index: 1 }, tgt: { to: 'col' as const, col: 1 } };
+    expect(findHint(s)).toEqual(there);
+    const next = move(s, there.src, there.tgt)!;
+    expect(findHint(next)).toEqual({ src: { from: 'col', col: 1, index: 1 }, tgt: { to: 'col', col: 0 } });
+    expect(findHint(next, [s])).toBeNull();
+    expect(isStuck(next, [s])).toBe(true);
+    expect(isStuck(next)).toBe(false);
+    // Free cells in a different order are still the same position.
+    expect(findHint(next, [{ ...s, cells: [...s.cells].reverse() }])).toBeNull();
   });
 });
