@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { load, save } from '../../core/storage';
 import { makeContainer, track, answerNewGame } from '../../test/helpers';
-import { AI_DELAY, TRICK_PAUSE, mount } from './index';
+import { AI_DELAY, TRICK_PAUSE, mount, moveText } from './index';
 import { estimateTricks, type State } from './logic';
 import { position, trick } from './test-fixtures';
 
@@ -26,6 +26,26 @@ const bidding = (o: Partial<State> = {}) =>
 
 beforeEach(() => {
   vi.useFakeTimers();
+});
+
+describe('Spades recent moves', () => {
+  const recent = (c: HTMLElement) => [...c.querySelectorAll('[data-recent] li')].map((li) => li.textContent);
+
+  it('says who led each trick and who won it, spades trumping', () => {
+    const s = position(['', '', '', ''], { trick: trick(1, '2D KD 3S AD') });
+    expect(moveText(s, { ...s, trick: [] })).toBe('West led the 2 of diamonds; East won with the 3 of spades.');
+    expect(moveText(s, { ...s, trick: trick(1, '2D') })).toBeNull();
+  });
+
+  it('lists each trick as it ends, and starts over with a new game', () => {
+    const { container, $ } = setup(position(['9D 5S', '2D 3C', 'KD 4C', 'AD 6C'], { turn: 0 }));
+    $('[data-hand][data-card="9D"]').click();
+    vi.advanceTimersByTime(AI_DELAY * 3 + TRICK_PAUSE);
+    expect(recent(container)).toEqual(['You led the 9 of diamonds; East won with the ace of diamonds.']);
+    $('[data-new]').click();
+    answerNewGame();
+    expect(recent(container)).toEqual([]);
+  });
 });
 
 describe('Spades screen', () => {

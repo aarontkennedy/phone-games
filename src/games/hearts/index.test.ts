@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { cardId } from '../../core/cards';
 import { load, save } from '../../core/storage';
 import { makeContainer, track, answerNewGame } from '../../test/helpers';
-import { AI_DELAY, TRICK_PAUSE, mount } from './index';
+import { AI_DELAY, TRICK_PAUSE, mount, moveText } from './index';
 import type { State } from './logic';
 import { cards, position, trick } from './test-fixtures';
 
@@ -26,6 +26,37 @@ const opening = () =>
 
 beforeEach(() => {
   vi.useFakeTimers();
+});
+
+describe('Hearts recent moves', () => {
+  const recent = (c: HTMLElement) => [...c.querySelectorAll('[data-recent] li')].map((li) => li.textContent);
+
+  it('says who led each trick, who won it, and the points it took', () => {
+    const done = (t: ReturnType<typeof trick>) => {
+      const s = position(['', '', '', ''], { trick: t });
+      return moveText(s, { ...s, trick: [] });
+    };
+    expect(done(trick(1, 'KS QS AS 10S'))).toBe('West led the king of spades; East won with the ace of spades, taking 13 points.');
+    expect(done(trick(0, 'AH 9H 10D QC'))).toBe('You led the ace of hearts and won, taking 2 points.');
+    expect(done(trick(0, 'AC 9C 10C QC'))).toBe('You led the ace of clubs and won.');
+    const mid = position(['', '', '', ''], { trick: trick(1, 'KS QS') });
+    expect(moveText(mid, { ...mid, trick: trick(1, 'KS QS AS') })).toBeNull();
+  });
+
+  it('lists each trick as it ends, and starts over with a new round', () => {
+    const { container, tapCard, stored } = setup(opening());
+    tapCard('2C');
+    vi.advanceTimersByTime(AI_DELAY * 3 + TRICK_PAUSE);
+    expect(recent(container)).toEqual(['You led the 2 of clubs; East won with the king of clubs.']);
+    expect(stored().trick).toEqual([]);
+    document.body.replaceChildren();
+    // A fresh round (nothing played yet) clears it.
+    const again = setup({ ...opening(), tricksPlayed: 1 });
+    expect(recent(again.container)).toHaveLength(1);
+    again.$('[data-new]').click();
+    answerNewGame();
+    expect(recent(again.container)).toEqual([]);
+  });
 });
 
 describe('Hearts screen', () => {

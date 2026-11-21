@@ -1,6 +1,7 @@
 import { load, save } from '../../core/storage';
 import { cardId } from '../../core/cards';
-import { SEAT_NAMES, trickWinner, type Seat } from '../../core/tricks';
+import { RECENT_HTML, recentMoves } from '../../core/recent';
+import { SEAT_NAMES, trickText, trickWinner, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
 import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
@@ -23,6 +24,15 @@ import {
   type Team,
 } from './logic';
 import './style.css';
+
+/** What a step just did, for the recent moves list: each finished trick (the bids show by the seats). */
+export function moveText(prev: State, next: State): string | null {
+  if (prev.trick.length !== 4 || next.trick.length) return null;
+  return trickText(prev.trick, trickWinner(prev.trick, 'S'));
+}
+
+/** No card played yet this round: a new round or game starts the recent moves over. */
+const fresh = (s: State) => !s.trick.length && s.tricks.every((n) => !n);
 
 const STATE_KEY = 'spades:state';
 /** Pause before each computer bid or play, so you can follow along. */
@@ -49,6 +59,7 @@ export function mount(container: HTMLElement): () => void {
       </div>
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
+      ${RECENT_HTML}
       <div class="controls">
         <div class="spd-bid actions" data-bidding>
           <button class="btn secondary" data-step="-1" aria-label="Bid fewer">−</button>
@@ -67,6 +78,7 @@ export function mount(container: HTMLElement): () => void {
   const amountEl = container.querySelector<HTMLElement>('[data-amount]')!;
   const bidBtn = container.querySelector<HTMLButtonElement>('[data-bid]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const recent = recentMoves(container, 'spades');
 
   const suggestion = () => Math.round(estimateTricks(state.hands[0]));
   const myBidTurn = () => state.phase === 'bidding' && state.turn === 0;
@@ -74,6 +86,8 @@ export function mount(container: HTMLElement): () => void {
 
   function update(next: State | null) {
     if (!next) return;
+    if (fresh(next) && !fresh(state)) recent.clear();
+    else recent.add(moveText(state, next));
     const wasMyBid = myBidTurn();
     state = next;
     if (myBidTurn() && !wasMyBid) myBid = suggestion();

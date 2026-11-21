@@ -1,5 +1,5 @@
-// Shared pieces for trick-taking games (Hearts, Spades). Pure functions, no DOM.
-import type { Card, Suit } from './cards';
+// Shared pieces for trick-taking games (Hearts, Spades, Euchre). Pure functions, no DOM.
+import { cardName, type Card, type Suit } from './cards';
 
 /** Seats in play order: you (South), then clockwise West, North, East. */
 export type Seat = 0 | 1 | 2 | 3;
@@ -40,4 +40,20 @@ export function sortHand(hand: Card[]): Card[] {
 /** Deals a deck into four hands of 13. */
 export function dealFour(deck: Card[]): Card[][] {
   return SEATS.map((s) => deck.slice(s * 13, s * 13 + 13));
+}
+
+/** "the ace of spades", "the 9 of hearts". */
+export const theCard = (c: Card): string => `the ${cardName(c).replace(/^(Ace|Jack|Queen|King)/, (w) => w.toLowerCase())}`;
+
+/**
+ * A finished trick in words, for the recent moves list (docs/DESIGN.md, "Recent moves"):
+ * "West led the king of spades; East won with the ace of spades." or "You led the ace of
+ * spades and won." `extra` goes before the full stop, e.g. ", taking 2 points".
+ */
+export function trickText(trick: Play[], winner: Seat, extra = ''): string {
+  const lead = trick[0];
+  const won = trick.find((p) => p.seat === winner)!;
+  const led = `${SEAT_NAMES[lead.seat]} led ${theCard(lead.card)}`;
+  if (won === lead) return `${led} and won${extra}.`;
+  return `${led}; ${winner === 0 ? 'you' : SEAT_NAMES[winner]} won with ${theCard(won.card)}${extra}.`;
 }

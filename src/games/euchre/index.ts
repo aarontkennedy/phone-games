@@ -1,8 +1,8 @@
 import { cardFace, suitSvg } from '../../core/card-view';
-import { SUITS, cardId, cardName, suitName, type Card, type Suit } from '../../core/cards';
+import { SUITS, cardId, cardName, suitName, type Suit } from '../../core/cards';
 import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { load, save } from '../../core/storage';
-import { SEAT_NAMES, type Seat } from '../../core/tricks';
+import { SEAT_NAMES, theCard, trickText, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
 import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
@@ -39,7 +39,6 @@ export const TRICK_PAUSE = 1100;
 
 const lower = (name: string) => name.replace(/^(Ace|Jack|Queen|King)/, (w) => w.toLowerCase());
 const capital = (word: string) => word[0].toUpperCase() + word.slice(1);
-const the = (c: Card) => `the ${lower(cardName(c))}`;
 
 /**
  * What a step just did, for the recent moves list: who made trump, and each finished
@@ -50,13 +49,10 @@ export function moveText(prev: State, next: State): string | null {
     const who = SEAT_NAMES[next.maker!];
     const alone = next.alone ? ' alone' : '';
     if (prev.phase === 'bidding2') return `${who} called ${suitName(next.trump)}${alone}.`;
-    return `${who} ${next.maker === prev.dealer ? 'picked' : 'ordered'} up ${the(upcard(prev))}${alone}.`;
+    return `${who} ${next.maker === prev.dealer ? 'picked' : 'ordered'} up ${theCard(upcard(prev))}${alone}.`;
   }
   if (prev.phase !== 'playing' || prev.trick.length !== playersIn(prev) || next.trick.length) return null;
-  const lead = prev.trick[0];
-  const won = prev.trick.find((p) => p.seat === trickWinner(prev.trick, prev.trump!))!;
-  const led = `${SEAT_NAMES[lead.seat]} led ${the(lead.card)}`;
-  return won === lead ? `${led} and won.` : `${led}; ${won.seat === 0 ? 'you' : SEAT_NAMES[won.seat]} won with ${the(won.card)}.`;
+  return trickText(prev.trick, trickWinner(prev.trick, prev.trump!));
 }
 
 export function mount(container: HTMLElement): () => void {

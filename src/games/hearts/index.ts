@@ -1,9 +1,11 @@
 import { cardId, cardName, sameCard, type Card } from '../../core/cards';
 import { load, save } from '../../core/storage';
-import { SEATS, SEAT_NAMES, nextSeat, trickWinner, type Seat } from '../../core/tricks';
+import { RECENT_HTML, recentMoves } from '../../core/recent';
+import { SEATS, SEAT_NAMES, nextSeat, trickText, trickWinner, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
 import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
+  cardPoints,
   chooseCard,
   collect,
   isValidState,
@@ -27,6 +29,16 @@ const PASS_TO = { left: 'West', right: 'East', across: 'North' } as const;
 
 /** "A, B and C". Always called with at least two items. */
 const listOf = (items: string[]) => `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
+/** What a step just did, for the recent moves list: each finished trick, and its points. */
+export function moveText(prev: State, next: State): string | null {
+  if (prev.trick.length !== 4 || next.trick.length) return null;
+  const points = prev.trick.reduce((sum, p) => sum + cardPoints(p.card), 0);
+  return trickText(prev.trick, trickWinner(prev.trick), points ? `, taking ${points} point${points > 1 ? 's' : ''}` : '');
+}
+
+/** No card played yet this round: a new round or game starts the recent moves over. */
+const fresh = (s: State) => !s.tricksPlayed && !s.trick.length;
+
 const lower = (c: Card) => cardName(c).replace(/^(Ace|Jack|Queen|King)/, (w) => w.toLowerCase());
 
 export function mount(container: HTMLElement): () => void {
@@ -44,6 +56,7 @@ export function mount(container: HTMLElement): () => void {
       </div>
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
+      ${RECENT_HTML}
       <div class="controls">
         <button class="btn" data-pass>Pass</button>
       </div>
@@ -55,9 +68,12 @@ export function mount(container: HTMLElement): () => void {
   const roundEl = container.querySelector<HTMLElement>('[data-round]')!;
   const passBtn = container.querySelector<HTMLButtonElement>('[data-pass]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const recent = recentMoves(container, 'hearts');
 
   function update(next: State | null) {
     if (!next) return;
+    if (fresh(next) && !fresh(state)) recent.clear();
+    else recent.add(moveText(state, next));
     state = next;
     save(STATE_KEY, state);
     render();

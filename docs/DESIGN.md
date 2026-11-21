@@ -223,7 +223,8 @@ hand (the casino games' Bet and Chip) stay on screen.
 ### Recent moves
 
 In games where the computer makes several moves between your turns (Go Fish, Crazy
-Eights, Rummy 500, Gin Rummy, Texas Hold'em, Five-Card Draw, Dominoes, Hot Dice, Euchre), a short
+Eights, Rummy 500, Gin Rummy, Texas Hold'em, Five-Card Draw, Dominoes, Hot Dice, Euchre,
+Hearts, Spades), a short
 list under the status line shows the last 4 moves, newest at the top, so none flash by
 unseen. Your own moves are in it too. The order is board, then what to do now (the status
 line, which mostly points at the board), then what just happened, then the buttons.
@@ -233,9 +234,10 @@ line, which mostly points at the board), then what just happened, then the butto
 - **One line per move,** written by a pure `moveText(prev, next)` (or the action itself, as
   in the poker games' `betText`) and added in the screen's `update()`. Keep lines short
   ("West asked North for 7s and got 2."): about 40 characters fit one line on a small phone.
-- **Trick games** say who made trump and one line per finished trick, not each card
-  (the table shows the trick in progress): "West led the king of spades; East won with
-  the ace of spades." (Euchre's `moveText`.)
+- **Trick games** list one line per finished trick, not each card (the table shows the
+  trick in progress), from the shared `trickText()` in src/core/tricks.ts: "West led the
+  king of spades; East won with the ace of spades." Hearts adds the points it took; Euchre
+  also says who made trump. Spades leaves bids out, since they show by the seats.
 - **Cleared** at a new game, round or hand (each screen's `start()`), so it's always about
   the play in front of you.
 - **The status line no longer repeats the last move;** it says what to do next.

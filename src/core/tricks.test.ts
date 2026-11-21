@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { newDeck, type Card, type Suit } from './cards';
-import { dealFour, followSuit, highRank, nextSeat, sortHand, trickWinner, type Play, type Seat } from './tricks';
+import { dealFour, followSuit, highRank, nextSeat, sortHand, theCard, trickText, trickWinner, type Play, type Seat } from './tricks';
 
 const c = (rank: number, suit: Suit): Card => ({ suit, rank });
 const trick = (...cards: Card[]): Play[] => cards.map((card, i) => ({ seat: i as Seat, card }));
@@ -49,5 +49,17 @@ describe('tricks', () => {
     const hands = dealFour(newDeck());
     expect(hands.map((h) => h.length)).toEqual([13, 13, 13, 13]);
     expect(new Set(hands.flat().map((x) => `${x.rank}${x.suit}`)).size).toBe(52);
+  });
+});
+
+describe('trick text', () => {
+  const play = (seat: Seat, suit: Suit, rank: number): Play => ({ seat, card: { suit, rank } });
+  it('names the lead and the winner, with "you" lower case mid-sentence', () => {
+    expect(theCard({ suit: 'S', rank: 1 })).toBe('the ace of spades');
+    expect(theCard({ suit: 'H', rank: 9 })).toBe('the 9 of hearts');
+    const t = [play(1, 'S', 13), play(2, 'S', 12), play(3, 'S', 1), play(0, 'S', 10)];
+    expect(trickText(t, 3)).toBe('West led the king of spades; East won with the ace of spades.');
+    expect(trickText(t, 0, ', taking 2 points')).toBe('West led the king of spades; you won with the 10 of spades, taking 2 points.');
+    expect(trickText([play(0, 'H', 1), play(1, 'H', 2)], 0)).toBe('You led the ace of hearts and won.');
   });
 });
