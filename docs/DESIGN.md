@@ -254,10 +254,12 @@ line, which mostly points at the board), then what just happened, then the butto
 ### Coaching
 
 Games with a best play to learn (Blackjack, Video Poker, Cribbage discards, Hot Dice,
-Texas Hold'em, Five-Card Draw, Euchre bids, Yacht) teach it, so the player gets better
-rather than just getting told. Craps and Mines have Hint without a Right score: Craps has
-better and worse bets rather than one right one, and Mines teaches reasoning (Hint
-outlines a square the numbers prove, and the number that proves it).
+Texas Hold'em, Five-Card Draw, Euchre bids, Yacht, Shut the Box) teach it, so the player
+gets better rather than just getting told. Craps, Baccarat and Mines have Hint without a
+Right score: Craps and Baccarat have better and worse bets rather than one right one, and
+Mines teaches reasoning (Hint outlines a square the numbers prove, and the number that
+proves it). The solitaires (Solitaire, Spider, Free Cells, Pyramid) keep their own Hint
+and Undo buttons, which suggest a move rather than teach a strategy.
 
 - **Shared:** `coach(id)` from `src/core/coach.ts` makes the Hint row and the Right score,
   saved as `${id}:accuracy`. The Hint button (light bulb) sits in its own row just above
@@ -277,8 +279,10 @@ outlines a square the numbers prove, and the number that proves it).
   the winning chance with the pot odds (bestBet in src/core/betting.ts, shared with
   Five-Card Draw, which draws by the book). Some are rules of thumb, said so in the rules:
   Euchre counts the hand for trump (Strong's count), Yacht weighs each box against what it
-  usually scores, looking ahead over the rolls left. Craps ranks bets by the house's
-  share; Mines finds squares the numbers prove. Each game's rules say how its Hint decides.
+  usually scores, looking ahead over the rolls left. Shut the Box is exact, from a table
+  of every set of open tiles. Craps and Baccarat rank bets by the house's share (Baccarat's
+  worked out exactly from a six-deck shoe in its tests); Mines finds squares the numbers
+  prove. Each game's rules say how its Hint decides.
 - **Shown on the board too:** cards or dice to keep get the dashed `hint` outline.
 
 ## Touch

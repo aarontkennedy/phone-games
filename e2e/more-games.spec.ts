@@ -285,6 +285,44 @@ test('Craps: bet the pass line and roll', async ({ page }) => {
   await expectGoodLayout(page);
 });
 
+test('Pyramid: pair cards, turn the deck, and take a hint', async ({ page }) => {
+  await page.goto('./#/pyramid');
+  await expectGoodLayout(page);
+  await expect(page.locator('[data-i]:enabled')).toHaveCount(7);
+  await page.locator('[data-stock]').click();
+  await expect(page.locator('[data-waste]')).toBeVisible();
+  await page.locator('[data-hint]').click();
+  await expect(status(page)).toHaveText(/^Hint: |^No moves left/);
+  await expectGoodLayout(page);
+});
+
+test('Baccarat: bet on Banker, deal, and get paid or not', async ({ page }) => {
+  await page.goto('./#/baccarat');
+  await expectGoodLayout(page);
+  await page.locator('[data-spot="banker"]').click();
+  await page.locator('[data-deal]').click();
+  await expect(status(page)).toHaveText(/^(Player|Banker) wins, \d to \d\.|^A tie, \d each\./);
+  await expect(page.locator('.bc-hand .card')).not.toHaveCount(0);
+  await expectGoodLayout(page);
+});
+
+test('Shut the Box: roll, shut tiles that make the roll', async ({ page }) => {
+  await page.goto('./#/shutbox');
+  await expectGoodLayout(page);
+  await page.locator('[data-roll="2"]').click();
+  await expect(status(page)).toHaveText(/^You rolled (\d+)\. Tap open tiles that add up to \1\.$/);
+  const total = Number((await status(page).textContent())!.match(/\d+/)![0]);
+  // Shut the one tile that makes it, or two that do.
+  if (total <= 9) await page.locator(`[data-tile="${total}"]`).click();
+  else {
+    await page.locator('[data-tile="9"]').click();
+    await page.locator(`[data-tile="${total - 9}"]`).click();
+  }
+  await page.locator('[data-shut]').click();
+  await expect(page.locator('[data-score]')).toHaveText(String(45 - total));
+  await expectGoodLayout(page);
+});
+
 test('Pai Gow Poker: deal, set the hand with the hint, and play', async ({ page }) => {
   await page.goto('./#/paigow');
   await expectGoodLayout(page);

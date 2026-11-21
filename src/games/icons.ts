@@ -279,3 +279,35 @@ export const paiGowIcon = svg(
     '<rect x="30" y="30" width="10" height="15" rx="2" fill="#ef5f58" transform="rotate(-8 35 37)"/>' +
     '<rect x="37" y="30" width="10" height="15" rx="2" fill="#ef5f58" transform="rotate(8 42 37)"/>',
 );
+
+/** A wooden box of numbered tiles, some flipped shut, and a die. */
+export const shutBoxIcon = svg(
+  '<rect x="2" y="10" width="44" height="22" rx="3" fill="#8a5a2b"/>' +
+    [0, 1, 2, 3, 4]
+      .map((i) => `<rect x="${5 + i * 8}" y="13" width="6" height="${i === 1 || i === 3 ? 4 : 12}" rx="1" fill="${i === 1 || i === 3 ? '#5a3a1a' : '#ffd08a'}"/>`)
+      .join('') +
+    '<rect x="16" y="33" width="14" height="14" rx="3" fill="#ffffff" stroke="#23202e" stroke-width="2"/>' +
+    '<circle cx="20" cy="37" r="1.5" fill="#23202e"/><circle cx="26" cy="43" r="1.5" fill="#23202e"/><circle cx="23" cy="40" r="1.5" fill="#23202e"/>',
+);
+
+/** Two cards, a 9 and a court card, side by side over a Player and Banker spot. */
+export const baccaratIcon = svg(
+  '<rect x="2" y="34" width="21" height="11" rx="3" fill="#2a6a9c"/><rect x="25" y="34" width="21" height="11" rx="3" fill="#ef5f58"/>' +
+    '<rect x="7" y="4" width="16" height="24" rx="3" fill="#ffffff" stroke="#23202e" stroke-width="2"/>' +
+    '<rect x="25" y="4" width="16" height="24" rx="3" fill="#ffffff" stroke="#23202e" stroke-width="2"/>' +
+    '<circle cx="15" cy="16" r="4" fill="#23202e"/><rect x="29" y="10" width="8" height="12" rx="1" fill="#ef5f58"/>',
+);
+
+/** Six cards stacked as a pyramid, the top one a king's red. */
+export const pyramidIcon = svg(
+  [
+    [18, 6, '#ef5f58'],
+    [11, 18, '#ffffff'],
+    [25, 18, '#ffffff'],
+    [4, 30, '#ffffff'],
+    [18, 30, '#ffffff'],
+    [32, 30, '#ffffff'],
+  ]
+    .map(([x, y, fill]) => `<rect x="${x}" y="${y}" width="12" height="15" rx="2" fill="${fill}" stroke="#2a8a6c" stroke-width="2"/>`)
+    .join(''),
+);

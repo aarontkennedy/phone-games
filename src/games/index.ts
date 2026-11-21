@@ -1,7 +1,7 @@
 import type { GameMeta } from '../core/game';
 import { BULB_ICON, ERASE_ICON, NEW_GAME, SETTINGS, inlineIcon } from '../core/icons';
 import { chartHtml as blackjackChart } from './blackjack/strategy';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon, rouletteIcon, crapsIcon, paiGowIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon, rouletteIcon, crapsIcon, paiGowIcon, shutBoxIcon, baccaratIcon, pyramidIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -359,6 +359,31 @@ export const games: GameMeta[] = [
     load: () => import('./numberplace'),
   },
   {
+    id: 'pyramid',
+    title: 'Pyramid',
+    description: 'Clear the pyramid in pairs that make 13',
+    icon: pyramidIcon,
+    category: 'cards',
+    howToPlay: {
+      goal: 'Clear all 28 cards from the pyramid.',
+      steps: [
+        'Cards are dealt face up in a pyramid of 7 rows. The other 24 make the deck, at the bottom.',
+        'A card is <b>free</b> when no card covers it from the row below. Only free cards can be played.',
+        'Remove two free cards that add up to 13: tap one, then the other. Aces count 1, jacks 11, queens 12, and other cards their number. So a 6 goes with a 7, and a queen with an ace.',
+        'Kings count 13 on their own: tap a free king to remove it.',
+        'Tap the deck to turn its top card over. That card is free too, and can pair with a card in the pyramid.',
+        'When the deck runs out, tap it to turn the pile back over. You can go through the deck three times.',
+        'Clear the pyramid to win. <b>Left</b> is the cards still in the pyramid, and <b>Best</b> is the fewest you’ve left at the end of a deal.',
+      ],
+      tips: [
+        'Stuck? Tap <b>Hint</b>: it outlines a king or a pair to remove, or the deck to turn. If no moves are left, the line under the cards says so. <b>Undo</b> takes a move back.',
+        'Pair cards near the bottom first: they free the cards above them.',
+        'Before pairing a deck card with a pyramid card, check whether that pyramid card could pair inside the pyramid instead.',
+      ],
+    },
+    load: () => import('./pyramid'),
+  },
+  {
     id: 'freecells',
     title: 'Free Cells',
     description: 'Solitaire with every card face up',
@@ -639,6 +664,29 @@ export const games: GameMeta[] = [
     load: () => import('./dominoes'),
   },
   {
+    id: 'shutbox',
+    title: 'Shut the Box',
+    description: 'Roll two dice and shut tiles that add up',
+    icon: shutBoxIcon,
+    category: 'dice',
+    howToPlay: {
+      goal: 'Shut as many of the nine tiles as you can. Your score is the total of the tiles left open, so lower is better, and 0 (every tile shut) is shutting the box.',
+      steps: [
+        'Tap <b>Roll</b> to roll two dice.',
+        'Tap open tiles that add up to the roll, then tap <b>Shut</b>. You can shut one tile or several: a roll of 9 could shut the 9, or 4 and 5, or 1, 3 and 5.',
+        'Keep rolling and shutting. Once the 7, 8 and 9 are all shut, you may roll just one die instead: tap <b>Roll 1 die</b>.',
+        'When no open tiles add up to the roll, the round is over and scores the open tiles’ total. Tap <b>New round</b> to play again. <b>Best</b> is your lowest score.',
+        '<b>Right</b> is how often your choice (which tiles to shut, or how many dice to roll) matched the best one. After one that wasn’t, the line under the table says what was. Choices you make after tapping <b>Hint</b> don’t count.',
+      ],
+      tips: [
+        `Not sure? Tap ${HINT} above the buttons. It outlines the tiles to shut, or says whether to roll one die or two, for the lowest average score. It’s worked out exactly, for every set of tiles that could be left open.`,
+        'Shut the big tiles first when you can: they’re the hardest to make later, and they cost the most if they’re left.',
+        'With only small tiles left, one die is often better: two dice can’t make 1, and rarely make the small totals you need.',
+      ],
+    },
+    load: () => import('./shutbox'),
+  },
+  {
     id: 'yacht',
     title: 'Yacht',
     description: 'Roll five dice to fill a score card',
@@ -663,6 +711,30 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./yacht'),
+  },
+  {
+    id: 'baccarat',
+    title: 'Baccarat',
+    description: 'Bet on Player or Banker: closest to 9 wins',
+    icon: baccaratIcon,
+    category: 'casino',
+    howToPlay: {
+      goal: 'Bet on which hand, Player or Banker, will come closest to 9. The cards play themselves: you only choose the bet.',
+      steps: [
+        'Choose a chip at the bottom, then tap <b>Player</b>, <b>Banker</b> or <b>Tie</b> to bet. Tap again to add more. Tap <b>Deal</b>.',
+        'Each hand gets two cards. Aces count 1, 2 to 9 their number, and tens and court cards 0. A hand counts only its last digit: 7 and 8 make 15, which counts 5.',
+        'An 8 or 9 in the first two cards is a <b>natural</b>, and nobody draws. Otherwise the Player hand takes a third card on 0 to 5, and the Banker hand draws by fixed rules: always on 0 to 2, and on 3 to 6 depending on the Player’s third card.',
+        'The hand closer to 9 wins. <b>Player</b> pays 1 to 1. <b>Banker</b> pays 19 to 20: a win of 20 pays 19, because the house takes 5%. <b>Tie</b> pays 8 to 1, and on a tie, Player and Banker bets come back.',
+        'Your bets stay down for the next hand. <b>Clear</b> takes them back. Cards come from a six-deck shoe, shuffled when it runs low.',
+        'These are play chips, not money. If you run out, tap <b>Start over</b> for 1000 more. <b>Best</b> is the most chips you’ve ever had.',
+      ],
+      tips: [
+        `Not sure what to bet? Tap ${HINT} above the buttons. It outlines the best bet, by how much of each bet the house keeps on average: about 1.06% of Banker bets, 1.24% of Player bets, and 14.4% of Tie bets.`,
+        'Banker wins a little more often than Player, which is why it pays a little less.',
+        'Tie pays 8 to 1, but it would need to pay about 9.5 to 1 to be a fair bet.',
+      ],
+    },
+    load: () => import('./baccarat'),
   },
   {
     id: 'roulette',

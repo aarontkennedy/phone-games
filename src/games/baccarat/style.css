@@ -1,0 +1,100 @@
+/* The Player and Banker hands side by side, each with its count, then the three bet
+   spots: Player, Tie and Banker, as on a real layout. The winning hand gets an outline. */
+.bc-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  touch-action: manipulation;
+}
+
+.bc-hands {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.bc-hand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+}
+
+.bc-hand.won {
+  border-color: var(--highlight);
+}
+
+.bc-label {
+  margin: 0;
+}
+
+/* Two or three cards, overlapping a little so three fit half the table. */
+.bc-cards {
+  display: flex;
+  --card-w: min(56px, 30cqw);
+}
+
+.bc-table {
+  container-type: inline-size;
+}
+
+.bc-cards > .card,
+.bc-cards > .card-slot {
+  width: var(--card-w);
+  flex: none;
+}
+
+.bc-cards > * + * {
+  margin-left: calc(var(--card-w) * -0.25);
+}
+
+.bc-spots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.bc-spot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: var(--tap);
+  padding: var(--space-2) var(--space-1);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+}
+
+.bc-spot span {
+  font-weight: 700;
+}
+
+.bc-spot small {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.bc-spot b {
+  min-height: 1.2em;
+}
+
+.bc-spot.on {
+  border-color: var(--text);
+}
+
+/* The bet Hint suggests. */
+.bc-spot.hint {
+  outline: 3px dashed var(--highlight);
+  outline-offset: 2px;
+}

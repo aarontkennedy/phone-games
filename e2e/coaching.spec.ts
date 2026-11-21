@@ -89,10 +89,34 @@ test('Mines: Hint says what the numbers prove', async ({ page }) => {
   await expectTouchTargets(page);
 });
 
+test('Shut the Box: Hint outlines the best tiles to shut', async ({ page }) => {
+  await page.goto('./#/shutbox');
+  // Roll until there's a choice to make (more than one way to make the roll).
+  for (let i = 0; i < 10 && !(await page.locator('[data-hint]').count()); i++) {
+    if (await page.locator('[data-new-round]').count()) await page.locator('[data-new-round]').click();
+    else if (await page.locator('[data-shut]').count()) {
+      const total = Number((await page.locator('[data-status]').textContent())!.match(/\d+/)![0]);
+      await page.locator(`[data-tile="${total}"]`).click();
+      await page.locator('[data-shut]').click();
+    } else await page.locator('[data-roll="2"]').click();
+  }
+  await expectHint(page, /^Best: (shut the outlined tiles|roll (one die|two dice))\.$/);
+});
+
+test('Baccarat: Hint outlines the Banker bet', async ({ page }) => {
+  await page.goto('./#/baccarat');
+  await page.locator('[data-hint]').click();
+  await expect(page.locator('[data-tip]')).toHaveText(/^Best: bet on Banker\./);
+  await expect(page.locator('.bc-spot.hint')).toHaveCount(1);
+  await expectNoHorizontalOverflow(page);
+  await expectReadableText(page);
+  await expectTouchTargets(page);
+});
+
 test('three stats fit the side bar on a small phone held sideways', async ({ page }) => {
   await page.setViewportSize({ width: 667, height: 375 });
   // Each game's screen class, so the check waits for that game, not the one before it.
-  const games = { videopoker: 'vp', cribbage: 'cb', hotdice: 'hd', holdem: 'he', blackjack: 'bj', drawpoker: 'dp', euchre: 'eu', yacht: 'ya' };
+  const games = { videopoker: 'vp', cribbage: 'cb', hotdice: 'hd', holdem: 'he', blackjack: 'bj', drawpoker: 'dp', euchre: 'eu', yacht: 'ya', shutbox: 'sb' };
   for (const [id, screen] of Object.entries(games)) {
     await page.goto(`./#/${id}`);
     await expect(page.locator(`.screen.${screen} [data-accuracy]`)).toBeVisible();

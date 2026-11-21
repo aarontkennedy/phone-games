@@ -33,6 +33,9 @@ const GAMES = [
   { id: 'holdem', title: 'Texas Hold’em' },
   { id: 'drawpoker', title: 'Five-Card Draw' },
   { id: 'roulette', title: 'Roulette' },
+  { id: 'pyramid', title: 'Pyramid' },
+  { id: 'baccarat', title: 'Baccarat' },
+  { id: 'shutbox', title: 'Shut the Box' },
   { id: 'craps', title: 'Craps' },
   { id: 'paigow', title: 'Pai Gow Poker' },
 ];
