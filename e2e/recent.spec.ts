@@ -4,7 +4,7 @@ import { expectNoHorizontalOverflow, expectReadableText, failOnErrors, seedRando
 // Recent moves (docs/DESIGN.md, "Recent moves"): a short list under the board in the games
 // where the computer makes moves between your turns. Full of long moves, it must still fit
 // the phone, upright and sideways, with the newest move in view.
-const GAMES = ['gofish', 'crazyeights', 'rummy', 'gin', 'holdem', 'drawpoker', 'dominoes', 'hotdice'];
+const GAMES = ['gofish', 'crazyeights', 'rummy', 'gin', 'holdem', 'drawpoker', 'dominoes', 'hotdice', 'euchre'];
 
 const LONG = [
   'West asked North for queens: go fish, drew a queen, goes again. Book of queens.',

@@ -1,5 +1,6 @@
 import { cardFace, suitSvg } from '../../core/card-view';
-import { SUITS, cardId, cardName, suitName, type Suit } from '../../core/cards';
+import { SUITS, cardId, cardName, suitName, type Card, type Suit } from '../../core/cards';
+import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { load, save } from '../../core/storage';
 import { SEAT_NAMES, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
@@ -38,6 +39,25 @@ export const TRICK_PAUSE = 1100;
 
 const lower = (name: string) => name.replace(/^(Ace|Jack|Queen|King)/, (w) => w.toLowerCase());
 const capital = (word: string) => word[0].toUpperCase() + word.slice(1);
+const the = (c: Card) => `the ${lower(cardName(c))}`;
+
+/**
+ * What a step just did, for the recent moves list: who made trump, and each finished
+ * trick (who led what, and who won it with what). Null for anything else.
+ */
+export function moveText(prev: State, next: State): string | null {
+  if (!prev.trump && next.trump) {
+    const who = SEAT_NAMES[next.maker!];
+    const alone = next.alone ? ' alone' : '';
+    if (prev.phase === 'bidding2') return `${who} called ${suitName(next.trump)}${alone}.`;
+    return `${who} ${next.maker === prev.dealer ? 'picked' : 'ordered'} up ${the(upcard(prev))}${alone}.`;
+  }
+  if (prev.phase !== 'playing' || prev.trick.length !== playersIn(prev) || next.trick.length) return null;
+  const lead = prev.trick[0];
+  const won = prev.trick.find((p) => p.seat === trickWinner(prev.trick, prev.trump!))!;
+  const led = `${SEAT_NAMES[lead.seat]} led ${the(lead.card)}`;
+  return won === lead ? `${led} and won.` : `${led}; ${won.seat === 0 ? 'you' : SEAT_NAMES[won.seat]} won with ${the(won.card)}.`;
+}
 
 export function mount(container: HTMLElement): () => void {
   const saved = load<unknown>(STATE_KEY, null);
@@ -55,6 +75,7 @@ export function mount(container: HTMLElement): () => void {
       </div>
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
+      ${RECENT_HTML}
       <div class="controls">
         <div class="eu-bid actions" data-bidding></div>
       </div>
@@ -66,6 +87,7 @@ export function mount(container: HTMLElement): () => void {
   const usEl = container.querySelector<HTMLElement>('[data-us]')!;
   const themEl = container.querySelector<HTMLElement>('[data-them]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const recent = recentMoves(container, 'euchre');
 
   const bidding = () => state.phase === 'bidding1' || state.phase === 'bidding2';
   const myBid = () => bidding() && state.turn === 0;
@@ -73,6 +95,9 @@ export function mount(container: HTMLElement): () => void {
 
   function update(next: State | null) {
     if (!next) return;
+    // A new hand (or game) starts the list over; otherwise say what just happened.
+    if (next.phase === 'bidding1' && state.phase !== 'bidding1') recent.clear();
+    else recent.add(moveText(state, next));
     state = next;
     alone = false;
     save(STATE_KEY, state);

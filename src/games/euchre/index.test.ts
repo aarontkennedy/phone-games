@@ -5,7 +5,7 @@ import cardsCss from '../../core/cards.css?raw';
 import { load, save } from '../../core/storage';
 import { contrast, readVars, themes } from '../../test/contrast';
 import { makeContainer, track, answerNewGame } from '../../test/helpers';
-import { AI_DELAY, TRICK_PAUSE, mount } from './index';
+import { AI_DELAY, TRICK_PAUSE, mount, moveText } from './index';
 import type { HandResult, State } from './logic';
 import { bidding, position, trick } from './test-fixtures';
 
@@ -28,6 +28,43 @@ const HANDS = ['JH JD AH KC 9C', '10H QH 9D 10D 10C', 'KH AD KD QD JC', 'AS JS 9
 
 beforeEach(() => {
   vi.useFakeTimers();
+});
+
+describe('Euchre recent moves', () => {
+  const recent = (c: HTMLElement) => [...c.querySelectorAll('[data-recent] li')].map((li) => li.textContent);
+
+  it('says who made trump', () => {
+    const s = bidding(HANDS);
+    const made = (next: Partial<State>, prev: Partial<State> = {}) =>
+      moveText({ ...s, ...prev }, { ...s, phase: 'playing', trump: 'H', maker: 0, alone: false, ...next });
+    expect(made({})).toBe('You ordered up the 9 of hearts.');
+    expect(made({ maker: 3, alone: true })).toBe('East picked up the 9 of hearts alone.');
+    expect(made({ trump: 'S', maker: 1 }, { phase: 'bidding2' })).toBe('West called spades.');
+    expect(moveText(s, { ...s, turn: 1 })).toBeNull(); // a pass
+  });
+
+  it('says who led each trick, and who won it with what', () => {
+    const done = (t: ReturnType<typeof trick>) => {
+      const s = position(['', '', '', ''], { trick: t });
+      return moveText(s, { ...s, trick: [] });
+    };
+    expect(done(trick(1, 'KS QS AS 10S'))).toBe('West led the king of spades; East won with the ace of spades.');
+    expect(done(trick(0, 'AS 9S 10S QS'))).toBe('You led the ace of spades and won.');
+    // The left bower (jack of diamonds, with hearts trump) wins as trump.
+    expect(done(trick(2, 'AC KC JD QC'))).toBe('North led the ace of clubs; you won with the jack of diamonds.');
+    const mid = position(['', '', '', ''], { trick: trick(1, 'KS QS') });
+    expect(moveText(mid, { ...mid, trick: trick(1, 'KS QS AS') })).toBeNull();
+  });
+
+  it('lists each trick as it ends, and starts over with the next hand', () => {
+    const s = position(['9S AH', 'KS', 'QS', 'AS 10C'], { turn: 0, tricks: [1, 0, 0, 0] });
+    const { container, $ } = setup(s);
+    expect(recent(container)).toEqual([]);
+    $('[data-hand][data-card="9S"]').click();
+    vi.advanceTimersByTime(AI_DELAY * 3 + TRICK_PAUSE);
+    expect(recent(container)).toEqual(['You led the 9 of spades; East won with the ace of spades.']);
+    expect(load('euchre:recent', [])).toHaveLength(1);
+  });
 });
 
 describe('Euchre screen', () => {
