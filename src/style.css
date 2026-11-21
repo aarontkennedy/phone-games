@@ -698,6 +698,21 @@ body {
   color: var(--on-accent);
 }
 
+/* A button you can't use right now (Undo with nothing to undo, Deal with no bet): an empty
+   outline in muted text instead of a fill, so it reads as off at a glance. The text keeps
+   the muted color's contrast, and the button keeps its size, so the row doesn't move. */
+.btn:disabled,
+.btn.secondary:disabled {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
+}
+
+.btn:disabled:active {
+  transform: none;
+}
+
 /* A row of mutually exclusive options. Mark the chosen one with aria-pressed="true". */
 .segmented {
   flex: 1;
@@ -722,6 +737,12 @@ body {
 .segmented button[aria-pressed='true'] {
   background: var(--accent);
   color: var(--on-accent);
+}
+
+/* An option you can't pick right now (a bet bigger than your chips): struck through. */
+.segmented button:disabled:not([aria-pressed='true']) {
+  text-decoration: line-through;
+  cursor: default;
 }
 
 /* The playing surface. Positioned so an .overlay can cover it. */

@@ -48,6 +48,15 @@ describe('flat design', () => {
   });
 });
 
+describe('disabled buttons', () => {
+  it('look off: an empty outline in muted text (muted on bg is checked above)', () => {
+    const rule = css.match(/\.btn:disabled,\s*\.btn\.secondary:disabled\s*{([^}]*)}/)?.[1] ?? '';
+    expect(rule).toMatch(/background:\s*transparent/);
+    expect(rule).toMatch(/color:\s*var\(--muted\)/);
+    expect(rule).toMatch(/border-color:\s*var\(--border\)/);
+  });
+});
+
 describe('tokens', () => {
   it('defines a dark value for every themed color', () => {
     const colorTokens = Object.keys(light).filter((k) => /^#|rgba?\(/.test(light[k]));
