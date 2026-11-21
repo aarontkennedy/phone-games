@@ -106,6 +106,13 @@
   border-color: var(--text);
 }
 
+/* The bets Hint suggests. */
+.cr-number.hint,
+.cr-bet.hint {
+  outline: 3px dashed var(--highlight);
+  outline-offset: 2px;
+}
+
 .cr-number.point {
   background: var(--accent);
   color: var(--on-accent);

@@ -4,7 +4,7 @@
 // thirty-ones, pairs, runs, "go" and last card. Then the show: the non-dealer's hand,
 // the dealer's hand and the crib are counted with the starter.
 // Pure functions: every action returns a new State, or null if it isn't allowed.
-import { isCard, isFullDeck, sameCard, shuffledDeck, type Card } from '../../core/cards';
+import { isCard, isFullDeck, newDeck, sameCard, shuffledDeck, type Card } from '../../core/cards';
 import { randomInt, type Rng } from '../../core/random';
 
 export type Level = 'easy' | 'strong';
@@ -339,4 +339,93 @@ export function isValidState(s: unknown): s is State {
       ...(st.starter ? [st.starter] : []),
     ])
   );
+}
+
+// --- The best discard (Hint and the Right score) ---
+
+/** Fifteens, pairs and runs in five ranks (1 to 13), for the crib average. Suits don't matter here. */
+function rankPoints(ranks: number[]): number {
+  let points = 0;
+  for (let mask = 1; mask < 32; mask++) {
+    let sum = 0;
+    for (let i = 0; i < 5; i++) if (mask & (1 << i)) sum += Math.min(ranks[i], 10);
+    if (sum === 15) points += 2;
+  }
+  const counts = new Array<number>(15).fill(0);
+  for (const r of ranks) counts[r]++;
+  for (const n of counts) points += n * (n - 1); // 2 per pair
+  for (let start = 1; start <= 11; start++) {
+    if (!counts[start] || counts[start - 1]) continue;
+    let len = 0;
+    let ways = 1;
+    while (counts[start + len]) ways *= counts[start + len++];
+    if (len >= 3) points += len * ways;
+  }
+  return points;
+}
+
+const choose = (n: number, k: number): number => (k < 0 || k > n ? 0 : k === 0 ? 1 : (choose(n - 1, k - 1) * n) / k);
+
+export interface DiscardChoice {
+  toss: Card[];
+  /** The kept hand's average points over every possible starter. */
+  hand: number;
+  /** The crib's average points, if the other player throws any two cards. */
+  crib: number;
+  /** hand plus the crib if it's yours, minus it if it isn't. */
+  value: number;
+}
+
+/**
+ * Every way to put 2 of your 6 cards in the crib, valued from what you can see: the kept
+ * four averaged exactly over the 46 cards the starter could be, and the crib averaged
+ * over every 2 cards the other player could throw and every starter.
+ */
+export function discardChoices(hand: Card[], myCrib: boolean): DiscardChoice[] {
+  const unseen = newDeck().filter((c) => !hand.some((h) => sameCard(h, c)));
+  const avail = new Array<number>(14).fill(0);
+  for (const c of unseen) avail[c.rank]++;
+  const out: DiscardChoice[] = [];
+  for (let i = 0; i < hand.length; i++) {
+    for (let j = i + 1; j < hand.length; j++) {
+      const toss = [hand[i], hand[j]];
+      const keep = hand.filter((_, k) => k !== i && k !== j);
+      const handAvg = unseen.reduce((t, st) => t + total(scoreHand(keep, st)), 0) / unseen.length;
+      // The crib's other three cards (two thrown, then the starter), by rank: exact for
+      // fifteens, pairs and runs.
+      let sum = 0;
+      for (let a = 1; a <= 13; a++) {
+        for (let b = a; b <= 13; b++) {
+          for (let c = b; c <= 13; c++) {
+            const need = new Map<number, number>();
+            for (const r of [a, b, c]) need.set(r, (need.get(r) ?? 0) + 1);
+            const ways = [...need].reduce((w, [r, n]) => w * choose(avail[r], n), 1);
+            if (ways) sum += ways * rankPoints([toss[0].rank, toss[1].rank, a, b, c]);
+          }
+        }
+      }
+      let crib = sum / choose(unseen.length, 3);
+      // A crib flush needs all five cards one suit; nobs is a jack matching the starter.
+      if (toss[0].suit === toss[1].suit) crib += (5 * choose(unseen.filter((c) => c.suit === toss[0].suit).length, 3)) / choose(unseen.length, 3);
+      const unseenJacks = unseen.filter((c) => c.rank === 11);
+      for (const jack of [...toss.filter((c) => c.rank === 11)]) crib += unseen.filter((c) => c.suit === jack.suit).length / unseen.length;
+      // The other player's jacks: each of their 2 cards is a jack 1 in 46 per jack, and the
+      // starter (one of the other 45) shares its suit 12 times in 45.
+      crib += (2 * unseenJacks.length * 12) / (unseen.length * (unseen.length - 1));
+      out.push({ toss, hand: handAvg, crib, value: handAvg + (myCrib ? crib : -crib) });
+    }
+  }
+  return out;
+}
+
+/** The best two cards to put in the crib. Ties go to the first found. */
+export function bestDiscard(hand: Card[], myCrib: boolean): Card[] {
+  return discardChoices(hand, myCrib).reduce((best, c) => (c.value > best.value + 1e-9 ? c : best)).toss;
+}
+
+/** Whether putting `toss` in the crib is as good as the best choice (several can tie). */
+export function isBestDiscard(hand: Card[], myCrib: boolean, toss: Card[]): boolean {
+  const choices = discardChoices(hand, myCrib);
+  const mine = choices.find((c) => c.toss.every((t) => toss.some((x) => sameCard(x, t))))!;
+  return mine.value >= Math.max(...choices.map((c) => c.value)) - 1e-9;
 }

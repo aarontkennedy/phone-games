@@ -8,7 +8,7 @@ import { makeContainer, pointer, setHidden, tap, track, answerNewGame } from '..
 import { LONG_PRESS_MS, mount } from './index';
 import { seededRng } from '../../core/random';
 import { fixture } from './test-fixtures';
-import type { State } from './logic';
+import { newState, type State } from './logic';
 
 function setup(saved: State | null = fixture()) {
   if (saved) save('minesweeper:state', saved);
@@ -341,5 +341,49 @@ describe('Mines symbols', () => {
     expect(
       doc.querySelectorAll('linearGradient, radialGradient, pattern, filter, image, foreignObject, [filter], [opacity]'),
     ).toHaveLength(0);
+  });
+});
+
+/**
+ * An Easy (6 by 6) game with mines at `mines` and these squares dug. Row 0 is squares 0
+ * to 5, row 1 is 6 to 11, and so on.
+ */
+function board(mines: number[], dug: number[]): State {
+  const s = newState('easy');
+  s.mines = s.revealed.map((_, i) => mines.includes(i));
+  s.revealed = s.revealed.map((_, i) => dug.includes(i));
+  s.status = 'playing';
+  return s;
+}
+/** Rows 1 to 5 dug, row 0 hidden. */
+const below = Array.from({ length: 30 }, (_, i) => i + 6);
+
+describe('Mines hints', () => {
+  it('outlines a safe square and the number that proves it', () => {
+    const { $, cell } = setup(board([0, 2], [...below, 3, 4, 5]));
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: dig the dashed square. The 1 with the solid outline already touches its mine, so the rest around it are safe.');
+    expect(cell(1).classList.contains('hint')).toBe(true);
+    expect(cell(8).classList.contains('why')).toBe(true);
+    expect($('[data-accuracy]')).toBeNull(); // no Right score in Mines
+  });
+
+  it('says when every hidden square is a mine, compares two numbers, or admits a guess', () => {
+    const corner = setup(board([0, 1], [2, 3, 4, 5, ...below]));
+    corner.$('[data-hint]').click();
+    expect(corner.$('[data-tip]').textContent).toMatch(/^Best: flag the dashed square\. The \d with the solid outline touches exactly/);
+    document.body.replaceChildren();
+    const pair = setup(board([1, 4], below));
+    pair.$('[data-hint]').click();
+    expect(pair.$('[data-tip]').textContent).toMatch(/^Best: dig the dashed square\. Compare the two outlined numbers/);
+    expect(pair.cell(6).classList.contains('why') && pair.cell(7).classList.contains('why')).toBe(true);
+    document.body.replaceChildren();
+    const guess = setup(board([0], [7]));
+    guess.$('[data-hint]').click();
+    expect(guess.$('[data-tip]').textContent).toMatch(/^No square is certain right now/);
+    document.body.replaceChildren();
+    const fresh = setup(newState('easy'));
+    fresh.$('[data-hint]').click();
+    expect(fresh.$('[data-tip]').textContent).toBe('Best: dig anywhere. The first dig is never a mine.');
   });
 });

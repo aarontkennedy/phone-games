@@ -3,6 +3,7 @@ import { seededRng } from '../../core/random';
 import {
   LEVELS,
   countAt,
+  deduce,
   flagsLeft,
   isFinished,
   isValidState,
@@ -259,5 +260,45 @@ describe('toggleFlag', () => {
     const s = fixture();
     s.status = 'won';
     expect(toggleFlag(s, 3)).toBe(false);
+  });
+});
+
+/**
+ * An Easy (6 by 6) game with mines at `mines` and these squares dug. Row 0 is squares 0
+ * to 5, row 1 is 6 to 11, and so on.
+ */
+function board(mines: number[], dug: number[]): State {
+  const s = newState('easy');
+  s.mines = s.revealed.map((_, i) => mines.includes(i));
+  s.revealed = s.revealed.map((_, i) => dug.includes(i));
+  s.status = 'playing';
+  return s;
+}
+/** Rows 1 to 5 dug, row 0 hidden. */
+const below = Array.from({ length: 30 }, (_, i) => i + 6);
+
+describe('hints: what the numbers prove', () => {
+  it('finds a number whose hidden squares are all mines, then one whose mines are all found', () => {
+    // Mines at 0 and 2; squares 3, 4 and 5 dug too. The 1 at square 3 touches only square
+    // 2, so 2 is a mine; then the 1 at square 8 has its mine, so square 1 is safe.
+    expect(deduce(board([0, 2], [...below, 3, 4, 5]))).toEqual({ cell: 1, safe: true, clues: [8], rule: 'full' });
+  });
+
+  it('compares two numbers', () => {
+    // Mines at 1 and 4. The 1 at square 6 needs one of 0 and 1; the 1 at square 7 needs one
+    // of 0, 1 and 2: the same mine, so square 2 is safe.
+    expect(deduce(board([1, 4], below))).toEqual({ cell: 2, safe: true, clues: [6, 7], rule: 'pair' });
+    // Mines at 0, 2 and 4: the 2 at square 7 needs one more than the 1 at square 6, so
+    // square 2 is a mine. Then the 2 at square 9 has one left among 3 and 4, the same one
+    // the 1 at square 10 needs, so square 5 is safe.
+    expect(deduce(board([0, 2, 4], below))).toEqual({ cell: 5, safe: true, clues: [9, 10], rule: 'pair' });
+  });
+
+  it('reports a proved mine when nothing is safe, and nothing when it’s all guesswork', () => {
+    // Every hidden square next to the 3 at square 6... is a mine: 0, 1 hidden, mines at both.
+    const corner = board([0, 1], [2, 3, 4, 5, ...below]);
+    expect(deduce(corner)).toMatchObject({ safe: false, rule: 'all' });
+    expect(deduce(board([0], [7]))).toBeNull();
+    expect(deduce(newState('easy'))).toBeNull(); // no mines yet: the first dig is safe
   });
 });

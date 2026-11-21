@@ -21,7 +21,7 @@ test('bid through to play, then play a trick', async ({ page }) => {
   const bidding = page.locator('[data-bidding]');
   // Pass whenever asked; if it comes back to you in round two, name the first suit offered.
   for (let i = 0; i < 3; i++) {
-    await expect(status).toHaveText(/Your turn|Order the dealer|Name a trump/, { timeout: 15_000 });
+    await expect(status).toHaveText(/Your turn|Order up the|Name a trump/, { timeout: 15_000 });
     if (!(await bidding.isVisible())) break;
     const passBtn = page.locator('[data-pass]');
     if (await passBtn.count()) await passBtn.click();

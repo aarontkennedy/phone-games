@@ -150,3 +150,83 @@ export function toggleFlag(state: State, i: number): boolean {
   state.flagged[i] = !state.flagged[i];
   return true;
 }
+
+// --- Hint: a square that's certainly safe (or certainly a mine), and why ---
+
+export interface Deduction {
+  /** The square the numbers prove something about. */
+  cell: number;
+  /** Safe to dig, or certainly a mine (flag it). */
+  safe: boolean;
+  /** The revealed numbers that prove it: one, or two compared. */
+  clues: number[];
+  /** How: the number's mines are all found ("full"), its hidden squares are all mines ("all"), or two numbers compared ("pair"). */
+  rule: 'full' | 'all' | 'pair';
+}
+
+/**
+ * A square the revealed numbers prove safe (first choice) or a mine, as a player would
+ * reason it out. Flags aren't trusted (they might be wrong); mines proved along the way
+ * are. Null when no square is certain: the next dig is a guess.
+ */
+export function deduce(state: State): Deduction | null {
+  if (!state.mines) return null;
+  const n = state.revealed.length;
+  const mine = Array<boolean>(n).fill(false); // proved mines
+  const clues = [...Array(n).keys()].filter((i) => state.revealed[i] && !state.mines![i] && around(state, i).some((j) => !state.revealed[j]));
+  /** A clue's hidden squares not yet proved, and how many mines are still among them. */
+  const open = (c: number) => {
+    const hidden = around(state, c).filter((j) => !state.revealed[j]);
+    const unknown = hidden.filter((j) => !mine[j]);
+    return { unknown, left: countAt(state, c) - (hidden.length - unknown.length) };
+  };
+  const best: { found: Deduction | null } = { found: null };
+  const note = (d: Deduction) => {
+    if (d.safe) {
+      if (!best.found?.safe) best.found = d;
+    } else {
+      mine[d.cell] = true;
+      best.found ??= d;
+    }
+  };
+  for (let changed = true; changed && !best.found?.safe; ) {
+    changed = false;
+    for (const c of clues) {
+      const { unknown, left } = open(c);
+      if (!unknown.length) continue;
+      if (left === 0) {
+        note({ cell: unknown[0], safe: true, clues: [c], rule: 'full' });
+        break;
+      }
+      if (left === unknown.length) {
+        unknown.forEach((cell) => note({ cell, safe: false, clues: [c], rule: 'all' }));
+        changed = true;
+      }
+    }
+    if (best.found?.safe || changed) continue;
+    // Two numbers compared: when one's unknown squares all touch the other, the other's
+    // extra squares hold exactly the difference in their mines.
+    for (const a of clues) {
+      const A = open(a);
+      if (!A.unknown.length) continue;
+      for (const b of clues) {
+        if (a === b) continue;
+        const B = open(b);
+        if (!A.unknown.every((j) => B.unknown.includes(j))) continue;
+        const extra = B.unknown.filter((j) => !A.unknown.includes(j));
+        if (!extra.length) continue;
+        const diff = B.left - A.left;
+        if (diff === 0) {
+          note({ cell: extra[0], safe: true, clues: [a, b], rule: 'pair' });
+          break;
+        }
+        if (diff === extra.length) {
+          extra.forEach((cell) => note({ cell, safe: false, clues: [a, b], rule: 'pair' }));
+          changed = true;
+        }
+      }
+      if (best.found?.safe) break;
+    }
+  }
+  return best.found;
+}

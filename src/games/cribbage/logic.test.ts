@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { isFullDeck } from '../../core/cards';
 import { seededRng } from '../../core/random';
 import {
+  bestDiscard,
   canPlay,
+  discardChoices,
+  isBestDiscard,
   chooseCard,
   chooseDiscard,
   discard,
@@ -333,5 +336,30 @@ describe('isValidState', () => {
     ['bad starter', (s: State) => ({ ...s, starter: { suit: 'X', rank: 1 } })],
   ])('rejects %s', (_name, change) => {
     expect(isValidState(change(newGame('strong', seededRng(1))))).toBe(false);
+  });
+});
+
+describe('the best discard', () => {
+  it('values each discard from what you can see: the kept hand and the crib', () => {
+    const choices = discardChoices(cards('5H 5S KD 9C 2H 7S'), true);
+    expect(choices).toHaveLength(15);
+    const of = (a: string, b: string) => choices.find((c) => c.toss.map((x) => `${x.rank}${x.suit}`).join(' ') === `${a} ${b}`)!;
+    // Two 5s make the best crib, but keeping them makes a better hand.
+    expect(of('5H', '5S').crib).toBeGreaterThan(8);
+    expect(of('9C', '2H').hand).toBeGreaterThan(8.5);
+    expect(of('9C', '2H').value).toBeCloseTo(of('9C', '2H').hand + of('9C', '2H').crib, 9);
+    expect(bestDiscard(cards('5H 5S KD 9C 2H 7S'), true).map((c) => `${c.rank}${c.suit}`)).toEqual(['9C', '2H']);
+    // The other player's crib counts against you.
+    const theirs = discardChoices(cards('5H 5S KD 9C 2H 7S'), false);
+    expect(theirs[0].value).toBeCloseTo(theirs[0].hand - theirs[0].crib, 9);
+    expect(isBestDiscard(cards('5H 5S KD 9C 2H 7S'), true, cards('9C 2H'))).toBe(true);
+    expect(isBestDiscard(cards('5H 5S KD 9C 2H 7S'), true, cards('5H 5S'))).toBe(false);
+  });
+
+  it('counts crib flushes and jacks (nobs) too', () => {
+    // A jack and a card of its suit: the jack can score nobs, the suit can make a flush.
+    const suited = discardChoices(cards('JH 2H 3C 7D 9S KC'), true).find((c) => c.toss[0].rank === 11 && c.toss[1].rank === 2)!;
+    const offsuit = discardChoices(cards('JH 2S 3C 7D 9H KC'), true).find((c) => c.toss[0].rank === 11 && c.toss[1].rank === 2)!;
+    expect(suited.crib).toBeGreaterThan(offsuit.crib);
   });
 });

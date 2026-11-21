@@ -146,3 +146,38 @@ describe("Hold'em screen", () => {
     expect(setup({ hand: 'x' }).$$('[data-seat]')).toHaveLength(4);
   });
 });
+
+describe('Hold’em hints', () => {
+  it('gives the best play by the numbers when asked, and scores plays made without it', () => {
+    // Aces against one player on the flop: well ahead, so raise.
+    const s = table(['AS AH', 'KS KH', '', ''], '2C 3C 4C', { bets: [0, 10, 0, 0], put: [0, 10, 0, 0], stacks: [1000, 990, 1000, 1000], raises: 1 });
+    const { $, status } = setup(s);
+    expect($('[data-accuracy]').textContent).toBe('–');
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toMatch(/^Best: Raise\. You win about \d+% against 1 hand, well over an even share \(50%\)\.$/);
+    $('[data-action="call"]').click(); // asked first: not scored
+    expect($('[data-accuracy]').textContent).toBe('–');
+    expect(status()).not.toMatch(/Best was/);
+  });
+
+  it('says the best play after a miss, with the pot odds', () => {
+    // Seven-two against three players facing a bet: fold.
+    const s = table(['7C 2D', 'KS KH', 'QS QH', 'JS JH'], '', { bets: [0, 10, 10, 10], put: [0, 10, 10, 10], stacks: [1000, 990, 990, 990], toAct: [true, false, false, false], raises: 1 });
+    const { $ } = setup(s);
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toMatch(/^Best: Fold\. You win about \d+% against 3 hands; calling 10 to win 30 needs 25%\.$/);
+    document.body.replaceChildren();
+    const again = setup(s);
+    again.$('[data-action="call"]').click();
+    expect(again.$('[data-accuracy]').textContent).toBe('0%');
+    expect(again.status()).toMatch(/^Best was to fold\. You win about/);
+    expect(load('holdem:accuracy', null)).toEqual({ right: 0, plays: 1 });
+  });
+
+  it('says to check when it’s free and the hand isn’t strong', () => {
+    const s = table(['7C 2D', 'KS KH', '', ''], '9S 10S JD', { bets: [0, 0, 0, 0], put: [10, 10, 0, 0], stacks: [990, 990, 1000, 1000] });
+    const { $ } = setup(s);
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toMatch(/^Best: Check\. You win about \d+% against 1 hand: not enough to bet, and checking is free\.$/);
+  });
+});

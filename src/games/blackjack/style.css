@@ -91,35 +91,6 @@
   color: var(--muted);
 }
 
-/* Hint: its own row just above the four play buttons. Tapping it shows the best play in
-   the same spot, leaving the instructions in the status line alone. */
-.bj-coach {
-  flex: 1 1 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.bj-hint,
-.bj-tip {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: var(--tap);
-  margin: 0;
-}
-
-.bj-hint svg,
-.bj-tip svg {
-  flex: none;
-  width: 26px;
-  height: 26px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
 /* The instructions sit right above the buttons they're about, not up under the table. */
 .screen.bj > .status-line {
   margin-top: auto;
@@ -133,15 +104,6 @@
   /* The spare height goes above the status line, not between it and the buttons. */
   #app:has(> .game .bj) {
     grid-template-rows: auto auto 1fr auto auto;
-  }
-
-  /* Three stats in a side bar ~260px wide: tighter spacing, so CI's wider font fits too. */
-  .game .bj > .stats {
-    gap: var(--space-1);
-  }
-
-  .game .bj .stat {
-    padding-inline: var(--space-1);
   }
 
   .game .bj > .status-line {

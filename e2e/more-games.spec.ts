@@ -124,7 +124,8 @@ test('Yacht: roll, hold a die, roll again and score a box', async ({ page }) => 
   await page.locator('[data-roll]').click();
   await page.locator('[data-box="chance"]').click();
   await expect(page.locator('[data-box="chance"]')).toHaveClass(/filled/);
-  await expect(status(page)).toHaveText('Turn 2 of 13. Tap Roll.');
+  // It may first say what the best play was (Hint, docs/DESIGN.md "Coaching").
+  await expect(status(page)).toHaveText(/(^|\. )Turn 2 of 13\. Tap Roll\.$/);
 });
 
 test('Reversi: place a disc, the computer answers', async ({ page }) => {

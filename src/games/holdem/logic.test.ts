@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { isFullDeck } from '../../core/cards';
 import { seededRng } from '../../core/random';
 import { makePots } from '../../core/betting';
-import { act, betSize, bigBlind, chooseAction, equity, isValidState, newGame, nextHand, options, pot, raiseCost, toCall, winner, type State } from './logic';
+import { act, advice, betSize, bigBlind, chooseAction, equity, isValidState, newGame, nextHand, options, pot, raiseCost, toCall, winner, type State } from './logic';
 import { cards, table } from './test-fixtures';
 
 describe("hold'em hands", () => {
@@ -159,5 +159,16 @@ describe("hold'em computer players", () => {
       { ...good, deck: good.deck.slice(1) },
     ];
     for (const b of bad) expect(isValidState(b as State)).toBe(false);
+  });
+});
+
+describe('Hold’em advice', () => {
+  it('gives the same answer for the same cards', () => {
+    const s = table(['AS AH', 'KS KH', '', ''], '2C 3C 4C', { bets: [0, 10, 0, 0], put: [0, 10, 0, 0], stacks: [1000, 990, 1000, 1000], raises: 1 });
+    const a = advice(s);
+    expect(a).toEqual(advice(s));
+    expect(a.action).toBe('raise');
+    expect(a.opponents).toBe(1);
+    expect(a.odds).toBe(0.5);
   });
 });

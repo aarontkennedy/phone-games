@@ -82,6 +82,17 @@
   background: var(--ms-open);
 }
 
+/* Hint: the square to dig or flag is dashed; the numbers that prove it are solid. */
+.ms-cell.hint,
+.ms-cell.why {
+  outline: 3px dashed var(--highlight);
+  outline-offset: -3px;
+}
+
+.ms-cell.why {
+  outline-style: solid;
+}
+
 .ms-cell.exploded {
   background: var(--danger);
 }

@@ -1,12 +1,16 @@
 import { cardFace, suitSvg } from '../../core/card-view';
 import { SUITS, cardId, cardName, suitName, type Suit } from '../../core/cards';
 import { RECENT_HTML, recentMoves } from '../../core/recent';
+import { coach } from '../../core/coach';
 import { load, save } from '../../core/storage';
 import { SEAT_NAMES, theCard, trickText, type Seat } from '../../core/tricks';
 import { handHtml, seatsHtml } from '../../core/trick-view';
 import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
+  ALONE,
+  CALL,
   applyBid,
+  bidAdvice,
   callTrump,
   chooseBid,
   chooseCard,
@@ -21,11 +25,14 @@ import {
   pass,
   play,
   playersIn,
+  sameBid,
   sittingOut,
   teamOf,
   trickWinner,
   upcard,
   winner,
+  type Bid,
+  type BidAdvice,
   type Level,
   type State,
 } from './logic';
@@ -68,11 +75,12 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>Us</small><b data-us></b></div>
         <button class="btn" data-new>New</button>
         <div class="stat"><small>Them</small><b data-them></b></div>
+        <div class="stat"><small>Right</small><b data-accuracy></b></div>
       </div>
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       ${RECENT_HTML}
-      <div class="controls">
+      <div class="controls" data-controls>
         <div class="eu-bid actions" data-bidding></div>
       </div>
     </div>${settingsHtml(levelSetting('Computer players'))}`;
@@ -84,6 +92,11 @@ export function mount(container: HTMLElement): () => void {
   const themEl = container.querySelector<HTMLElement>('[data-them]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
   const recent = recentMoves(container, 'euchre');
+  const controlsEl = container.querySelector<HTMLElement>('[data-controls]')!;
+  /** How often your bids and discards were the best ones by the count (src/core/coach.ts). */
+  const coaching = coach('euchre');
+  /** After your bid or discard: the best one, when yours wasn't, said until your next one. */
+  let missed: string | null = null;
 
   const bidding = () => state.phase === 'bidding1' || state.phase === 'bidding2';
   const myBid = () => bidding() && state.turn === 0;
@@ -92,8 +105,11 @@ export function mount(container: HTMLElement): () => void {
   function update(next: State | null) {
     if (!next) return;
     // A new hand (or game) starts the list over; otherwise say what just happened.
-    if (next.phase === 'bidding1' && state.phase !== 'bidding1') recent.clear();
-    else recent.add(moveText(state, next));
+    if (next.phase === 'bidding1' && state.phase !== 'bidding1') {
+      recent.clear();
+      missed = null;
+    } else recent.add(moveText(state, next));
+    if (next.phase !== state.phase || next.turn !== state.turn) coaching.asked = false;
     state = next;
     alone = false;
     save(STATE_KEY, state);
@@ -153,6 +169,40 @@ export function mount(container: HTMLElement): () => void {
     }
   }
 
+  const myDiscard = () => state.phase === 'discard' && state.dealer === 0;
+
+  /** "Your hand counts about 8.3 with hearts as trump: 7 or more is worth calling." */
+  function countText(a: BidAdvice): string {
+    const n = Math.max(0, a.strength).toFixed(1).replace(/\.0$/, ''); // the dealer's gift can take it below 0
+    const need = a.bid.action === 'pass' ? `${CALL} is needed to call` : a.strength >= ALONE ? `${ALONE} or more is worth going alone` : `${CALL} or more is worth calling`;
+    return `Your hand counts about ${n} with ${suitName(a.suit)} as trump: ${need}.`;
+  }
+
+  /** "order up", "pick it up alone", "call spades", "pass" */
+  function bidWords(b: Bid): string {
+    if (b.action === 'pass') return 'pass';
+    const alone = b.alone ? ' alone' : '';
+    if (b.action === 'call') return `call ${suitName(b.suit)}${alone}`;
+    return `${state.dealer === 0 ? 'pick it up' : 'order up'}${alone}`;
+  }
+
+  /** The best play now (HTML), or null when there's nothing to advise. */
+  function tipText(): string | null {
+    if (myBid()) {
+      const a = bidAdvice(state, 0);
+      return `Best: <b>${bidWords(a.bid)}</b>. ${countText(a)}`;
+    }
+    if (myDiscard()) return 'Best: put back the <b>outlined card</b>, keeping trump and aces and emptying a short suit if you can.';
+    return null;
+  }
+
+  /** Scores your bid against the best one, before it's made. */
+  function scoreBid(b: Bid) {
+    const a = bidAdvice(state, 0);
+    const right = sameBid(b, a.bid);
+    missed = coaching.score(right) && !right ? `Best was to ${bidWords(a.bid)}. ${countText(a)}` : null;
+  }
+
   function handSummary(): string {
     const r = state.last!;
     const makers = state.maker!;
@@ -165,13 +215,17 @@ export function mount(container: HTMLElement): () => void {
   }
 
   function statusText(): string {
+    return (missed ? `${missed} ` : '') + statusWords();
+  }
+
+  function statusWords(): string {
     const up = lower(cardName(upcard(state)));
     switch (state.phase) {
       case 'bidding1':
         if (state.turn !== 0) return `${name(state.turn)} is deciding…`;
         return state.dealer === 0
           ? `Pick up the ${up} to make ${suitName(upcard(state).suit)} trump, or pass.`
-          : `Order the dealer to pick up the ${up}, making ${suitName(upcard(state).suit)} trump? Or pass.`;
+          : `Order up the ${up} to make ${suitName(upcard(state).suit)} trump, or pass.`;
       case 'bidding2':
         if (state.turn !== 0) return `${name(state.turn)} is deciding…`;
         return state.dealer === 0
@@ -207,11 +261,15 @@ export function mount(container: HTMLElement): () => void {
         card: state.trick.find((p) => p.seat === seat)?.card,
         turn: (bidding() || (state.phase === 'playing' && !trickDone())) && state.turn === seat,
       }))}
-      ${handHtml(state.hands[0], { playable })}`;
+      ${handHtml(state.hands[0], { playable, marked: { hint: myDiscard() && coaching.asked ? [chooseDiscard(state)] : [] } })}`;
     usEl.textContent = String(state.scores[0]);
     themEl.textContent = String(state.scores[1]);
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
     renderBidding();
+    container.querySelector('[data-accuracy]')!.textContent = coaching.text();
+    controlsEl.querySelector('.coach')?.remove();
+    const tip = tipText();
+    if (tip) controlsEl.insertAdjacentHTML('afterbegin', coaching.html(coaching.asked ? tip : ''));
     statusEl.textContent = statusText();
 
     if (state.phase === 'handOver') showOverlay(boardEl, 'Hand over', [['Next hand', () => update(nextHand(state))]]);
@@ -226,7 +284,20 @@ export function mount(container: HTMLElement): () => void {
     const el = (e.target as Element).closest<HTMLButtonElement>('[data-hand]');
     if (!el) return;
     const c = state.hands[0].find((h) => cardId(h) === el.dataset.card)!;
-    update(state.phase === 'discard' ? discard(state, c) : play(state, 0, c));
+    if (myDiscard()) {
+      const best = chooseDiscard(state);
+      const right = best.suit === c.suit && best.rank === c.rank;
+      missed = coaching.score(right) && !right ? `Best was to put back ${theCard(best)}.` : null;
+      update(discard(state, c));
+    } else {
+      if (state.phase === 'playing') missed = null;
+      update(play(state, 0, c));
+    }
+  });
+  controlsEl.addEventListener('click', (e) => {
+    if (!(e.target as Element).closest('[data-hint]')) return;
+    coaching.asked = true;
+    render();
   });
   biddingEl.addEventListener('click', (e) => {
     const el = (e.target as Element).closest<HTMLButtonElement>('button');
@@ -234,9 +305,16 @@ export function mount(container: HTMLElement): () => void {
     if (el.hasAttribute('data-alone')) {
       alone = !alone;
       renderBidding();
-    } else if (el.hasAttribute('data-pass')) update(pass(state, 0));
-    else if (el.hasAttribute('data-order')) update(orderUp(state, 0, alone));
-    else update(callTrump(state, 0, el.dataset.suit as Suit, alone));
+    } else if (el.hasAttribute('data-pass')) {
+      scoreBid({ action: 'pass' });
+      update(pass(state, 0));
+    } else if (el.hasAttribute('data-order')) {
+      scoreBid({ action: 'order', alone });
+      update(orderUp(state, 0, alone));
+    } else {
+      scoreBid({ action: 'call', suit: el.dataset.suit as Suit, alone });
+      update(callTrump(state, 0, el.dataset.suit as Suit, alone));
+    }
   });
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase !== 'gameOver' && (state.scores.some((n) => n > 0) || state.played.length > 0);

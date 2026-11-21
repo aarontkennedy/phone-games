@@ -8,8 +8,8 @@
 // Pure functions: every action returns a new State, or null if it isn't allowed.
 import { isCard, isFullDeck, newDeck, sameCard, shuffledDeck, type Card } from '../../core/cards';
 import { bestHand, type HandRank } from '../../core/poker';
-import { MAX_RAISES, after, applyAction, newRound, options as tableOptions, payPots, pot, postBlinds, raiseCost as tableRaiseCost, toCall, type Action, type Pot, type Table } from '../../core/betting';
-import { type Rng } from '../../core/random';
+import { MAX_RAISES, after, applyAction, bestBet, type Advice, newRound, options as tableOptions, payPots, pot, postBlinds, raiseCost as tableRaiseCost, toCall, type Action, type Pot, type Table } from '../../core/betting';
+import { seedFrom, seededRng, type Rng } from '../../core/random';
 import { SEATS, type Seat } from '../../core/tricks';
 
 export type Level = 'easy' | 'strong';
@@ -20,7 +20,7 @@ export const BLIND = 10; // the big blind at the start
 export const DOUBLE_EVERY = 10; // hands
 export const STREETS = ['Before the flop', 'The flop', 'The turn', 'The river'] as const;
 
-export { MAX_RAISES, pot, toCall, type Action, type Pot };
+export { MAX_RAISES, pot, toCall, type Action, type Advice, type Pot };
 
 export interface State extends Table {
   level: Level;
@@ -170,6 +170,19 @@ export function chooseAction(s: State, seat: Seat, rng: Rng = Math.random): Acti
   if (owe === 0) return 'check';
   const odds = owe / (pot(s) + owe); // what the call risks, against what it could win
   return eq >= odds ? 'call' : 'fold';
+}
+
+// --- The best play (Hint and the Right score) ---
+
+/**
+ * The best play for `seat` by the numbers: deal out the rest of the hand many times
+ * against the other hands still in (cards you can't see, so any cards) to get your chance
+ * of winning, then bet, check, call or fold by it (bestBet in src/core/betting.ts).
+ * Seeded by the cards you can see, so asking twice gives one answer.
+ */
+export function advice(s: State, seat: Seat = 0): Advice {
+  const seen = JSON.stringify([s.hole[seat], s.board, s.live, s.hand, s.street]);
+  return bestBet(s, seat, equity(s, seat, seededRng(seedFrom(seen)), 600));
 }
 
 export function isValidState(s: unknown): s is State {

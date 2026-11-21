@@ -143,6 +143,128 @@ export function computerStep(s: State, rng: Rng = Math.random): State | null {
   return shouldBank(s, rng) ? bank(s) : roll(s, rng);
 }
 
+// --- The best play (Hint and the Right score) ---
+
+/** Turn points this high always bank: rolling on can't pay for the risk of a bust. */
+const CAP = 30_000;
+
+interface Outcome {
+  p: number;
+  /** For each number of dice kept (1 to n), the most that many scoring dice can make, or 0. */
+  best: number[];
+}
+
+/** Every roll of n dice, as counts of each face, with its chance and its best keeps. */
+function outcomes(n: number): Outcome[] {
+  const out: Outcome[] = [];
+  const counts = [0, 0, 0, 0, 0, 0, 0];
+  const fact = (k: number): number => (k < 2 ? 1 : k * fact(k - 1));
+  const fill = (face: number, left: number) => {
+    if (face === 6) {
+      counts[6] = left;
+      const ways = fact(n) / counts.slice(1).reduce((t, c) => t * fact(c), 1);
+      const dice = counts.flatMap((c, f) => Array<number>(c).fill(f));
+      const best = Array<number>(n + 1).fill(0);
+      // Every sub-collection of the roll (by face counts) that scores.
+      const sub = [0, 0, 0, 0, 0, 0, 0];
+      const pick = (f: number) => {
+        if (f === 7) {
+          const kept = sub.flatMap((c, face) => Array<number>(c).fill(face));
+          const points = scoreDice(kept);
+          if (points !== null && points > best[kept.length]) best[kept.length] = points;
+          return;
+        }
+        for (let c = 0; c <= counts[f]; c++) {
+          sub[f] = c;
+          pick(f + 1);
+        }
+      };
+      if (dice.length) pick(1);
+      out.push({ p: ways / 6 ** n, best });
+      return;
+    }
+    for (let c = 0; c <= left; c++) {
+      counts[face] = c;
+      fill(face + 1, left - c);
+    }
+  };
+  fill(1, n);
+  return out;
+}
+
+let table: Float64Array[] | null = null;
+
+/**
+ * The average points a turn ends with when you roll n dice holding t turn points and play
+ * on perfectly, for n 1 to 6 and t in steps of 50. Worked out once, from the highest
+ * totals down: each roll's best keep, then the better of banking or rolling on.
+ */
+function rollTable(): Float64Array[] {
+  if (table) return table;
+  const steps = CAP / 50;
+  const rolls = [1, 2, 3, 4, 5, 6].map(outcomes);
+  table = Array.from({ length: 7 }, () => new Float64Array(steps + 1));
+  const after = (n: number, t: number) => (t >= CAP ? t : Math.max(t, table![n][t / 50]));
+  for (let i = steps; i >= 0; i--) {
+    const t = i * 50;
+    for (let n = 1; n <= 6; n++) {
+      let value = 0;
+      for (const o of rolls[n - 1]) {
+        let best = 0; // a bust ends the turn with nothing
+        for (let k = 1; k <= n; k++) if (o.best[k]) best = Math.max(best, after(n - k || 6, t + o.best[k]));
+        value += o.p * best;
+      }
+      table[n][i] = value;
+    }
+  }
+  return table;
+}
+
+/** What rolling on is worth: the average points the turn ends with, playing perfectly. */
+export const rollValue = (dice: number, turnPoints: number): number => (turnPoints >= CAP ? 0 : rollTable()[dice][turnPoints / 50]);
+
+export interface Choice {
+  /** Indexes of the dice to keep. */
+  keep: number[];
+  then: 'roll' | 'bank';
+  /** The average points the turn ends with. Banking that wins the game counts as infinite. */
+  value: number;
+}
+
+/** What a keep and then rolling or banking is worth, from `s` (the choose phase). */
+export function choiceValue(s: State, keepDice: number[], then: 'roll' | 'bank'): number {
+  const points = scoreDice(keepDice)!;
+  const total = s.turnPoints + points;
+  if (then === 'bank') return s.scores[s.turn] + total >= GOAL ? Infinity : total;
+  return rollValue(s.remaining - keepDice.length || 6, total);
+}
+
+/**
+ * The best play from a roll: which dice to keep, then roll or bank. It scores the most
+ * points per turn on average (and banks whenever that wins the game). Ties keep fewer dice.
+ */
+export function bestChoice(s: State): Choice {
+  let best: Choice = { keep: [], then: 'bank', value: -1 };
+  for (let mask = 1; mask < 1 << s.dice.length; mask++) {
+    const keep = s.dice.flatMap((_, i) => (mask & (1 << i) ? [i] : []));
+    const dice = keep.map((i) => s.dice[i]);
+    if (scoreDice(dice) === null) continue;
+    for (const then of ['roll', 'bank'] as const) {
+      const value = choiceValue(s, dice, then);
+      const better = value > best.value + 1e-9 || (Math.abs(value - best.value) <= 1e-9 && keep.length < best.keep.length);
+      if (better) best = { keep, then, value };
+    }
+  }
+  return best;
+}
+
+/** Whether keeping `keepDice` and then rolling or banking is as good as the best play. */
+export const isBestChoice = (s: State, keepDice: number[], then: 'roll' | 'bank'): boolean => {
+  const best = bestChoice(s).value;
+  const mine = choiceValue(s, keepDice, then);
+  return mine === best || mine >= best - 1e-6;
+};
+
 export function isValidState(s: unknown): s is State {
   const st = s as State | null;
   const dice = (a: unknown) => Array.isArray(a) && a.every((d) => Number.isInteger(d) && d >= 1 && d <= 6);

@@ -165,3 +165,53 @@ export function payPots(t: Table, score: ((seat: Seat) => number) | null): Pot[]
     return { ...p, winners };
   });
 }
+
+// --- The best bet by the numbers (Hint, in the poker games) ---
+
+export interface Advice {
+  action: Action;
+  /** Your chance (0 to 1) of having the best hand at the end, against the hands still in. */
+  equity: number;
+  /** The chance a call needs to pay for itself: what it costs over the pot it could win. */
+  odds: number;
+  /** How many other players are still in. */
+  opponents: number;
+  /** Chips a call costs. */
+  owe: number;
+  /** Chips in the pot now. */
+  pot: number;
+}
+
+/**
+ * A winning chance worth betting on: a quarter of the way from an even share to certain.
+ * Against 1 hand that's 62.5%, against 2 it's 50%, against 3 it's about 44%.
+ */
+export const strongShare = (opponents: number): number => {
+  const fair = 1 / (opponents + 1);
+  return fair + (1 - fair) / 4;
+};
+
+/**
+ * The best play for `seat` by the numbers, given its chance of winning: bet or raise when
+ * that's well over an even share (strongShare); otherwise check if it's free, call if the
+ * pot pays for the risk (pot odds), or fold.
+ */
+export function bestBet(t: Table, seat: Seat, equity: number): Advice {
+  const opts = options(t, seat);
+  const opponents = SEATS.filter((x) => x !== seat && t.live[x]).length;
+  const owe = toCall(t, seat);
+  const size = pot(t);
+  const odds = owe / (size + owe);
+  const aggressive = opts.find((a) => a === 'bet' || a === 'raise');
+  const action: Action = aggressive && equity > strongShare(opponents) ? aggressive : owe === 0 ? 'check' : equity >= odds ? 'call' : 'fold';
+  return { action, equity, odds, opponents, owe, pot: size };
+}
+
+/** Why, in numbers: "You win about 34% against 3 hands; calling 10 to win 40 needs 20%." */
+export function betWhy(a: Advice): string {
+  const pct = (x: number) => `${Math.round(100 * x)}%`;
+  const win = `You win about ${pct(a.equity)} against ${a.opponents === 1 ? '1 hand' : `${a.opponents} hands`}`;
+  if (a.action === 'bet' || a.action === 'raise') return `${win}, well over an even share (${pct(1 / (a.opponents + 1))}).`;
+  if (a.action === 'check') return `${win}: not enough to bet, and checking is free.`;
+  return `${win}; calling ${a.owe} to win ${a.pot} needs ${pct(a.odds)}.`;
+}

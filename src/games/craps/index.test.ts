@@ -170,3 +170,41 @@ describe('Craps colors', () => {
     expect(css).toContain('var(--on-accent)');
   });
 });
+
+describe('Craps hints', () => {
+  const bet = (o: Partial<State>): State => ({ ...newState(), ...o });
+  const hinted = (c: HTMLElement) => [...c.querySelectorAll<HTMLElement>('.hint')].map((b) => b.dataset.target);
+
+  it('points to the line bets on the come-out, then says to roll', () => {
+    const { $, container } = setup();
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: bet the Pass line or Don’t pass. The house keeps about 1.4% of each, the least of any first bet.');
+    expect(hinted(container)).toEqual(['pass', 'dontPass']);
+    $('[data-target="pass"]').click(); // a bet: ask again for the next one
+    expect($('[data-tip]')).toBeNull();
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: Roll. Your line bet is the best first bet. Once a point is set, add odds.');
+    expect($('[data-accuracy]')).toBeNull(); // no Right score in Craps
+  });
+
+  it('points to odds once there is a point, and warns off the field', () => {
+    const { $, container } = setup(bet({ point: 6, bets: [{ kind: 'pass', flat: 5, odds: 0, point: null }], field: 5, chips: 990 }));
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: add odds to the outlined bet. Odds pay exactly what they’re worth, so the house keeps nothing on them. Skip the field: it keeps 2.8%.');
+    expect(hinted(container)).toEqual(['odds:pass']);
+  });
+
+  it('suggests come bets with a point and nothing down, and odds on a come bet’s number', () => {
+    const none = setup(bet({ point: 8 }));
+    none.$('[data-hint]').click();
+    expect(none.$('[data-tip]').textContent).toMatch(/^Best: bet Come or Don’t come\./);
+    document.body.replaceChildren();
+    const come = setup(bet({ point: 8, chips: 975, bets: [{ kind: 'pass', flat: 5, odds: 25, point: null }, { kind: 'come', flat: 5, odds: 0, point: 5 }] }));
+    come.$('[data-hint]').click();
+    expect(hinted(come.container)).toEqual(['odds:5']);
+    document.body.replaceChildren();
+    const full = setup(bet({ point: 8, chips: 970, bets: [{ kind: 'pass', flat: 5, odds: 25, point: null }] }));
+    full.$('[data-hint]').click();
+    expect(full.$('[data-tip]').textContent).toBe('Best: Roll. Your bets are as good as they get.');
+  });
+});

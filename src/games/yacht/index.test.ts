@@ -115,6 +115,44 @@ describe('Yacht screen', () => {
   });
 });
 
+describe('Yacht hints', () => {
+  it('outlines the dice to hold when asked, and scores holds made without it', () => {
+    const { $, $$ } = setup(rolled([2, 3, 4, 6, 6]));
+    expect($('[data-accuracy]').textContent).toBe('–');
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: hold the outlined dice and roll.');
+    expect($$('.ya-die.hint').map((d) => d.dataset.die)).toEqual(['3', '4']);
+    $('[data-roll]').click(); // asked first: not scored
+    expect($('[data-accuracy]').textContent).toBe('–');
+
+    document.body.replaceChildren();
+    const wrong = setup(rolled([2, 3, 4, 6, 6]));
+    wrong.die(0).click(); // hold the 2: not the best
+    wrong.$('[data-roll]').click();
+    expect(wrong.$('[data-accuracy]').textContent).toBe('0%');
+    expect(wrong.status()).toMatch(/^Best was to hold 6 6 and roll\. /);
+    expect(load('yacht:accuracy', null)).toEqual({ right: 0, plays: 1 });
+  });
+
+  it('outlines the box to score, and counts the best box as right', () => {
+    const { $, $$ } = setup(rolled([6, 6, 6, 6, 6]));
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: score Yacht now.');
+    expect($$('.ya-box.hint').map((b) => b.dataset.box)).toEqual(['yacht']);
+    document.body.replaceChildren();
+    const right = setup(rolled([6, 6, 6, 6, 6]));
+    right.box('yacht').click();
+    expect(right.$('[data-accuracy]').textContent).toBe('100%');
+    expect(right.status()).not.toMatch(/Best was/);
+  });
+
+  it('says where to dump a poor last roll', () => {
+    const { $ } = setup(rolled([1, 3, 4, 6, 6], { rolls: 3 }));
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: score Ones.');
+  });
+});
+
 describe('Yacht colors', () => {
   const ya = themes(css, '.ya');
   const app = themes(appCss, ':root');

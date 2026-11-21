@@ -22,6 +22,24 @@ async function openWithMoves(page: Page, id: string) {
   await page.addInitScript(([key, lines]) => localStorage.setItem(key, lines), [`pg:${id}:recent`, JSON.stringify(LONG)] as const);
   await page.goto(`./#/${id}`);
   await expect(page.locator('[data-recent] li')).toHaveCount(4);
+  if (id === 'euchre') await pastBidding(page);
+}
+
+/**
+ * Euchre's list starts over each hand, so it's empty while you bid (when the bid buttons
+ * and Hint take the room). Pass (or name trump, or put a card back) until play starts.
+ */
+async function pastBidding(page: Page) {
+  for (let i = 0; i < 20; i++) {
+    const pass = page.locator('[data-pass]:visible');
+    const suit = page.locator('[data-suit]:visible');
+    const putBack = page.locator('.eu [data-hand]:enabled');
+    if (await pass.count()) await pass.click();
+    else if (await suit.count()) await suit.first().click();
+    else if (await page.locator('[data-tip], [data-hint]').count() && (await putBack.count())) await putBack.first().click();
+    else if (!(await page.locator('.eu-bid:visible').count()) && (await page.locator('.eu .tt-hand [data-hand]').count()) >= 5) break;
+    await page.waitForTimeout(700);
+  }
 }
 
 /** The newest move is fully inside the list's visible box. */

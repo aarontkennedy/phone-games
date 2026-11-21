@@ -16,7 +16,8 @@ function setup(saved: unknown = null) {
   return { container, unmount, $, $$, stored, status };
 }
 
-describe('Video poker screen', () => {
+// Draw and Hint work out the best hold, ~0.1s per hand alone, far longer under coverage.
+describe('Video poker screen', { timeout: 30_000 }, () => {
   it('shows the pay table for your bet and deals', () => {
     const { $, $$, stored, status } = setup();
     expect(status()).toBe('Choose a bet of 1 to 5 credits and tap Deal.');
@@ -54,12 +55,39 @@ describe('Video poker screen', () => {
     const { $, stored, status } = setup(dealt('2S 5H 7D 9C JS', 'KD 4C 3C 8H 10S', { credits: 0 }));
     expect(status()).toBe('Tap the cards to keep, then tap Draw.');
     $('[data-draw]').click();
-    expect(status()).toBe('King high: no win. You’re out of credits. Tap Start over for 100 more.');
+    expect(status()).toBe('King high: no win. Best was to hold the jack of spades. You’re out of credits. Tap Start over for 100 more.');
     expect($('[data-deal]').textContent).toBe('Start over');
     $('[data-deal]').click();
     expect(stored().credits).toBe(100);
     expect(stored().phase).toBe('betting');
     $('[data-controls]').click(); // not on a button
+  });
+
+  it('shows the best hold when asked, and scores holds you make without it', () => {
+    const { $, $$, status } = setup(dealt('JS JH 4D 8C 9S', 'JD 2C 3C 5D 6D'));
+    expect($('[data-accuracy]').textContent).toBe('–');
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: hold the 2 outlined cards.');
+    expect($$('.card.hint').map((c) => c.dataset.cardIndex)).toEqual(['0', '1']);
+    $('[data-draw]').click(); // held nothing, but asked first: not scored
+    expect($('[data-accuracy]').textContent).toBe('–');
+    expect(status()).not.toMatch(/Best was/);
+
+    document.body.replaceChildren();
+    const right = setup(dealt('JS JH 4D 8C 9S', 'JD 2C 3C'));
+    right.$('[data-card-index="0"]').click();
+    right.$('[data-card-index="1"]').click();
+    right.$('[data-draw]').click();
+    expect(right.$('[data-accuracy]').textContent).toBe('100%');
+    expect(load('videopoker:accuracy', null)).toEqual({ right: 1, plays: 1 });
+    right.$('[data-deal]').click();
+    expect(right.$('[data-hint]')).not.toBeNull(); // a new hand: ask again
+  });
+
+  it('says to draw five new cards when nothing is worth holding', () => {
+    const { $ } = setup(dealt('2S 4H 7D 9C 3D'));
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: hold nothing and draw 5 new cards.');
   });
 
   it('starts fresh from a broken save', () => {

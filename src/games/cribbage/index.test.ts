@@ -5,7 +5,7 @@ import { load, save } from '../../core/storage';
 import { contrast, themes } from '../../test/contrast';
 import { makeContainer, track, answerNewGame, expectStaysFinished } from '../../test/helpers';
 import { AI_DELAY, holeAt, mount } from './index';
-import { nextStep, play, type State } from './logic';
+import { bestDiscard, nextStep, play, type State } from './logic';
 import { card, cards, pegging, pile } from './test-fixtures';
 
 function setup(saved: unknown = null) {
@@ -35,11 +35,52 @@ beforeEach(() => {
   vi.useFakeTimers();
 });
 
+describe('Cribbage hints', () => {
+  const hand = 'AH 2H 3H 4H 5H 6H';
+  const ids = (cs: { rank: number; suit: string }[]) =>
+    cs.map((c) => `${({ 1: 'A', 11: 'J', 12: 'Q', 13: 'K' } as Record<number, string>)[c.rank] ?? c.rank}${c.suit}`);
+
+  it('outlines the best two cards for the crib when asked', () => {
+    const { $, $$ } = setup(discarding());
+    expect($('[data-accuracy]').textContent).toBe('–');
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: put the 2 outlined cards in the crib.');
+    const best = ids(bestDiscard(cards(hand), false));
+    expect($$('.card.hint').map((c) => c.dataset.card).sort()).toEqual(best.sort());
+    // Asked first, so this discard isn't scored.
+    best.forEach((id) => $(`[data-hand][data-card="${id}"]`).click());
+    $('[data-crib]').click();
+    expect($('[data-accuracy]').textContent).toBe('–');
+    expect($('[data-hint]')).toBeNull(); // only while discarding
+  });
+
+  it('scores your discard, and says the best one when yours wasn’t', () => {
+    const best = ids(bestDiscard(cards(hand), false));
+    const right = setup(discarding());
+    best.forEach((id) => right.tap(id));
+    right.$('[data-crib]').click();
+    expect(right.$('[data-accuracy]').textContent).toBe('100%');
+    expect(right.status()).not.toMatch(/Best was/);
+
+    document.body.replaceChildren();
+    const worse = cards(hand).map((c) => ids([c])[0]).filter((id) => !best.includes(id)).slice(0, 2);
+    const wrong = setup(discarding());
+    worse.forEach((id) => wrong.tap(id));
+    wrong.$('[data-crib]').click();
+    expect(wrong.$('[data-accuracy]').textContent).toBe('50%');
+    expect(load('cribbage:accuracy', null)).toEqual({ right: 1, plays: 2 });
+    expect(wrong.status()).toMatch(/^Best was to put the .+ and the .+ in the crib\. /);
+    // Gone once you play a card.
+    wrong.$$<HTMLButtonElement>('[data-hand]:not([disabled])')[0].click();
+    expect(wrong.status()).not.toMatch(/Best was/);
+  });
+});
+
 describe('Cribbage screen', () => {
   it('starts by asking for two cards for the crib', () => {
     const { $, $$, status } = setup(discarding());
     expect($$('[data-hand]:not([disabled])')).toHaveLength(6);
-    expect($$('.stat small').map((w) => w.textContent)).toEqual(['You', 'Computer']); // each with its peg color
+    expect($$('.stat small').map((w) => w.textContent)).toEqual(['You', 'Computer', 'Right']); // each with its peg color
     expect($$('.stat .cb-key')).toHaveLength(2);
     expect($('.cb-opponent').textContent).toContain('Computer · dealer');
     expect($$('.cb-opponent .card.back')).toHaveLength(6);

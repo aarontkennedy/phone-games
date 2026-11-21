@@ -232,8 +232,8 @@ function orderStrength(s: State, seat: Seat): number {
   return teamOf(s.dealer) === teamOf(seat) ? mine + gift * 0.7 : mine - gift * 0.7;
 }
 
-const CALL = 7;
-const ALONE = 10.5; // about five sure tricks
+export const CALL = 7;
+export const ALONE = 10.5; // about five sure tricks
 
 export type Bid = { action: 'pass' } | { action: 'order'; alone: boolean } | { action: 'call'; suit: Suit; alone: boolean };
 
@@ -252,6 +252,29 @@ export function chooseBid(s: State, seat: Seat, rng: Rng = Math.random): Bid {
     .reduce((a, b) => (b[1] > a[1] ? b : a));
   if (strength < threshold && seat !== s.dealer) return { action: 'pass' };
   return { action: 'call', suit, alone: !easy && strength >= ALONE };
+}
+
+export interface BidAdvice {
+  bid: Bid;
+  /** The suit the strength is for: the turned card's in round one, your best other suit in round two. */
+  suit: Suit;
+  /** The hand's strength with that suit as trump (CALL or more to call, ALONE or more alone). */
+  strength: number;
+}
+
+/** The best bid by Strong's count (Hint and the Right score), with the numbers behind it. */
+export function bidAdvice(s: State, seat: Seat): BidAdvice {
+  const bid = chooseBid({ ...s, level: 'strong' }, seat);
+  if (s.phase === 'bidding1') return { bid, suit: upcard(s).suit, strength: orderStrength(s, seat) };
+  const suit = bid.action === 'call' ? bid.suit : SUITS.filter((x) => x !== upcard(s).suit).reduce((a, b) => (handStrength(s.hands[seat], b) > handStrength(s.hands[seat], a) ? b : a));
+  return { bid, suit, strength: handStrength(s.hands[seat], suit) };
+}
+
+/** Whether two bids are the same: pass, or order up or call the same suit, alone or not. */
+export function sameBid(a: Bid, b: Bid): boolean {
+  if (a.action === 'pass' || b.action === 'pass') return a.action === b.action;
+  if (a.action !== b.action || a.alone !== b.alone) return false;
+  return a.action === 'order' || (b.action === 'call' && a.suit === b.suit);
 }
 
 /** Applies a computer player's bid. */

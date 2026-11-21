@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { isFullDeck } from '../../core/cards';
 import { seededRng } from '../../core/random';
-import { START_CREDITS, deal, draw, isBroke, isValidState, newState, payout, restart, setBet, toggleHold, winOf, type State } from './logic';
+import { START_CREDITS, bestHold, deal, draw, holdValues, isBestHold, isBroke, isValidState, newState, payout, restart, setBet, toggleHold, winOf, type State } from './logic';
 import { cards, dealt } from './test-fixtures';
 
 describe('video poker', () => {
@@ -85,4 +85,19 @@ describe('video poker', () => {
     ];
     for (const b of bad) expect(isValidState(b as State)).toBe(false);
   });
+
+  it('works out the best hold exactly, from every possible draw', () => {
+    // A pair of jacks held averages 1.5365 per credit: the known figure for this pay table.
+    const jacks = holdValues(cards('JS JH 4D 8C 9S'), 1);
+    expect(jacks[0b00011]).toBeCloseTo(1.5365, 4);
+    expect(bestHold(jacks)).toEqual([true, true, false, false, false]);
+    expect(isBestHold(jacks, [true, true, false, false, false])).toBe(true);
+    expect(isBestHold(jacks, [false, false, false, false, false])).toBe(false);
+    // Four cards to a royal flush.
+    expect(bestHold(holdValues(cards('10H JH QH KH 2S'), 5))).toEqual([true, true, true, true, false]);
+    // Nothing but one high card: hold it.
+    expect(bestHold(holdValues(cards('2S 7H 9D JC 4S'), 5))).toEqual([false, false, false, true, false]);
+    // Holding all five pays the hand as dealt.
+    expect(jacks[31]).toBe(1);
+  }, 60_000); // each hand takes ~0.1s alone, far longer with coverage and every test running
 });

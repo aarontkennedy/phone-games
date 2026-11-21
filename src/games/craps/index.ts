@@ -1,10 +1,12 @@
 import { dieFace } from '../../core/dice-view';
+import { coach } from '../../core/coach';
 import { load, save } from '../../core/storage';
 import {
   CHIPS,
   NAMES,
   POINTS,
   START_CHIPS,
+  betAdvice,
   isBroke,
   isValidState,
   newState,
@@ -51,9 +53,13 @@ export function mount(container: HTMLElement): () => void {
   const boardEl = container.querySelector<HTMLElement>('[data-board]')!;
   const controlsEl = container.querySelector<HTMLElement>('[data-controls]')!;
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
+  /** Hint: the best bets by the house's share. No Right score: there's no single right
+   *  bet, just better and worse ones (src/core/coach.ts). */
+  const coaching = coach('craps');
 
   function update(next: State | null) {
     if (!next) return;
+    coaching.asked = false;
     state = next;
     if (state.chips + onTable(state) > best) {
       best = state.chips + onTable(state);
@@ -67,6 +73,9 @@ export function mount(container: HTMLElement): () => void {
   const describe = (b: LineBet | undefined) => (!b ? '' : `, bet ${b.flat}${b.odds ? ` with ${b.odds} odds` : ''}`);
 
   /** A bet area: tap to bet, or to add odds once the bet has a number. */
+  /** The bet areas Hint outlines. */
+  const hinted = (s: State, rolling: boolean): string[] => (coaching.asked && !rolling ? betAdvice(s).targets : []);
+
   function area(kind: Kind, s: State, rolling: boolean) {
     const line = kind === 'pass' || kind === 'dontPass';
     const bet = s.bets.find((b) => b.kind === kind && (line || b.point === null));
@@ -74,7 +83,8 @@ export function mount(container: HTMLElement): () => void {
     if (line) target = s.point === null ? kind : bet && oddsRoom(s, bet) > 0 ? `odds:${kind}` : '';
     else target = s.point !== null ? kind : '';
     const odds = target.startsWith('odds:') ? ', tap to add odds' : '';
-    return `<button class="cr-bet${bet ? ' on' : ''}" data-target="${target}" aria-label="${NAMES[kind]}${describe(bet)}${odds}"${target && !rolling ? '' : ' disabled'}>
+    const hint = target && hinted(s, rolling).includes(target) ? ' hint' : '';
+    return `<button class="cr-bet${bet ? ' on' : ''}${hint}" data-target="${target}" aria-label="${NAMES[kind]}${describe(bet)}${odds}"${target && !rolling ? '' : ' disabled'}>
       <span>${NAMES[kind]}</span><b>${amount(bet)}</b></button>`;
   }
 
@@ -89,7 +99,8 @@ export function mount(container: HTMLElement): () => void {
       const room = bets.some((b) => oddsRoom(s, b) > 0);
       const what = bets.map((b) => `${NAMES[b.kind]}${describe(b)}`).join(', ');
       const label = `${p}${s.point === p ? ', the point' : ''}${what ? `: ${what}${room ? ', tap to add odds' : ''}` : ''}`;
-      return `<button class="cr-number${s.point === p ? ' point' : ''}${bets.length ? ' on' : ''}" data-target="odds:${p}" aria-label="${label}"${room && !rolling ? '' : ' disabled'}>
+      const hint = room && hinted(s, rolling).includes(`odds:${p}`) ? ' hint' : '';
+      return `<button class="cr-number${s.point === p ? ' point' : ''}${bets.length ? ' on' : ''}${hint}" data-target="odds:${p}" aria-label="${label}"${room && !rolling ? '' : ' disabled'}>
         <span>${p}</span><b>${sum || ''}</b></button>`;
     }).join('');
     const field = `<button class="cr-bet field${s.field ? ' on' : ''}" data-target="field" aria-label="Field: 2, 3, 4, 9, 10, 11 or 12${s.field ? `, bet ${s.field}` : ''}"${rolling ? ' disabled' : ''}>
@@ -110,7 +121,8 @@ export function mount(container: HTMLElement): () => void {
       (c) => `<button data-chip="${c}" aria-pressed="${c === state.chip}">${c}</button>`,
     ).join('')}</div>`;
     const main = isBroke(state) ? '<button class="btn" data-restart>Start over</button>' : '<button class="btn" data-roll>Roll</button>';
-    controlsEl.innerHTML = `${chips}<button class="btn secondary" data-clear${takeDown(state) ? '' : ' disabled'}>Clear</button>${main}`;
+    const tip = isBroke(state) ? null : coaching.asked ? betAdvice(state).text : '';
+    controlsEl.innerHTML = `${coaching.html(tip)}${chips}<button class="btn secondary" data-clear${takeDown(state) ? '' : ' disabled'}>Clear</button>${main}`;
   }
 
   function statusText(): string {
@@ -154,7 +166,10 @@ export function mount(container: HTMLElement): () => void {
   controlsEl.addEventListener('click', (e) => {
     const el = (e.target as Element).closest<HTMLButtonElement>('button');
     if (!el) return;
-    if (el.dataset.chip) update(setChip(state, Number(el.dataset.chip)));
+    if (el.hasAttribute('data-hint')) {
+      coaching.asked = true;
+      render();
+    } else if (el.dataset.chip) update(setChip(state, Number(el.dataset.chip)));
     else if (el.hasAttribute('data-clear')) update(takeDown(state));
     else if (el.hasAttribute('data-restart')) update(restart(state));
     else if (el.hasAttribute('data-roll')) {

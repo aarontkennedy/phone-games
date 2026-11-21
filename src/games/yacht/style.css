@@ -92,6 +92,18 @@
   outline-offset: 2px;
 }
 
+/* What Hint suggests: dice to hold, or the box to score. Dashed, so it's not mistaken for
+   a held die. */
+.ya-die.hint,
+.ya-box.hint {
+  outline: 3px dashed var(--highlight);
+  outline-offset: 2px;
+}
+
+.ya-die.held.hint {
+  outline-style: solid;
+}
+
 .ya {
   --ya-edge: #5f7069;
 }

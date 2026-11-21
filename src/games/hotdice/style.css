@@ -45,6 +45,16 @@
   outline-offset: 2px;
 }
 
+/* The dice Hint suggests keeping: dashed, so they're not mistaken for your picks. */
+.hd-die.hint {
+  outline: 3px dashed var(--highlight);
+  outline-offset: 2px;
+}
+
+.hd-die.picked.hint {
+  outline-style: solid;
+}
+
 .hd-die.small {
   width: 36px;
   padding: 3px;

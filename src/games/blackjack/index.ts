@@ -23,22 +23,11 @@ import {
   type Hand,
   type State,
 } from './logic';
-import { BULB_ICON } from '../../core/icons';
+import { coach } from '../../core/coach';
 import './style.css';
 
 const STATE_KEY = 'blackjack:state';
 const BEST_KEY = 'blackjack:best';
-/** How many of your plays matched the best play (see strategy.ts), over all your hands. */
-const ACCURACY_KEY = 'blackjack:accuracy';
-
-interface Accuracy {
-  right: number;
-  plays: number;
-}
-
-const isAccuracy = (a: unknown): a is Accuracy =>
-  !!a && Number.isInteger((a as Accuracy).right) && Number.isInteger((a as Accuracy).plays) && (a as Accuracy).right <= (a as Accuracy).plays;
-
 const ACTIONS: [Action, string][] = [
   ['hit', 'Hit'],
   ['stand', 'Stand'],
@@ -58,10 +47,8 @@ export function mount(container: HTMLElement): () => void {
   const saved = upgrade(load<unknown>(STATE_KEY, null));
   let state: State = isValidState(saved) ? saved : newState();
   let best = Math.max(load(BEST_KEY, START_CHIPS), state.chips);
-  const savedAccuracy = load<unknown>(ACCURACY_KEY, null);
-  const accuracy: Accuracy = isAccuracy(savedAccuracy) ? savedAccuracy : { right: 0, plays: 0 };
-  /** Whether you asked for a hint on this decision. Cleared by your next move. */
-  let showHint = false;
+  /** How many of your plays matched the best play (see strategy.ts), over all your hands. */
+  const coaching = coach('blackjack');
   /** The best play, when your last play wasn't it. */
   let missed: Action | null = null;
 
@@ -94,7 +81,7 @@ export function mount(container: HTMLElement): () => void {
   function update(next: State | null) {
     if (!next) return;
     state = next;
-    showHint = false;
+    coaching.asked = false;
     if (state.chips > best) {
       best = state.chips;
       save(BEST_KEY, best);
@@ -155,10 +142,8 @@ export function mount(container: HTMLElement): () => void {
     if (state.phase === 'playing') {
       // The hint sits just above the buttons it's about, and doesn't replace the instructions.
       const tip = hint(state);
-      const coach = showHint && tip
-        ? `<p class="bj-tip" data-tip>${BULB_ICON}<span>Best play: <b>${new Map(ACTIONS).get(tip)}</b></span></p>`
-        : `<button class="btn secondary bj-hint" data-hint>${BULB_ICON}<span>Hint</span></button>`;
-      controlsEl.innerHTML = `<div class="bj-coach">${coach}</div><div class="bj-actions">${ACTIONS.map(
+      const coachRow = coaching.html(tip && `Best play: <b>${new Map(ACTIONS).get(tip)}</b>`);
+      controlsEl.innerHTML = `${coachRow}<div class="bj-actions">${ACTIONS.map(
         ([a, label]) => `<button class="btn secondary" data-action="${a}"${canAct(state, a) ? '' : ' disabled'}>${label}</button>`,
       ).join('')}</div>`;
       return;
@@ -197,7 +182,7 @@ export function mount(container: HTMLElement): () => void {
     });
     chipsEl.textContent = String(state.chips);
     bestEl.textContent = String(best);
-    accuracyEl.textContent = accuracy.plays ? `${Math.round((100 * accuracy.right) / accuracy.plays)}%` : '–';
+    accuracyEl.textContent = coaching.text();
     statusEl.textContent = statusText();
   }
 
@@ -205,11 +190,7 @@ export function mount(container: HTMLElement): () => void {
   function score(action: Action) {
     const bestPlay = hint(state);
     missed = null;
-    if (showHint || !bestPlay) return;
-    accuracy.plays++;
-    if (action === bestPlay) accuracy.right++;
-    else missed = bestPlay;
-    save(ACCURACY_KEY, accuracy);
+    if (bestPlay && coaching.score(action === bestPlay) && action !== bestPlay) missed = bestPlay;
   }
 
   // --- Input ---
@@ -218,7 +199,7 @@ export function mount(container: HTMLElement): () => void {
     const el = (e.target as Element).closest<HTMLButtonElement>('button');
     if (!el) return;
     if (el.hasAttribute('data-hint')) {
-      showHint = true;
+      coaching.asked = true;
       render();
     } else if (el.hasAttribute('data-deal')) {
       missed = null;

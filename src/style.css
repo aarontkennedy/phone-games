@@ -619,6 +619,35 @@ body {
   flex: 1 1 0;
 }
 
+/* Coaching (src/core/coach.ts): Hint gets its own row just above the game's buttons.
+   Tapping it shows the best play in the same spot, leaving the status line alone. */
+.coach {
+  flex: 1 1 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.coach-hint,
+.coach-tip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--tap);
+  margin: 0;
+}
+
+.coach-hint svg,
+.coach-tip svg {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* A stat is a bare number under a quiet label: no box, so the numbers read first. */
 .stat {
   flex: 1;
@@ -853,6 +882,16 @@ body {
   /* The side bar is ~260px on the smallest phones; keep stats on one row. */
   .game .stat {
     padding-inline: var(--space-2);
+  }
+
+  /* Three stats (a game with a Right score) in that side bar: tighter spacing, so CI's
+     wider font fits too. */
+  .game .stats:has(> .stat ~ .stat ~ .stat) {
+    gap: var(--space-1);
+  }
+
+  .game .stats:has(> .stat ~ .stat ~ .stat) > .stat {
+    padding-inline: var(--space-1);
   }
 
   .game .board-frame {

@@ -77,9 +77,33 @@ describe('Hot dice screen', () => {
     expect(stored().scores).toEqual([350, 0]);
     expect(recent()).toEqual(['You rolled 5 2 3 4 6 6, kept 5 for 50.', 'You banked 350.']);
     expect(stored().turn).toBe(1);
-    expect(status()).toBe('The computer is playing…');
+    // 350 with five dice to roll: rolling on was better, and the line says so.
+    expect(status()).toBe('Best was to keep 5, then roll 5. The computer is playing…');
+    expect($('[data-accuracy]').textContent).toBe('0%');
     vi.advanceTimersByTime(AI_DELAY);
     expect(stored().phase).not.toBe('roll');
+  });
+
+  it('shows the best keep and whether to roll or bank when asked', () => {
+    const { $, $$, act } = setup(at({ phase: 'choose', dice: [1, 5, 3, 3, 4, 2], turnPoints: 0, remaining: 6 }));
+    expect($('[data-accuracy]').textContent).toBe('–');
+    $('[data-hint]').click();
+    // Keep just the 1, to roll five dice rather than four.
+    expect($('[data-tip]').textContent).toBe('Best: keep 1, then roll 5.');
+    expect($$('.hd-die.hint').map((d) => d.dataset.die)).toEqual(['0']);
+    $('[data-die="0"]').click();
+    $('[data-die="1"]').click();
+    act('keep-roll'); // asked first: not scored
+    expect($('[data-accuracy]').textContent).toBe('–');
+  });
+
+  it('scores a best choice as right', () => {
+    const { $, act, status } = setup(at({ phase: 'choose', dice: [1, 5, 3, 3, 4, 2], turnPoints: 0, remaining: 6 }));
+    $('[data-die="0"]').click();
+    act('keep-roll');
+    expect($('[data-accuracy]').textContent).toBe('100%');
+    expect(status()).not.toMatch(/Best was/);
+    expect(load('hotdice:accuracy', null)).toEqual({ right: 1, plays: 1 });
   });
 
   it('banks between rolls', () => {

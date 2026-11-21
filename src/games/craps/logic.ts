@@ -207,6 +207,47 @@ export function settle(s: State, dice: [number, number]): State {
   return n;
 }
 
+// --- Hint: the best bets, by how much of each bet the house keeps ---
+
+export interface BetAdvice {
+  /** The bet areas to outline: `place` targets. */
+  targets: string[];
+  /** What to do and why (HTML). */
+  text: string;
+}
+
+/**
+ * The best bets now. On average the house keeps about 1.4% of pass, don't pass, come and
+ * don't come bets (1.41% and 1.36%), nothing on odds (they pay true odds), and 2.8% on the
+ * field (1 in 36). So: a line bet first, then as much odds as the table allows.
+ */
+export function betAdvice(s: State): BetAdvice {
+  const field = s.field ? ' Skip the field: it keeps 2.8%.' : '';
+  if (s.point === null) {
+    if (!s.bets.some((b) => isLine(b.kind))) {
+      return {
+        targets: ['pass', 'dontPass'],
+        text: `Best: bet the <b>Pass line</b> or <b>Don’t pass</b>. The house keeps about 1.4% of each, the least of any first bet.${field}`,
+      };
+    }
+    return { targets: [], text: `Best: <b>Roll</b>. Your line bet is the best first bet. Once a point is set, add odds.${field}` };
+  }
+  const roomy = s.bets.filter((b) => oddsRoom(s, b) > 0);
+  if (roomy.length) {
+    return {
+      targets: roomy.map((b) => (isLine(b.kind) ? `odds:${b.kind}` : `odds:${b.point}`)),
+      text: `Best: add <b>odds</b> to the outlined bet. Odds pay exactly what they’re worth, so the house keeps nothing on them.${field}`,
+    };
+  }
+  if (!s.bets.length) {
+    return {
+      targets: ['come', 'dontCome'],
+      text: `Best: bet <b>Come</b> or <b>Don’t come</b>. They work like the pass line from here, and the house keeps about 1.4%.${field}`,
+    };
+  }
+  return { targets: [], text: `Best: <b>Roll</b>. Your bets are as good as they get.${field}` };
+}
+
 export const isBroke = (s: State): boolean => s.chips < CHIPS[0] && onTable(s) === 0;
 export const restart = (s: State): State => ({ ...newState(), chip: s.chip });
 

@@ -251,6 +251,36 @@ line, which mostly points at the board), then what just happened, then the butto
   the newest stays in view.
 - **Tested** by `e2e/recent.spec.ts`, upright and sideways, with 4 long moves.
 
+### Coaching
+
+Games with a best play to learn (Blackjack, Video Poker, Cribbage discards, Hot Dice,
+Texas Hold'em, Five-Card Draw, Euchre bids, Yacht) teach it, so the player gets better
+rather than just getting told. Craps and Mines have Hint without a Right score: Craps has
+better and worse bets rather than one right one, and Mines teaches reasoning (Hint
+outlines a square the numbers prove, and the number that proves it).
+
+- **Shared:** `coach(id)` from `src/core/coach.ts` makes the Hint row and the Right score,
+  saved as `${id}:accuracy`. The Hint button (light bulb) sits in its own row just above
+  the game's buttons, only during a decision it can advise on. Tapping it shows the best
+  play in that same row; the status line keeps its instructions.
+- **Only when asked,** for that decision only: the next decision shows the button again.
+- **Right** (a stat at the top) is how often your choices matched the best one. A choice
+  made after tapping Hint doesn't count, so the score shows what you've learned. Several
+  choices can tie for best; any of them is right.
+- **After a miss** the status line says what was best ("Best was to hold the jack of
+  spades."), until your next choice.
+- **What's best is worked out, not guessed,** from what the player can see, never the hidden
+  cards: Video Poker scores every possible draw for all 32 holds; Cribbage averages the kept
+  hand over every starter and the crib over every 2 cards the computer might throw; Hot Dice
+  uses a table of what rolling on is worth for every dice count and turn total; Hold'em deals
+  out the rest of the hand 600 times (seeded, so asking twice gives one answer) and compares
+  the winning chance with the pot odds (bestBet in src/core/betting.ts, shared with
+  Five-Card Draw, which draws by the book). Some are rules of thumb, said so in the rules:
+  Euchre counts the hand for trump (Strong's count), Yacht weighs each box against what it
+  usually scores, looking ahead over the rolls left. Craps ranks bets by the house's
+  share; Mines finds squares the numbers prove. Each game's rules say how its Hint decides.
+- **Shown on the board too:** cards or dice to keep get the dashed `hint` outline.
+
 ## Touch
 
 - **Buttons and links:** at least `--tap` (44px) tall. The E2E tests check this.

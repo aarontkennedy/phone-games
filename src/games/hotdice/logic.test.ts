@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { seededRng } from '../../core/random';
-import { bank, bestKeep, canScore, chooseKeep, computerStep, endBust, isValidState, keep, newGame, roll, scoreDice, shouldBank, winner, type State } from './logic';
+import { bank, bestChoice, bestKeep, canScore, choiceValue, chooseKeep, computerStep, endBust, isValidState, isBestChoice, keep, newGame, roll, rollValue, scoreDice, shouldBank, winner, type State } from './logic';
 
 const at = (o: Partial<State>): State => ({ ...newGame(), ...o });
 
@@ -128,5 +128,53 @@ describe('computer player', () => {
     expect(isValidState({ ...newGame(), phase: 'x' })).toBe(false);
     expect(isValidState({ ...newGame(), turn: 2 })).toBe(false);
     expect(isValidState({ ...newGame(), level: 'x' })).toBe(false);
+  });
+});
+
+describe('the best play', () => {
+  const at = (o: Partial<State>): State => ({ ...newGame(), phase: 'choose', ...o });
+
+
+  it('knows what rolling on is worth, and when to bank', () => {
+    // A whole turn, played perfectly, scores about 583 on average.
+    expect(rollValue(6, 0)).toBeGreaterThan(550);
+    expect(rollValue(6, 0)).toBeLessThan(620);
+    // With 2 dice left, 250 is worth banking; 200 is worth rolling for.
+    expect(rollValue(2, 250)).toBeLessThan(250);
+    expect(rollValue(2, 200)).toBeGreaterThan(200);
+    // Six fresh dice are almost always worth rolling.
+    expect(rollValue(6, 5000)).toBeGreaterThan(5000);
+    expect(rollValue(6, 40_000)).toBe(0);
+  });
+
+  it('picks the keep, then roll or bank, that scores most', () => {
+    expect(bestChoice(at({ dice: [1, 5, 3, 3, 4, 2], remaining: 6 }))).toMatchObject({ keep: [0], then: 'roll' });
+    expect(bestChoice(at({ dice: [1, 5, 3], remaining: 3, turnPoints: 350 }))).toMatchObject({ keep: [0, 1], then: 'bank', value: 500 });
+    // All six score: keep them all and roll six fresh dice.
+    expect(bestChoice(at({ dice: [1, 2, 3, 4, 5, 6], remaining: 6 }))).toMatchObject({ keep: [0, 1, 2, 3, 4, 5], then: 'roll' });
+    // Banking that wins the game beats everything.
+    const win = at({ dice: [1, 2, 3, 4, 6, 6], remaining: 6, turnPoints: 0, scores: [9950, 0] });
+    expect(bestChoice(win)).toMatchObject({ keep: [0], then: 'bank', value: Infinity });
+    expect(choiceValue(win, [1], 'roll')).toBeLessThan(Infinity);
+  });
+
+  it('banks from the totals the rules give', () => {
+    // src/games/index.ts, Hot Dice tips: bank once the turn has this much, by dice left.
+    const bankFrom = (dice: number) => {
+      let t = 50;
+      while (rollValue(dice, t) > t) t += 50;
+      return t;
+    };
+    expect([1, 2, 3, 4, 5].map(bankFrom)).toEqual([350, 250, 450, 1050, 3100]);
+    // And it's one switch: rolling is better below those, banking at and above.
+    for (const [dice, from] of [[1, 350], [2, 250], [3, 450], [4, 1050], [5, 3100]]) {
+      for (let t = 50; t < 5000; t += 50) expect(rollValue(dice, t) > t).toBe(t < from);
+    }
+  });
+
+  it('counts ties as right', () => {
+    const s = at({ dice: [1, 5, 3, 3, 4, 2], remaining: 6 });
+    expect(isBestChoice(s, [1], 'roll')).toBe(true);
+    expect(isBestChoice(s, [1, 5], 'bank')).toBe(false);
   });
 });

@@ -1,8 +1,9 @@
 import { dieFace } from '../../core/dice-view';
+import { coach } from '../../core/coach';
 import { load, save } from '../../core/storage';
 import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
-import { GOAL, bank, computerStep, endBust, isValidState, keep, newGame, roll, scoreDice, winner, type Level, type State } from './logic';
+import { GOAL, bank, bestChoice, computerStep, endBust, isBestChoice, isValidState, keep, newGame, roll, scoreDice, winner, type Choice, type Level, type State } from './logic';
 import './style.css';
 
 const STATE_KEY = 'hotdice:state';
@@ -41,6 +42,7 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>You</small><b data-score="0"></b></div>
         <button class="btn" data-new>New</button>
         <div class="stat"><small>Computer</small><b data-score="1"></b></div>
+        <div class="stat"><small>Right</small><b data-accuracy></b></div>
       </div>
       <div class="board-frame hd-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
@@ -55,10 +57,15 @@ export function mount(container: HTMLElement): () => void {
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
   const recent = recentMoves(container, 'hotdice');
+  /** How often your keep-and-roll-or-bank choices were the best ones (src/core/coach.ts). */
+  const coaching = coach('hotdice');
+  /** After your choice: the best one, when yours wasn't, said until your next choice. */
+  let missed: string | null = null;
 
   function update(next: State | null) {
     if (!next) return;
     recent.add(moveText(state, next));
+    if (next.phase !== state.phase || next.dice !== state.dice) coaching.asked = false;
     state = next;
     picked = [];
     save(STATE_KEY, state);
@@ -80,10 +87,12 @@ export function mount(container: HTMLElement): () => void {
 
   function render() {
     const choosing = mine() && state.phase === 'choose';
+    const tip = choosing && coaching.asked ? bestChoice(state) : null;
     const dice = state.dice
       .map((d, i) => {
         const on = picked.includes(i);
-        return `<button class="hd-die${on ? ' picked' : ''}" data-die="${i}" aria-label="Die showing ${d}${on ? ', kept' : ''}" aria-pressed="${on}"${choosing ? '' : ' disabled'}>${face(d)}</button>`;
+        const hint = tip && tip.keep.includes(i) ? ' hint' : '';
+        return `<button class="hd-die${on ? ' picked' : ''}${hint}" data-die="${i}" aria-label="Die showing ${d}${on ? ', kept' : ''}" aria-pressed="${on}"${choosing ? '' : ' disabled'}>${face(d)}</button>`;
       })
       .join('');
     const kept = state.kept.map((d) => `<span class="hd-die small" role="img" aria-label="Kept ${d}">${face(d)}</span>`).join('');
@@ -92,13 +101,14 @@ export function mount(container: HTMLElement): () => void {
       <div class="hd-dice">${dice || `<span class="hd-hint">${state.remaining} ${state.remaining === 1 ? 'die' : 'dice'} to roll</span>`}</div>
       <div class="hd-kept"><span>Kept</span>${kept || '<span class="tt-muted">none yet</span>'}</div>`;
     container.querySelectorAll<HTMLElement>('[data-score]').forEach((el, p) => (el.textContent = fmt(state.scores[p])));
+    container.querySelector('[data-accuracy]')!.textContent = coaching.text();
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
 
     const score = pickedScore();
     actionsEl.innerHTML = !mine()
       ? ''
       : state.phase === 'choose'
-        ? `<button class="btn" data-act="keep-roll"${score ? '' : ' disabled'}>Keep &amp; roll</button><button class="btn secondary" data-act="keep-bank"${score ? '' : ' disabled'}>Keep &amp; bank</button>`
+        ? `${coaching.html(tip ? choiceText('Best:', tip) : '')}<button class="btn" data-act="keep-roll"${score ? '' : ' disabled'}>Keep &amp; roll</button><button class="btn secondary" data-act="keep-bank"${score ? '' : ' disabled'}>Keep &amp; bank</button>`
         : state.phase === 'roll'
           ? `<button class="btn" data-act="roll">Roll ${state.remaining}</button>${state.turnPoints ? '<button class="btn secondary" data-act="bank">Bank</button>' : ''}`
           : '';
@@ -108,7 +118,20 @@ export function mount(container: HTMLElement): () => void {
     else hideOverlay(boardEl);
   }
 
+  /** "Best: keep 1 5, then roll 4." (HTML); `lead` is "Best:" or "Best was to". */
+  function choiceText(lead: string, c: Choice): string {
+    const kept = c.keep.map((i) => state.dice[i]).sort((a, b) => a - b).join(' ');
+    const left = state.remaining - c.keep.length || 6;
+    const total = state.turnPoints + scoreDice(c.keep.map((i) => state.dice[i]))!;
+    return `${lead} keep <b>${kept}</b>, then <b>${c.then === 'roll' ? `roll ${left}` : `bank ${fmt(total)}`}</b>.`;
+  }
+
   function statusText(score: number | null): string {
+    const lesson = missed ? `${missed} ` : '';
+    return lesson + statusWords(score);
+  }
+
+  function statusWords(score: number | null): string {
     const who = state.turn === 0 ? 'You' : 'The computer';
     if (state.phase === 'gameOver') return `${who} reached ${fmt(GOAL)} with ${fmt(state.scores[state.turn])}!`;
     if (state.phase === 'bust') return `Bust! Nothing scored, so ${state.turn === 0 ? 'your' : 'the computer’s'} turn ends with no points.`;
@@ -128,12 +151,22 @@ export function mount(container: HTMLElement): () => void {
     render();
   });
   actionsEl.addEventListener('click', (e) => {
+    if ((e.target as Element).closest('[data-hint]')) {
+      coaching.asked = true;
+      render();
+      return;
+    }
     const act = (e.target as Element).closest<HTMLButtonElement>('[data-act]')?.dataset.act;
+    if (act === 'roll' || act === 'bank') missed = null;
     if (act === 'roll') update(roll(state));
     else if (act === 'bank') update(bank(state));
     else if (act) {
       const kept = keep(state, picked);
       if (!kept) return;
+      // Scored before the dice move on; not if you asked for the hint first.
+      const then = act === 'keep-roll' ? 'roll' : 'bank';
+      const right = isBestChoice(state, picked.map((i) => state.dice[i]), then);
+      missed = coaching.score(right) && !right ? choiceText('Best was to', bestChoice(state)).replace(/<\/?b>/g, '') : null;
       update(kept); // one step at a time, so the recent moves list sees each
       update(act === 'keep-roll' ? roll(state) : bank(state));
     }

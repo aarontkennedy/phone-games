@@ -7,7 +7,7 @@ import { contrast, readVars, themes } from '../../test/contrast';
 import { makeContainer, track, answerNewGame } from '../../test/helpers';
 import { AI_DELAY, TRICK_PAUSE, mount, moveText } from './index';
 import type { HandResult, State } from './logic';
-import { bidding, position, trick } from './test-fixtures';
+import { bidding, card, position, trick } from './test-fixtures';
 
 function setup(saved: unknown = null) {
   if (saved) save('euchre:state', saved);
@@ -73,7 +73,7 @@ describe('Euchre screen', () => {
     expect(strip()).toMatch(/^Turned up/);
     expect($('.eu-trump .card').dataset.card).toBe('9H');
     expect(buttons()).toEqual(['Order up', 'Alone', 'Pass']);
-    expect(status()).toBe('Order the dealer to pick up the 9 of hearts, making hearts trump? Or pass.');
+    expect(status()).toBe('Order up the 9 of hearts to make hearts trump, or pass.');
     expect(info(3)).toBe('Dealer');
     expect(info(1)).toBe('');
   });
@@ -119,7 +119,9 @@ describe('Euchre screen', () => {
     const { $, status, stored } = setup(bidding(HANDS));
     $('[data-pass]').click();
     expect(stored().turn).toBe(1);
-    expect(status()).toBe('West is deciding…');
+    // Both bowers and the ace: worth ordering up, and the line says so.
+    expect(status()).toBe('Best was to order up. Your hand counts about 7.9 with hearts as trump: 7 or more is worth calling. West is deciding…');
+    expect($('[data-accuracy]').textContent).toBe('0%');
     expect($('[data-bidding]').hidden).toBe(true);
     vi.advanceTimersByTime(AI_DELAY * 3);
     expect(stored().turn).not.toBe(1);
@@ -241,5 +243,48 @@ describe('Euchre colors', () => {
     expect(contrast(t['eu-red'], a.tint), 'suit buttons').toBeGreaterThanOrEqual(3);
     expect(contrast(onFelt, f.board), 'trump, on the felt').toBeGreaterThanOrEqual(3);
     expect(contrast(onFelt, f.surface), 'trump, on a panel on the felt').toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe('Euchre hints', () => {
+  it('gives the best bid by the count when asked, and scores bids made without it', () => {
+    const { $, status } = setup(bidding(HANDS));
+    expect($('[data-accuracy]').textContent).toBe('–');
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: order up. Your hand counts about 7.9 with hearts as trump: 7 or more is worth calling.');
+    $('[data-pass]').click(); // asked first: not scored
+    expect($('[data-accuracy]').textContent).toBe('–');
+    expect(status()).not.toMatch(/Best was/);
+
+    document.body.replaceChildren();
+    const right = setup(bidding(HANDS));
+    right.$('[data-order]').click();
+    expect(right.$('[data-accuracy]').textContent).toBe('100%');
+    expect(load('euchre:accuracy', null)).toEqual({ right: 1, plays: 1 });
+  });
+
+  it('says to pass a weak hand, and which suit to call in round two', () => {
+    const weak = ['9D 10D 9C 10C QC', 'JH JD AH KC JS', 'KH AD KD QD AS', '10H QH 9S AC JC'];
+    const { $ } = setup(bidding(weak));
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toMatch(/^Best: pass\. Your hand counts about [\d.]+ with hearts as trump: 7 is needed to call\.$/);
+    document.body.replaceChildren();
+    // Round two, dealer: you must name a suit.
+    const stuck = setup(bidding(HANDS, { phase: 'bidding2', dealer: 0, turn: 0 }));
+    stuck.$('[data-hint]').click();
+    expect(stuck.$('[data-tip]').textContent).toMatch(/^Best: call (spades|diamonds|clubs)\. Your hand counts about/);
+  });
+
+  it('outlines the card to put back when you pick up, and scores it', () => {
+    const picking = () =>
+      position(['JH JD AH KC 9C 9H', '10H QH 9D 10D 10C', 'KH AD KD QD JC', 'AS JS 9S AC QC'], { phase: 'discard', dealer: 0, turn: 0, maker: 1, turned: card('9H') }, '10S QS KS');
+    const { $, $$ } = setup(picking());
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toMatch(/^Best: put back the outlined card/);
+    expect($$('.card.hint').map((c) => c.dataset.card)).toEqual(['9C']);
+    document.body.replaceChildren();
+    const wrong = setup(picking());
+    wrong.$('[data-hand][data-card="KC"]').click();
+    expect(wrong.status()).toMatch(/^Best was to put back the 9 of clubs\. /);
   });
 });

@@ -1,9 +1,11 @@
+import { coach } from '../../core/coach';
 import { load, save } from '../../core/storage';
 import { showIcons } from '../../core/icons';
 import { confirmNew, settingRow, settingsHtml } from '../../core/ui';
 import {
   LEVELS,
   countAt,
+  deduce,
   flagsLeft,
   isFinished,
   isValidState,
@@ -36,7 +38,7 @@ export function mount(container: HTMLElement): () => void {
       </div>
       <div class="board-frame ms-board" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
-      <div class="controls">
+      <div class="controls" data-controls>
         <button class="btn secondary ms-mode" data-mode></button>
       </div>
     </div>${settingsHtml(settingRow('Difficulty', Object.entries(LEVELS).map(([id, l]) => `<button data-level="${id}">${l.label}</button>`).join(''), 'Starts a new game.'))}`;
@@ -47,6 +49,10 @@ export function mount(container: HTMLElement): () => void {
   const statusEl = container.querySelector<HTMLElement>('[data-status]')!;
   const modeBtn = container.querySelector<HTMLButtonElement>('[data-mode]')!;
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const controlsEl = container.querySelector<HTMLElement>('[data-controls]')!;
+  /** Hint: a square the numbers prove safe (or a mine), and why. No Right score: Mines
+   *  teaches the reasoning, not one best move (src/core/coach.ts). */
+  const coaching = coach('minesweeper');
   let cells: HTMLElement[] = [];
 
   // --- Clock: only counts while the game is on screen ---
@@ -117,6 +123,7 @@ export function mount(container: HTMLElement): () => void {
   }
 
   function commit() {
+    coaching.asked = false;
     persist();
     render();
   }
@@ -134,8 +141,28 @@ export function mount(container: HTMLElement): () => void {
     boardEl.replaceChildren(...cells);
   }
 
+  /** What Hint says (HTML), and the squares it outlines. */
+  function tip(): { text: string; cell: number; clues: number[] } {
+    if (!state.mines) return { text: 'Best: dig anywhere. The first dig is never a mine.', cell: -1, clues: [] };
+    const d = deduce(state);
+    if (!d) return { text: 'No square is certain right now: the next dig is a guess. Squares away from the numbers are often safer.', cell: -1, clues: [] };
+    const n = countAt(state, d.clues[0]);
+    const mines = n === 1 ? 'its mine' : `its ${n} mines`;
+    const text =
+      d.rule === 'full'
+        ? `Best: dig the <b>dashed square</b>. The ${n} with the solid outline already touches ${mines}, so the rest around it are safe.`
+        : d.rule === 'all'
+          ? `Best: flag the <b>dashed square</b>. The ${n} with the solid outline touches exactly ${n} hidden ${n === 1 ? 'square' : 'squares'}, so ${n === 1 ? 'it’s a mine' : 'they’re all mines'}.`
+          : d.safe
+            ? 'Best: dig the <b>dashed square</b>. Compare the two outlined numbers: every hidden square the first needs also touches the second, and the second needs no more mines, so its other squares are safe.'
+            : 'Best: flag the <b>dashed square</b>. Compare the two outlined numbers: every hidden square the first needs also touches the second, and the second’s extra mines fill exactly its other squares.';
+    return { text, cell: d.cell, clues: d.clues };
+  }
+
   function render() {
     const lost = state.status === 'lost';
+    const deciding = state.status === 'ready' || state.status === 'playing';
+    const hint = deciding && coaching.asked ? tip() : null;
     cells.forEach((cell, i) => {
       const isMine = !!state.mines?.[i];
       let cls = 'ms-cell';
@@ -157,6 +184,8 @@ export function mount(container: HTMLElement): () => void {
         if (wrong) cls += ' wrong';
         symbol = wrong ? sym.wrongFlag : sym.flag;
       }
+      if (hint?.cell === i) cls += ' hint';
+      if (hint?.clues.includes(i)) cls += ' why';
       cell.className = cls;
       if (symbol) cell.innerHTML = symbol;
       else cell.textContent = text;
@@ -166,6 +195,8 @@ export function mount(container: HTMLElement): () => void {
     renderClock();
 
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
+    controlsEl.querySelector('.coach')?.remove();
+    if (deciding) controlsEl.insertAdjacentHTML('afterbegin', coaching.html(hint ? hint.text : ''));
     modeBtn.textContent = flagMode ? 'Flag' : 'Dig';
     modeBtn.setAttribute('aria-pressed', String(flagMode));
 
@@ -230,6 +261,11 @@ export function mount(container: HTMLElement): () => void {
   const inProgress = () => state.status === 'playing';
   container.querySelector('[data-new]')!.addEventListener('click', () => confirmNew(inProgress(), () => newGame(state.level)));
   levelBtns.forEach((b) => b.addEventListener('click', () => confirmNew(inProgress(), () => newGame(b.dataset.level as Level))));
+  controlsEl.addEventListener('click', (e) => {
+    if (!(e.target as Element).closest('[data-hint]')) return;
+    coaching.asked = true;
+    render();
+  });
   modeBtn.addEventListener('click', () => {
     flagMode = !flagMode;
     render();

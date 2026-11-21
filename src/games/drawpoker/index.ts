@@ -1,15 +1,18 @@
-import { betText } from '../../core/betting';
+import { betText, betWhy, type Advice } from '../../core/betting';
 import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { cardId, cardName, sameCard, type Card } from '../../core/cards';
 import { CATEGORY_NAMES, describeHand, type HandRank } from '../../core/poker';
+import { coach } from '../../core/coach';
 import { load, save } from '../../core/storage';
-import { SEAT_NAMES, type Seat } from '../../core/tricks';
+import { SEAT_NAMES, theCard, type Seat } from '../../core/tricks';
 import { SEAT_ORDER } from '../../core/trick-view';
 import { RECENT_HTML, recentMoves } from '../../core/recent';
 import { confirmNew, hideOverlay, showOverlay, levelSetting, settingsHtml } from '../../core/ui';
 import {
   MAX_DRAW,
+  advice,
   applyTurn,
+  bestDraw,
   betSize,
   bigBlind,
   chooseTurn,
@@ -58,11 +61,12 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>You</small><b data-chips></b></div>
         <button class="btn" data-new>New</button>
         <div class="stat"><small>Pot</small><b data-pot></b></div>
+        <div class="stat"><small>Right</small><b data-accuracy></b></div>
       </div>
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       ${RECENT_HTML}
-      <div class="controls">
+      <div class="controls" data-controls>
         <div class="dp-actions actions" data-actions></div>
       </div>
     </div>${settingsHtml(levelSetting('Computer players'))}`;
@@ -73,6 +77,20 @@ export function mount(container: HTMLElement): () => void {
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
 
   const recent = recentMoves(container, 'drawpoker');
+  const controlsEl = container.querySelector<HTMLElement>('[data-controls]')!;
+  /** How often your draws and bets were the best ones (src/core/coach.ts). */
+  const coaching = coach('drawpoker');
+  /** After your play: the best one, when yours wasn't, said until your next play. */
+  let missed: string | null = null;
+  /** The bet advice for the decision in front of you, worked out once (it takes a moment). */
+  let adviceFor: { key: string; advice: Advice } | null = null;
+  const bestBetNow = (): Advice => {
+    const key = JSON.stringify([state.hand, state.round, state.bets, state.put, state.live, state.hands[0]]);
+    if (adviceFor?.key !== key) adviceFor = { key, advice: advice(state, 0) };
+    return adviceFor.advice;
+  };
+  const sameCards = (a: Card[], b: Card[]) => a.length === b.length && a.every((c) => b.some((x) => sameCard(x, c)));
+  const listCards = (cards: Card[]) => join(cards.map(theCard));
 
   function update(next: State | null) {
     if (!next) return;
@@ -90,6 +108,18 @@ export function mount(container: HTMLElement): () => void {
   /** A bet or a draw, said in the recent moves list. */
   function play(seat: Seat, t: Turn) {
     const next = applyTurn(state, seat, t);
+    if (next && seat === 0) {
+      // Scored before the table moves on; not if you asked for the hint first.
+      if ('swap' in t) {
+        const best = bestDraw(state.hands[0]);
+        const right = sameCards(t.swap, best);
+        missed = coaching.score(right) && !right ? `Best was to ${best.length ? `swap ${listCards(best)}` : 'stand pat'}.` : null;
+      } else {
+        const tip = bestBetNow();
+        missed = coaching.score(t.action === tip.action) && t.action !== tip.action ? `Best was to ${tip.action}. ${betWhy(tip)}` : null;
+      }
+      coaching.asked = false;
+    }
     if (next) recent.add('swap' in t ? drawText(seat, t.swap.length) : betText(state, seat, t.action, betSize(state), SEAT_NAMES[seat]));
     update(next);
   }
@@ -97,6 +127,7 @@ export function mount(container: HTMLElement): () => void {
   /** A new hand or game starts with an empty list. */
   function start(next: State | null) {
     if (!next) return;
+    missed = null;
     state = next;
     recent.clear();
     update(next);
@@ -129,7 +160,8 @@ export function mount(container: HTMLElement): () => void {
       ? mine
           .map((c) => {
             const out = picked.some((p) => sameCard(p, c));
-            const card = cardFace(c, { button: true, className: out ? 'swap' : '', attrs: `data-hand aria-pressed="${out}"${drawing ? '' : ' disabled'}` });
+            const hint = drawing && coaching.asked && bestDraw(mine).some((x) => sameCard(x, c)) ? ' hint' : '';
+            const card = cardFace(c, { button: true, className: `${out ? 'swap' : ''}${hint}`, attrs: `data-hand aria-pressed="${out}"${drawing ? '' : ' disabled'}` });
             return `<div class="dp-slot">${card}<span class="dp-mark">${out ? 'Swap' : ''}</span></div>`;
           })
           .join('')
@@ -144,6 +176,10 @@ export function mount(container: HTMLElement): () => void {
     container.querySelector('[data-pot]')!.textContent = String(state.phase === 'betting' || state.phase === 'drawing' ? pot(state) : 0);
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
     const opts = options(state, 0);
+    container.querySelector('[data-accuracy]')!.textContent = coaching.text();
+    controlsEl.querySelector('.coach')?.remove();
+    const myTurn = (state.phase === 'betting' && state.turn === 0 && opts.length > 0) || drawing;
+    if (myTurn) controlsEl.insertAdjacentHTML('afterbegin', coaching.html(coaching.asked ? tipText() : ''));
     actionsEl.innerHTML =
       state.phase === 'handOver'
         ? '<button class="btn" data-next>Next hand</button>'
@@ -169,7 +205,22 @@ export function mount(container: HTMLElement): () => void {
       .join(' ');
   }
 
+  /** The best play now (HTML). */
+  function tipText(): string {
+    if (myDraw()) {
+      const n = bestDraw(state.hands[0]).length;
+      return n ? `Best: swap the <b>${n === 1 ? 'outlined card' : `${n} outlined cards`}</b>.` : 'Best: <b>stand pat</b> and keep all five.';
+    }
+    const tip = bestBetNow();
+    return `Best: <b>${LABELS[tip.action]}</b>. ${betWhy(tip)}`;
+  }
+
   function statusText(opts: Action[]): string {
+    const lesson = missed && state.phase !== 'handOver' && state.phase !== 'gameOver' ? `${missed} ` : '';
+    return lesson + statusWords(opts);
+  }
+
+  function statusWords(opts: Action[]): string {
     if (state.phase === 'handOver' || state.phase === 'gameOver') return `${state.shown ? '' : 'Everyone else folded. '}${resultText()}`;
     if (state.phase === 'drawing') {
       if (state.turn !== 0) return `The draw: ${SEAT_NAMES[state.turn]} is choosing cards…`;
@@ -191,6 +242,11 @@ export function mount(container: HTMLElement): () => void {
     const c = state.hands[0].find((h) => cardId(h) === el.dataset.card)!;
     if (picked.some((p) => sameCard(p, c))) picked = picked.filter((p) => !sameCard(p, c));
     else if (picked.length < MAX_DRAW) picked = [...picked, c];
+    render();
+  });
+  controlsEl.addEventListener('click', (e) => {
+    if (!(e.target as Element).closest('[data-hint]')) return;
+    coaching.asked = true;
     render();
   });
   actionsEl.addEventListener('click', (e) => {

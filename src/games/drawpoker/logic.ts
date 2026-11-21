@@ -4,13 +4,13 @@
 // size) and the best hand wins. Blinds double every 10 hands. The game ends when you're
 // out of chips or have them all. Betting rules are shared with hold'em (core/betting).
 // Pure functions: every action returns a new State, or null if it isn't allowed.
-import { MAX_RAISES, after, applyAction, newRound, options as tableOptions, payPots, pot, postBlinds, raiseCost as tableRaiseCost, toCall, type Action, type Pot, type Table } from '../../core/betting';
+import { MAX_RAISES, after, applyAction, bestBet, newRound, options as tableOptions, payPots, pot, postBlinds, raiseCost as tableRaiseCost, toCall, type Action, type Advice, type Pot, type Table } from '../../core/betting';
 import { isCard, isFullDeck, sameCard, shuffledDeck, type Card } from '../../core/cards';
 import { rankFive, type HandRank } from '../../core/poker';
-import { type Rng } from '../../core/random';
+import { seedFrom, seededRng, type Rng } from '../../core/random';
 import { SEATS, type Seat } from '../../core/tricks';
 
-export { MAX_RAISES, pot, toCall, type Action, type Pot };
+export { MAX_RAISES, pot, toCall, type Action, type Advice, type Pot };
 
 export type Level = 'easy' | 'strong';
 export type Phase = 'betting' | 'drawing' | 'handOver' | 'gameOver';
@@ -232,6 +232,18 @@ export function chooseTurn(s: State, seat: Seat, rng: Rng = Math.random): Turn {
 
 export function applyTurn(s: State, seat: Seat, t: Turn): State | null {
   return 'swap' in t ? swap(s, seat, t.swap) : act(s, seat, t.action);
+}
+
+// --- The best play (Hint and the Right score) ---
+
+/**
+ * The best bet for `seat` by the numbers: its chance of winning, from playing the rest
+ * out many times, against the pot (bestBet in src/core/betting.ts). Seeded by what the
+ * seat can see, so asking twice gives one answer.
+ */
+export function advice(s: State, seat: Seat = 0): Advice {
+  const seen = JSON.stringify([s.hands[seat], s.live, s.hand, s.round, s.drew]);
+  return bestBet(s, seat, equity(s, seat, seededRng(seedFrom(seen)), 600));
 }
 
 export function isValidState(s: unknown): s is State {

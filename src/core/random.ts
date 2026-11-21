@@ -13,6 +13,13 @@ export function seededRng(seed: number): Rng {
   };
 }
 
+/** A seed from text, so the same situation always gets the same random numbers (hints). */
+export function seedFrom(text: string): number {
+  let seed = 7;
+  for (let i = 0; i < text.length; i++) seed = (seed * 31 + text.charCodeAt(i)) >>> 0;
+  return seed;
+}
+
 /** Integer in [0, max). */
 export function randomInt(max: number, rng: Rng = Math.random): number {
   return Math.floor(rng() * max);

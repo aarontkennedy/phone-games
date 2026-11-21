@@ -56,7 +56,9 @@ describe('Five-card draw screen', () => {
     expect(stored().hands[0]).toHaveLength(5);
     expect(stored().said[0]).toBe('Drew 2');
     expect(recent()).toEqual(['You drew 2 cards.']);
-    expect(status()).toBe('The draw: West is choosing cards…');
+    // Keeping the 9 wasn't the book draw: the line says what was.
+    expect(status()).toBe('Best was to swap the 2 of clubs, the 3 of diamonds and the 9 of spades. The draw: West is choosing cards…');
+    expect($('[data-accuracy]').textContent).toBe('0%');
     vi.advanceTimersByTime(AI_DELAY);
     expect(recent()[1]).toMatch(/^West (drew [123] cards?|kept all five cards)\.$/);
     expect(stored().phase).toBe('betting');
@@ -133,5 +135,41 @@ describe('Five-card draw screen', () => {
     again.$('[data-actions]').click();
     document.body.replaceChildren();
     expect(setup({ hand: 'x' }).$$('[data-seat]')).toHaveLength(4);
+  });
+});
+
+describe('Five-card draw hints', () => {
+  it('outlines the cards to swap when asked, and scores the book draw as right', () => {
+    const s = table(['AS AH 2C 3D 9S', 'KS KH 4C 5D 7S', '', ''], { phase: 'drawing', toAct: [false, false, false, false] }, 'AD AC 6H 8H');
+    const { $, $$ } = setup(s);
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: swap the 3 outlined cards.');
+    expect($$('.card.hint').map((c) => c.dataset.card).sort()).toEqual(['2C', '3D', '9S']);
+    document.body.replaceChildren();
+    const right = setup(s);
+    ['2C', '3D', '9S'].forEach((id) => right.tap(id));
+    right.$('[data-swap]').click();
+    expect(right.$('[data-accuracy]').textContent).toBe('100%');
+    expect(load('drawpoker:accuracy', null)).toEqual({ right: 1, plays: 1 });
+  });
+
+  it('says to stand pat with a made hand', () => {
+    const { $ } = setup(table(['2S 3S 4S 5S 9S', 'KS KH 4C 5D 7S', '', ''], { phase: 'drawing', toAct: [false, false, false, false] }));
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toBe('Best: stand pat and keep all five.');
+  });
+
+  it('gives the best bet by the numbers, and says it after a miss', () => {
+    const s = table(['AS AH AD 3D 9S', 'KS KH 4C 5D 7S', '', ''], { said: ['', 'Check', '', ''] });
+    const { $, status } = setup(s);
+    $('[data-hint]').click();
+    expect($('[data-tip]').textContent).toMatch(/^Best: (Bet|Raise)\. You win about \d+% against 1 hand, well over an even share \(50%\)\.$/);
+    $('[data-action="check"]').click(); // asked first: not scored
+    expect($('[data-accuracy]').textContent).toBe('–');
+    expect(status()).not.toMatch(/Best was/);
+    document.body.replaceChildren();
+    const again = setup(s);
+    again.$('[data-action="check"]').click();
+    expect(again.status()).toMatch(/^Best was to (bet|raise)\. You win about/);
   });
 });

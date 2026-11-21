@@ -1,9 +1,13 @@
 import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { cardId, sameCard, type Card } from '../../core/cards';
+import { coach } from '../../core/coach';
 import { load, save } from '../../core/storage';
+import { theCard } from '../../core/tricks';
 import { handHtml } from '../../core/trick-view';
 import { showOverlay, hideOverlay, confirmNew, levelSetting, settingsHtml } from '../../core/ui';
 import {
+  bestDiscard,
+  isBestDiscard,
   GAME_POINTS,
   PLAYER_NAMES,
   chooseCard,
@@ -34,6 +38,8 @@ function describe(items: ScoreItem[]): string {
   return parts.length < 2 ? parts.join('') : `${parts.slice(0, -1).join(', ')} and ${parts.at(-1)}`;
 }
 
+/** "the 9 of clubs and the 2 of hearts" */
+const listCards = (cards: Card[]) => cards.map(theCard).join(' and ');
 const whose = (p: Player) => (p === 0 ? 'Your' : 'The computer’s');
 
 // The peg board. Each player's track is three rows of 40 holes in fives, snaking back
@@ -74,10 +80,11 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small><i class="cb-key p0" aria-hidden="true"></i>You</small><b data-score="0"></b></div>
         <button class="btn" data-new>New</button>
         <div class="stat"><small><i class="cb-key p1" aria-hidden="true"></i>Computer</small><b data-score="1"></b></div>
+        <div class="stat"><small>Right</small><b data-accuracy></b></div>
       </div>
       <div class="board-frame cb-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
-      <div class="controls">
+      <div class="controls" data-controls>
         <button class="btn" data-crib>Send to crib</button>
         <button class="btn" data-next>Next</button>
       </div>
@@ -89,9 +96,23 @@ export function mount(container: HTMLElement): () => void {
   const nextBtn = container.querySelector<HTMLButtonElement>('[data-next]')!;
   const scoreEls = container.querySelectorAll<HTMLElement>('[data-score]');
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
+  const controlsEl = container.querySelector<HTMLElement>('[data-controls]')!;
+  /** How often your discards were the best ones (src/core/coach.ts). */
+  const coaching = coach('cribbage');
+  /** After your discard: the best two, when yours weren't, said until you play a card. */
+  let missed: Card[] | null = null;
+  /** The best discard for the hand in front of you, worked out once. */
+  let bestFor: { key: string; toss: Card[] } | null = null;
+  const bestToss = (): Card[] => {
+    const key = JSON.stringify([state.hands[0], state.dealer]);
+    if (bestFor?.key !== key) bestFor = { key, toss: bestDiscard(state.hands[0], state.dealer === 0) };
+    return bestFor.toss;
+  };
 
   function update(next: State | null) {
     if (!next) return;
+    if (next.phase !== state.phase) coaching.asked = false;
+    if (next.phase !== 'pegging') missed = null;
     state = next;
     picked = [];
     save(STATE_KEY, state);
@@ -167,21 +188,26 @@ export function mount(container: HTMLElement): () => void {
         return `${scored} ${winner(state) === 0 ? `You win ${me} to ${cpu}!` : `The computer wins ${cpu} to ${me}.`}`.trim();
       }
     }
-    if (state.turn === 1) return `${scored} Computer is playing…`.trim();
+    const lesson = missed ? `Best was to put ${listCards(missed)} in the crib. ` : '';
+    if (state.turn === 1) return `${lesson}${scored} Computer is playing…`.trim();
     const last = state.pile.at(-1) ?? state.pegged.at(-1);
     const go = last?.player === 0 && state.pile.length ? ' The computer says go.' : '';
-    return `${scored}${go} Your turn. The count is ${pileCount(state)}.`.trim();
+    return `${lesson}${scored}${go} Your turn. The count is ${pileCount(state)}.`.trim();
   }
 
   function render() {
+    const showTip = state.phase === 'discard' && coaching.asked;
     const playable = state.phase === 'discard' ? ('all' as const) : state.phase === 'pegging' && state.turn === 0 ? legalPlays(state, 0) : [];
     const hand = state.phase === 'show' || state.phase === 'gameOver' ? state.kept[0] : state.hands[0];
     boardEl.innerHTML = `
       ${pegBoard()}
       ${opponent()}
       <div class="cb-middle">${middle()}</div>
-      ${hand.length ? handHtml(hand, { playable: state.phase === 'show' ? [] : playable, picked }) : `<div class="tt-hand">${cardSlot()}</div>`}`;
+      ${hand.length ? handHtml(hand, { playable: state.phase === 'show' ? [] : playable, picked, marked: { hint: showTip ? bestToss() : [] } }) : `<div class="tt-hand">${cardSlot()}</div>`}`;
     scoreEls.forEach((el, p) => (el.textContent = String(state.scores[p])));
+    container.querySelector('[data-accuracy]')!.textContent = coaching.text();
+    controlsEl.querySelector('.coach')?.remove();
+    if (state.phase === 'discard') controlsEl.insertAdjacentHTML('afterbegin', coaching.html('Best: put the <b>2 outlined cards</b> in the crib.'));
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
     cribBtn.hidden = state.phase !== 'discard';
     cribBtn.disabled = picked.length !== 2;
@@ -203,9 +229,24 @@ export function mount(container: HTMLElement): () => void {
     if (state.phase === 'discard') {
       picked = picked.some((p) => sameCard(p, c)) ? picked.filter((p) => !sameCard(p, c)) : [...picked, c].slice(-2);
       render();
-    } else update(play(state, 0, c));
+    } else {
+      missed = null;
+      update(play(state, 0, c));
+    }
   });
-  cribBtn.addEventListener('click', () => update(discard(state, picked)));
+  cribBtn.addEventListener('click', () => {
+    const next = discard(state, picked);
+    if (!next) return;
+    // Scored before the crib takes them; not if you asked for the hint first.
+    const right = isBestDiscard(state.hands[0], state.dealer === 0, picked);
+    missed = coaching.score(right) && !right ? bestToss() : null;
+    update(next);
+  });
+  controlsEl.addEventListener('click', (e) => {
+    if (!(e.target as Element).closest('[data-hint]')) return;
+    coaching.asked = true;
+    render();
+  });
   nextBtn.addEventListener('click', () => update(nextStep(state)));
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase !== 'gameOver' && (state.scores.some((n) => n > 0) || state.pegged.length > 0);

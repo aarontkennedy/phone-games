@@ -1,6 +1,7 @@
-import { betText } from '../../core/betting';
+import { betText, betWhy } from '../../core/betting';
 import { cardBack, cardFace, cardSlot } from '../../core/card-view';
 import { describeHand } from '../../core/poker';
+import { coach } from '../../core/coach';
 import { load, save } from '../../core/storage';
 import { SEAT_NAMES, type Seat } from '../../core/tricks';
 import { SEAT_ORDER } from '../../core/trick-view';
@@ -9,6 +10,7 @@ import { confirmNew, hideOverlay, showOverlay, levelSetting, settingsHtml } from
 import {
   STREETS,
   act,
+  advice,
   betSize,
   bigBlind,
   chooseAction,
@@ -22,6 +24,7 @@ import {
   toCall,
   winner,
   type Action,
+  type Advice,
   type Level,
   type State,
 } from './logic';
@@ -46,11 +49,12 @@ export function mount(container: HTMLElement): () => void {
         <div class="stat"><small>You</small><b data-chips></b></div>
         <button class="btn" data-new>New</button>
         <div class="stat"><small>Pot</small><b data-pot></b></div>
+        <div class="stat"><small>Right</small><b data-accuracy></b></div>
       </div>
       <div class="board-frame tt-table" data-board></div>
       <p class="status-line" data-status aria-live="polite"></p>
       ${RECENT_HTML}
-      <div class="controls">
+      <div class="controls" data-controls>
         <div class="he-actions actions" data-actions></div>
       </div>
     </div>${settingsHtml(levelSetting('Computer players'))}`;
@@ -61,6 +65,18 @@ export function mount(container: HTMLElement): () => void {
   const levelBtns = container.querySelectorAll<HTMLButtonElement>('[data-level]');
 
   const recent = recentMoves(container, 'holdem');
+  const controlsEl = container.querySelector<HTMLElement>('[data-controls]')!;
+  /** How often your plays were the best ones by the numbers (src/core/coach.ts). */
+  const coaching = coach('holdem');
+  /** After your play: the best one, when yours wasn't, said until your next turn's play. */
+  let missed: string | null = null;
+  /** The advice for the decision in front of you, worked out once (it takes a moment). */
+  let adviceFor: { key: string; advice: Advice } | null = null;
+  const best = (): Advice => {
+    const key = JSON.stringify([state.hand, state.street, state.bets, state.put, state.live, state.board]);
+    if (adviceFor?.key !== key) adviceFor = { key, advice: advice(state, 0) };
+    return adviceFor.advice;
+  };
 
   function update(next: State | null) {
     if (!next) return;
@@ -80,6 +96,12 @@ export function mount(container: HTMLElement): () => void {
   /** A betting action, said in the recent moves list. */
   function play(seat: Seat, a: Action) {
     const next = act(state, seat, a);
+    if (next && seat === 0) {
+      // Scored before the table moves on; not if you asked for the hint first.
+      const tip = best();
+      missed = coaching.score(a === tip.action) && a !== tip.action ? `Best was to ${tip.action}. ${betWhy(tip)}` : null;
+      coaching.asked = false;
+    }
     if (next) recent.add(betText(state, seat, a, betSize(state), SEAT_NAMES[seat]));
     update(next);
   }
@@ -87,6 +109,7 @@ export function mount(container: HTMLElement): () => void {
   /** A new hand or game starts with an empty list. */
   function start(next: State | null) {
     if (!next) return;
+    missed = null;
     state = next;
     recent.clear();
     update(next);
@@ -117,9 +140,13 @@ export function mount(container: HTMLElement): () => void {
       <div class="he-board" aria-label="Shared cards">${board}</div>
       <p class="he-info">${mine ? `You have: <b>${lowerFirst(mine)}</b>` : '&nbsp;'}</p>`;
     container.querySelector('[data-chips]')!.textContent = String(state.stacks[0]);
+    container.querySelector('[data-accuracy]')!.textContent = coaching.text();
     container.querySelector('[data-pot]')!.textContent = String(state.phase === 'betting' ? pot(state) : 0);
     levelBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.level === state.level)));
     const opts = options(state, 0);
+    controlsEl.querySelector('.coach')?.remove();
+    const myTurn = state.phase === 'betting' && state.turn === 0 && opts.length > 0;
+    if (myTurn) controlsEl.insertAdjacentHTML('afterbegin', coaching.html(coaching.asked ? `Best: <b>${LABELS[best().action]}</b>. ${betWhy(best())}` : ''));
     actionsEl.innerHTML =
       state.phase === 'handOver'
         ? '<button class="btn" data-next>Next hand</button>'
@@ -160,13 +187,14 @@ export function mount(container: HTMLElement): () => void {
       const folded = state.shown ? '' : 'Everyone else folded. ';
       return `${folded}${resultText()}`;
     }
-    if (state.turn !== 0) return `${STREETS[state.street]}: ${SEAT_NAMES[state.turn]} is thinking…`;
+    const lesson = missed ? `${missed} ` : '';
+    if (state.turn !== 0) return `${lesson}${STREETS[state.street]}: ${SEAT_NAMES[state.turn]} is thinking…`;
     // e.g. "call 10, raise 20 or fold"; amounts are the chips each puts in now.
     const amount = (n: number) => (n >= state.stacks[0] ? `${state.stacks[0]} (all in)` : String(n));
     const words = [...opts.filter((a) => a !== 'fold'), ...opts.filter((a) => a === 'fold')].map((a) =>
       a === 'call' ? `call ${amount(toCall(state, 0))}` : a === 'bet' || a === 'raise' ? `${a} ${amount(raiseCost(state, 0))}` : a,
     );
-    return `${STREETS[state.street]}, your turn: ${join(words, 'or')}.`;
+    return `${lesson}${STREETS[state.street]}, your turn: ${join(words, 'or')}.`;
   }
 
   actionsEl.addEventListener('click', (e) => {
@@ -174,6 +202,11 @@ export function mount(container: HTMLElement): () => void {
     if (!el) return;
     if (el.hasAttribute('data-next')) start(nextHand(state));
     else play(0, el.dataset.action as Action);
+  });
+  controlsEl.addEventListener('click', (e) => {
+    if (!(e.target as Element).closest('[data-hint]')) return;
+    coaching.asked = true;
+    render();
   });
   // A game partway through: New asks first (docs/DESIGN.md, "Screen layout").
   const inProgress = () => state.phase !== 'gameOver' && (state.hand > 1 || state.said.some((w) => w && !w.includes('blind')));
