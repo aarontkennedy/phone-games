@@ -129,6 +129,26 @@ function moveNewToTopBar(root: HTMLElement, btn: HTMLButtonElement): void {
  * Hash router: `#/` shows the game list, `#/about` the About page, `#/settings` the
  * app's settings (Appearance), and `#/<id>` opens a game. Returns a stop function.
  */
+/** Reloading the page: replaceable in tests. */
+export const page = { reload: () => location.reload() };
+
+/** When the app last reloaded itself to fetch a game (so it does so once, not in a loop). */
+const RELOAD_KEY = 'pg:reloaded-at';
+function reloadedLongAgo(): boolean {
+  try {
+    return Date.now() - Number(sessionStorage.getItem(RELOAD_KEY) ?? 0) > 30_000;
+  } catch {
+    return false; // storage blocked: don't risk a loop
+  }
+}
+function markReload() {
+  try {
+    sessionStorage.setItem(RELOAD_KEY, String(Date.now()));
+  } catch {
+    // Unreachable: reloadedLongAgo already found storage usable.
+  }
+}
+
 export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
   let cleanup: (() => void) | null = null;
   let navigation = 0;
@@ -225,7 +245,18 @@ export function startApp(root: HTMLElement, games: GameMeta[]): () => void {
       module = await meta.load();
     } catch {
       if (current !== navigation) return;
-      main.innerHTML = `<p class="status-line">Couldn't load this game. Connect to the internet once and try again.</p>`;
+      // Usually the app was just updated: this copy asks for the old version's game files,
+      // which are gone. Reloading fetches the new version and opens the game (the address
+      // still points to it). Once only, so a real problem can't reload over and over.
+      if (navigator.onLine && reloadedLongAgo()) {
+        markReload();
+        page.reload();
+        return;
+      }
+      main.innerHTML = `<p class="status-line">${
+        navigator.onLine ? "Couldn't load this game. The app may have just updated: tap Reload." : "Couldn't load this game. Connect to the internet, then tap Reload."
+      }</p><button class="btn load-retry" data-reload>Reload</button>`;
+      main.querySelector('[data-reload]')!.addEventListener('click', () => page.reload());
       return;
     }
     if (current !== navigation) return; // user navigated away while loading

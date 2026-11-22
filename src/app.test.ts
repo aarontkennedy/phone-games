@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { startApp } from './app';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { page, startApp } from './app';
 import type { Category, GameMeta, GameModule } from './core/game';
 import { levelSetting, settingRow, settingsHtml } from './core/ui';
 import { flush } from './test/helpers';
@@ -399,11 +399,47 @@ describe('startApp', () => {
     stop();
   });
 
-  it('shows an error if a game fails to load', async () => {
-    const { root, stop, go } = setup([game('a', () => Promise.reject(new Error('offline')))]);
-    await go('#/a');
-    expect(root.querySelector('.game')!.textContent).toContain("Couldn't load this game");
-    stop();
+  describe('a game that fails to load', () => {
+    beforeEach(() => sessionStorage.clear());
+    afterEach(() => vi.restoreAllMocks());
+
+    it('reloads once, online, to fetch a freshly updated app', async () => {
+      const reload = vi.spyOn(page, 'reload').mockImplementation(() => {});
+      const { root, stop, go } = setup([game('a', () => Promise.reject(new Error('gone')))]);
+      await go('#/a');
+      expect(reload).toHaveBeenCalledTimes(1);
+      expect(root.querySelector('[data-reload]')).toBeNull();
+      // Failing again right after: no second reload, but a message and a Reload button.
+      await go('#/');
+      await go('#/a');
+      expect(reload).toHaveBeenCalledTimes(1);
+      expect(root.querySelector('.game')!.textContent).toContain("Couldn't load this game. The app may have just updated: tap Reload.");
+      root.querySelector<HTMLButtonElement>('[data-reload]')!.click();
+      expect(reload).toHaveBeenCalledTimes(2);
+      stop();
+    });
+
+    it('offline, says to connect first', async () => {
+      const reload = vi.spyOn(page, 'reload').mockImplementation(() => {});
+      vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+      const { root, stop, go } = setup([game('a', () => Promise.reject(new Error('offline')))]);
+      await go('#/a');
+      expect(reload).not.toHaveBeenCalled();
+      expect(root.querySelector('.game')!.textContent).toContain("Couldn't load this game. Connect to the internet, then tap Reload.");
+      stop();
+    });
+
+    it('doesn’t reload when it can’t remember having done so', async () => {
+      const reload = vi.spyOn(page, 'reload').mockImplementation(() => {});
+      vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+        throw new Error('blocked');
+      });
+      const { root, stop, go } = setup([game('a', () => Promise.reject(new Error('gone')))]);
+      await go('#/a');
+      expect(reload).not.toHaveBeenCalled();
+      expect(root.querySelector('[data-reload]')).not.toBeNull();
+      stop();
+    });
   });
 
   it('offers a problem report if a game crashes while starting', async () => {

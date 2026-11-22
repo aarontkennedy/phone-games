@@ -619,6 +619,13 @@ body {
   flex: 1 1 0;
 }
 
+/* A game that couldn't load: its Reload button, under the message. */
+.load-retry {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-3);
+}
+
 /* Coaching (src/core/coach.ts): Hint gets its own row just above the game's buttons.
    Tapping it shows the best play in the same spot, leaving the status line alone. */
 .coach {
