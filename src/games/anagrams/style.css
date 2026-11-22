@@ -1,0 +1,78 @@
+/* The words found so far (newest first, scrolling when there are many), the word you're
+   spelling in seven slots, and the seven letter tiles to tap. */
+.an-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  touch-action: manipulation;
+}
+
+.an-found {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-3);
+  width: 100%;
+  max-height: calc(3 * 1.4em + 2 * var(--space-1));
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  line-height: 1.4;
+}
+
+.an-found .an-seven {
+  color: var(--accent);
+  font-weight: 800;
+}
+
+.an-found .an-none {
+  color: var(--muted);
+}
+
+.an-word,
+.an-tiles {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 46px));
+  gap: var(--space-1);
+  justify-content: center;
+  width: 100%;
+}
+
+.an-slot,
+.an-tile {
+  display: grid;
+  place-items: center;
+  height: 46px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-xl);
+  font-weight: 800;
+}
+
+.an-slot {
+  border-bottom: 3px solid var(--border);
+}
+
+.an-tile {
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+/* A tile already in your word: an empty space, so the rest are easy to see. */
+.an-tile:disabled {
+  border-style: dashed;
+  background: transparent;
+  color: transparent;
+  cursor: default;
+}
+
+/* Delete, Shuffle and Enter on one row; Hint and Next word on the next. */
+.an-break {
+  flex-basis: 100%;
+  height: 0;
+}

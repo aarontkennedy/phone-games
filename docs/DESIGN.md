@@ -258,8 +258,9 @@ Texas Hold'em, Five-Card Draw, Euchre bids, Yacht, Shut the Box) teach it, so th
 gets better rather than just getting told. Craps, Baccarat and Mines have Hint without a
 Right score: Craps and Baccarat have better and worse bets rather than one right one, and
 Mines teaches reasoning (Hint outlines a square the numbers prove, and the number that
-proves it). The solitaires (Solitaire, Spider, Free Cells, Pyramid) keep their own Hint
-and Undo buttons, which suggest a move rather than teach a strategy.
+proves it). The solitaires (Solitaire, Spider, Free Cells, Pyramid), the word games,
+Peg Solitaire and Cross Sums keep plain Hint buttons, which suggest a move (or a word, or
+a square) rather than teach a strategy.
 
 - **Shared:** `coach(id)` from `src/core/coach.ts` makes the Hint row and the Right score,
   saved as `${id}:accuracy`. The Hint button (light bulb) sits in its own row just above

@@ -36,6 +36,12 @@ const GAMES = [
   { id: 'pyramid', title: 'Pyramid' },
   { id: 'baccarat', title: 'Baccarat' },
   { id: 'shutbox', title: 'Shut the Box' },
+  { id: 'anagrams', title: 'Anagrams' },
+  { id: 'wordsearch', title: 'Word Search' },
+  { id: 'ladder', title: 'Word Ladder' },
+  { id: 'wordgrid', title: 'Word Grid' },
+  { id: 'pegs', title: 'Peg Solitaire' },
+  { id: 'crosssums', title: 'Cross Sums' },
   { id: 'craps', title: 'Craps' },
   { id: 'paigow', title: 'Pai Gow Poker' },
 ];

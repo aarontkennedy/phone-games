@@ -1,0 +1,129 @@
+/* A 6 by 6 board: black squares, clue squares (a diagonal line, the across total top right
+   and the down total bottom left), and white squares to fill. A digit that repeats in a run
+   is red and underlined; digits Hint filled in are bold. */
+.cs-sums {
+  --xs-wrong: #b3141b;
+}
+
+@media (prefers-color-scheme: dark) {
+  .cs-sums {
+    --xs-wrong: #ff8a80;
+  }
+}
+
+.xs-board {
+  padding: var(--space-2);
+  touch-action: manipulation;
+}
+
+.xs-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  width: min(100%, 380px);
+  margin: 0 auto;
+}
+
+.xs-cell,
+.xs-black,
+.xs-clue {
+  aspect-ratio: 1;
+  min-width: var(--tap);
+  border-radius: var(--radius-sm);
+}
+
+.xs-black,
+.xs-clue {
+  background: var(--surface-2);
+}
+
+.xs-clue {
+  position: relative;
+  color: var(--text);
+  line-height: 1;
+}
+
+.xs-clue svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  stroke: var(--muted);
+  stroke-width: 0.3;
+}
+
+.xs-clue b {
+  position: absolute;
+  font-size: var(--text-sm);
+}
+
+.xs-across {
+  top: 3px;
+  right: 4px;
+}
+
+.xs-down {
+  bottom: 3px;
+  left: 4px;
+}
+
+.xs-cell {
+  padding: 0;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-xl);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.xs-cell.picked {
+  outline: 3px solid var(--highlight);
+  outline-offset: -3px;
+}
+
+.xs-cell.given {
+  font-weight: 800;
+}
+
+.xs-cell.wrong {
+  color: var(--xs-wrong);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+/* 1 to 6, then 7 to 9, Erase and Hint, like Number Place's keypad. */
+.xs-pad {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-2);
+  flex: 1 1 100%;
+}
+
+.xs-pad .btn {
+  padding-inline: 0;
+  border-radius: var(--radius-sm);
+}
+
+.xs-erase svg {
+  display: block;
+  width: 26px;
+  height: 26px;
+  margin: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.xs-hint {
+  font-size: var(--text-sm);
+}
+
+@media (orientation: landscape) and (max-height: 560px) {
+  .xs-pad {
+    gap: var(--space-1);
+  }
+}

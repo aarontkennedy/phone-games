@@ -323,6 +323,71 @@ test('Shut the Box: roll, shut tiles that make the roll', async ({ page }) => {
   await expectGoodLayout(page);
 });
 
+test('Anagrams: spell a word from the tiles', async ({ page }) => {
+  await page.goto('./#/anagrams');
+  await expectGoodLayout(page);
+  // Hint shows the 7-letter word a letter at a time; seven taps show it all, then spell it.
+  for (let i = 0; i < 7; i++) await page.locator('[data-hint]').click();
+  const word = (await status(page).textContent())!.match(/starts ([A-Z]{7})/)![1];
+  for (const ch of word) await page.locator(`[data-tile]:enabled:text-is("${ch}")`).first().click();
+  await page.locator('[data-enter]').click();
+  await expect(status(page)).toHaveText(`${word}: 17 points. All seven letters!`);
+  await expectGoodLayout(page);
+});
+
+test('Word Search: find a word from the hint', async ({ page }) => {
+  await page.goto('./#/wordsearch');
+  await expectGoodLayout(page);
+  await page.locator('[data-hint]').click();
+  await expect(status(page)).toHaveText(/^Hint: [A-Z]+ starts at the outlined letter\.$/);
+  await expect(page.locator('.ws-cell.hint')).toHaveCount(1);
+  await expectGoodLayout(page);
+});
+
+test('Word Ladder: follow the hint one step', async ({ page }) => {
+  await page.goto('./#/ladder');
+  await expectGoodLayout(page);
+  await page.locator('[data-hint]').click();
+  const next = (await status(page).textContent())!.match(/to ([A-Z]{4})\./)![1];
+  const now = await page.locator('.ld-now').getAttribute('aria-label');
+  const word = now!.match(/[A-Z]{4}$/)![0];
+  const at = [...word].findIndex((ch, i) => ch !== next[i]);
+  await page.locator(`[data-at="${at}"]`).click();
+  await page.locator(`[data-letter="${next[at]}"]`).click();
+  await expect(page.locator('[data-steps]')).toHaveText('1');
+  await expectGoodLayout(page);
+});
+
+test('Word Grid: take a hint and finish the round', async ({ page }) => {
+  await page.goto('./#/wordgrid');
+  await expectGoodLayout(page);
+  await page.locator('[data-hint]').click();
+  await expect(status(page)).toHaveText(/^Hint: a \d-letter word starts at the outlined letter\.$/);
+  await page.locator('[data-done]').click();
+  await expect(status(page)).toHaveText(/^0 words for 0 points\. Some you missed: /);
+  await expectGoodLayout(page);
+});
+
+test('Peg Solitaire: jump a peg into the center', async ({ page }) => {
+  await page.goto('./#/pegs');
+  await expectGoodLayout(page);
+  await page.locator('[data-cell="10"]').click(); // two above the center
+  await page.locator('[data-cell="24"]').click(); // the center
+  await expect(page.locator('[data-pegs]')).toHaveText('31');
+  await page.locator('[data-hint]').click();
+  await expect(page.locator('.pg-hole.hint')).toHaveCount(2);
+  await expectGoodLayout(page);
+});
+
+test('Cross Sums: fill a square, and hint another', async ({ page }) => {
+  await page.goto('./#/crosssums');
+  await expectGoodLayout(page);
+  const before = Number(await page.locator('[data-left]').textContent());
+  await page.locator('[data-hint]').click();
+  await expect(page.locator('[data-left]')).toHaveText(String(before - 1));
+  await expectGoodLayout(page);
+});
+
 test('Pai Gow Poker: deal, set the hand with the hint, and play', async ({ page }) => {
   await page.goto('./#/paigow');
   await expectGoodLayout(page);

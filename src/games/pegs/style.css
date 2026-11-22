@@ -1,0 +1,51 @@
+/* The 33-hole cross on a 7 by 7 grid. A peg is a solid circle; an empty hole is a ring.
+   The picked peg is outlined, the holes it can jump to are dashed, and the center hole
+   has a small ring of its own, so you can aim to finish there. */
+.pg-board {
+  padding: var(--space-3);
+  touch-action: manipulation;
+}
+
+.pg-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+  width: min(100%, 360px);
+  margin: 0 auto;
+}
+
+.pg-hole {
+  aspect-ratio: 1;
+  min-width: var(--tap);
+  padding: 0;
+  border: 3px solid var(--border);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pg-hole.peg {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+.pg-hole.center:not(.peg) {
+  border-style: double;
+  border-width: 5px;
+}
+
+.pg-hole.picked {
+  outline: 3px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+.pg-hole.target {
+  border-color: var(--highlight);
+  border-style: dashed;
+}
+
+/* Hint's jump: the peg and the hole it goes to, dashed. */
+.pg-hole.hint {
+  outline: 3px dashed var(--highlight);
+  outline-offset: 2px;
+}

@@ -28,3 +28,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+ENABLE word list (the word games' list of words, src/core/words/enable.txt)
+Enhanced North American Benchmark LExicon, by Alan Beale and M. Cooper
+License: Public domain
+
+From its readme: "The ENABLE master word list, WORD.LST, is herewith formally
+released into the Public Domain. Anyone is free to use it or distribute it in
+any manner they see fit. [...] Game designers may feel free to incorporate the
+WORD.LST into their games. Please mention the source and credit us as
+originators of the list."
+
+This app keeps the list's words of 3 to 8 letters, minus slurs and vulgar
+words (scripts/make-words.mjs). The word list stays in the public domain: this
+app's license doesn't restrict copying or sharing it.

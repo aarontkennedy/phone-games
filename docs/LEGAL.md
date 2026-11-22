@@ -30,6 +30,9 @@ protected list. Add to that list when you learn of a new one.
 | Farkle | Hot Dice | Farkle (possibly a trademark; kept off to be safe) |
 | Othello | Reversi | Othello |
 | Kalah (a mancala game) | Mancala | Kalah (an old trade name) |
+| Kakuro | Cross Sums | Kakuro (a name tied to the publisher Nikoli, like Sudoku) |
+| Boggle | Word Grid (our own letter frequencies and rules wording) | Boggle, and its letter cubes |
+| Word ladder (Lewis Carroll's "Doublets") | Word Ladder | |
 | UNO | Don't build one; Crazy Eights covers it | UNO, and its card design |
 | Chess, Checkers, Cribbage, Blackjack, Spades, Hearts, Euchre, Dominoes, Gin Rummy | Same. These are generic. | Brand names of specific apps |
 | Roulette, Craps, Pai Gow Poker, Video Poker, Texas Hold'em, Five-Card Draw | Same. These are generic (Pai Gow Poker was never patented or trademarked). | Brand names of specific casinos and machines |
@@ -55,6 +58,18 @@ protected list. Add to that list when you learn of a new one.
   Workbox, which provides offline support.
 - **Don't paste code** from other projects, blogs or Stack Overflow. Stack Overflow
   posts are CC-BY-SA, which has share-alike terms. Write it fresh.
+
+## Word lists
+
+- The word games check words against **ENABLE** (public domain; credited in
+  public/THIRD_PARTY_NOTICES.txt and on the About page, as its authors ask). Its authors
+  also ask that apps not restrict copying the list itself: the notice says it stays in
+  the public domain. `scripts/make-words.mjs` builds our copy (3 to 8 letters, slurs and
+  vulgar words removed).
+- Don't use word-frequency or "common words" lists built from Wiktionary or similar
+  sources: they're CC-BY-SA (share-alike). The everyday-word lists that pick puzzles
+  (src/games/*/words.ts) are written for this app.
+- Never use the official Scrabble dictionaries (OSPD, TWL, Collins): they're copyrighted.
 
 ## Assets (images, sounds, fonts)
 

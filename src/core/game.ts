@@ -20,6 +20,7 @@ export const CATEGORIES = [
   { id: 'cards', title: 'Card games' },
   { id: 'casino', title: 'Casino' },
   { id: 'puzzles', title: 'Puzzles' },
+  { id: 'words', title: 'Words' },
   { id: 'board', title: 'Board games' },
   { id: 'dice', title: 'Dice and tiles' },
 ] as const;

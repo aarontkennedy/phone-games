@@ -311,3 +311,60 @@ export const pyramidIcon = svg(
     .map(([x, y, fill]) => `<rect x="${x}" y="${y}" width="12" height="15" rx="2" fill="${fill}" stroke="#2a8a6c" stroke-width="2"/>`)
     .join(''),
 );
+
+/** A ladder of four letter tiles, one letter changing at each rung. */
+export const ladderIcon = svg(
+  '<path d="M10 4v40M38 4v40" stroke="#8a5a2b" stroke-width="3" stroke-linecap="round"/>' +
+    [8, 19, 30].map((y, i) => `<rect x="13" y="${y}" width="22" height="9" rx="2" fill="${['#ffd08a', '#4fbcac', '#ef5f58'][i]}"/>`).join(''),
+);
+
+/** Scrambled letter tiles, two of them lifted into a word. */
+export const anagramsIcon = svg(
+  [
+    [4, 26, '#ffd08a'],
+    [16, 26, '#4fbcac'],
+    [28, 26, '#ef5f58'],
+    [10, 8, '#2a8a6c'],
+    [24, 8, '#2a8a6c'],
+  ]
+    .map(([x, y, fill]) => `<rect x="${x}" y="${y}" width="${Number(y) === 8 ? 13 : 11}" height="13" rx="3" fill="${fill}"/>`)
+    .join('') + '<rect x="40" y="26" width="5" height="13" rx="2" fill="#2a8a6c"/>',
+);
+
+/** A grid of letter squares with one word circled across it. */
+export const wordSearchIcon = svg(
+  [0, 1, 2, 3]
+    .flatMap((r) => [0, 1, 2, 3].map((c) => `<rect x="${5 + c * 10}" y="${5 + r * 10}" width="8" height="8" rx="1.5" fill="${r === 1 ? '#ffd08a' : '#cfe3dc'}"/>`))
+    .join('') + '<rect x="3" y="13" width="42" height="12" rx="6" fill="none" stroke="#ef5f58" stroke-width="2.5"/>',
+);
+
+/** A 4 by 4 grid of letter tiles, a path of three lit up. */
+export const wordGridIcon = svg(
+  [0, 1, 2, 3]
+    .flatMap((r) => [0, 1, 2, 3].map((c) => {
+      const lit = (r === 0 && c === 0) || (r === 1 && c === 1) || (r === 1 && c === 2);
+      return `<rect x="${4 + c * 10.5}" y="${4 + r * 10.5}" width="9" height="9" rx="2" fill="${lit ? '#2a8a6c' : '#cfe3dc'}"/>`;
+    }))
+    .join(''),
+);
+
+/** The cross of holes, filled with pegs but for the center. */
+export const pegsIcon = svg(
+  Array.from({ length: 49 }, (_, i) => [Math.floor(i / 7), i % 7])
+    .filter(([r, c]) => (r >= 2 && r <= 4) || (c >= 2 && c <= 4))
+    .map(([r, c]) => `<circle cx="${6 + c * 6}" cy="${6 + r * 6}" r="2.4" fill="${r === 3 && c === 3 ? '#cfe3dc' : '#2a8a6c'}"/>`)
+    .join(''),
+);
+
+/** A small cross-sums board: clue squares with a diagonal, white squares, one filled in. */
+export const crossSumsIcon = svg(
+  [0, 1, 2]
+    .flatMap((r) => [0, 1, 2].map((c) => {
+      const clue = r === 0 || c === 0;
+      const x = 5 + c * 13;
+      const y = 5 + r * 13;
+      return `<rect x="${x}" y="${y}" width="12" height="12" rx="2" fill="${clue ? '#2a8a6c' : '#ffffff'}" stroke="#2a8a6c" stroke-width="1.5"/>` +
+        (clue && (r || c) ? `<path d="M${x + 1} ${y + 1}L${x + 11} ${y + 11}" stroke="#ffffff" stroke-width="1.5"/>` : '');
+    }))
+    .join('') + '<rect x="23" y="23" width="8" height="8" rx="1" fill="#ffd08a"/>',
+);

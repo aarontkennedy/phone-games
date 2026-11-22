@@ -1,7 +1,7 @@
 import type { GameMeta } from '../core/game';
 import { BULB_ICON, ERASE_ICON, NEW_GAME, SETTINGS, inlineIcon } from '../core/icons';
 import { chartHtml as blackjackChart } from './blackjack/strategy';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon, rouletteIcon, crapsIcon, paiGowIcon, shutBoxIcon, baccaratIcon, pyramidIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon, rouletteIcon, crapsIcon, paiGowIcon, shutBoxIcon, baccaratIcon, pyramidIcon, ladderIcon, anagramsIcon, wordSearchIcon, wordGridIcon, pegsIcon, crossSumsIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -332,6 +332,50 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./checkers'),
+  },
+  {
+    id: 'pegs',
+    title: 'Peg Solitaire',
+    description: 'Jump pegs until only one is left',
+    icon: pegsIcon,
+    category: 'puzzles',
+    howToPlay: {
+      goal: 'Jump pegs off the board until only one is left. Ending with that peg in the center is a perfect game.',
+      steps: [
+        'Every hole starts with a peg except the one in the center.',
+        'Tap a peg, then an empty hole two away across or up and down (not diagonally), with a peg in between. Your peg jumps there, and the peg it jumped over comes off.',
+        'The holes your picked peg can jump to are dashed. Tap a different peg to pick that one instead.',
+        'The game ends when no jumps are left. One peg left wins. <b>Best</b> is the fewest pegs you’ve ever left.',
+      ],
+      tips: [
+        'Stuck? Tap <b>Hint</b>: it outlines a jump from which you can still get down to one peg. If there’s none, it says so. <b>Undo</b> takes jumps back.',
+        'Work from the edges in. Pegs stranded in the corners of the cross are the hardest to clear.',
+        'Keep pegs together: a peg on its own can’t be jumped.',
+      ],
+    },
+    load: () => import('./pegs'),
+  },
+  {
+    id: 'crosssums',
+    title: 'Cross Sums',
+    description: 'Fill in digits so every run adds up',
+    icon: crossSumsIcon,
+    category: 'puzzles',
+    howToPlay: {
+      goal: 'Fill every white square with a digit from 1 to 9 so each run adds up to its clue.',
+      steps: [
+        'A <b>run</b> is a line of white squares across or down. Its clue is in the gray square just before it: the number at the top right is the total of the run to its right, and the number at the bottom left is the total of the run below it.',
+        'A run never uses the same digit twice. So a run of two squares totaling 3 must be 1 and 2, in some order.',
+        'Tap a white square, then a number. The erase key clears it. A digit that repeats in a run turns red.',
+        'Every puzzle has exactly one answer. <b>Solved</b> counts the puzzles you’ve finished.',
+      ],
+      tips: [
+        'Stuck? Tap <b>Hint</b> to fill in one square: the one you picked, a wrong one, or the easiest one to work out.',
+        'Start with runs that can only be made one way: two squares totaling 3, 4, 16 or 17, or three squares totaling 6, 7, 23 or 24.',
+        'Where an across run and a down run cross, the digit has to fit both. That narrows it fast.',
+      ],
+    },
+    load: () => import('./crosssums'),
   },
   {
     id: 'numberplace',
@@ -835,11 +879,100 @@ export const games: GameMeta[] = [
     load: () => import('./mancala'),
   },
   {
+    id: 'anagrams',
+    title: 'Anagrams',
+    description: 'Spell words from seven scrambled letters',
+    icon: anagramsIcon,
+    category: 'words',
+    howToPlay: {
+      goal: 'Spell as many words as you can from seven letters.',
+      steps: [
+        'Tap letters to spell a word, then tap <b>Enter</b>. Each letter can be used once per word. <b>Delete</b> takes back the last letter.',
+        'Words need at least 3 letters. Names and abbreviations don’t count.',
+        'Each word scores a point per letter. A word that uses all seven letters scores 10 more.',
+        'The seven letters always make at least one 7-letter word. Tap <b>Next word</b> for new letters: the line under the letters then says how many words there were and what the 7-letter word was.',
+        '<b>Best</b> is your highest score for one set of letters.',
+      ],
+      tips: [
+        'Tap <b>Shuffle</b> to mix the letters up. A new order often shows you words you missed.',
+        'Stuck on the 7-letter word? Tap <b>Hint</b> to see how it starts, one more letter each time.',
+        'Look for endings like -S, -ED, -ER and -ING: one word often gives you several more.',
+      ],
+    },
+    load: () => import('./anagrams'),
+  },
+  {
+    id: 'wordsearch',
+    title: 'Word Search',
+    description: 'Find the hidden words in a grid of letters',
+    icon: wordSearchIcon,
+    category: 'words',
+    howToPlay: {
+      goal: 'Find all 8 words hidden in the grid.',
+      steps: [
+        'The words to find are listed under the grid, all on one theme.',
+        'Words read across, down, or diagonally down to the right, always forwards.',
+        'To mark a word, tap its first letter, then its last. Found words are filled in on the grid and crossed off the list.',
+        'Find all 8 to finish. <b>Solved</b> counts the puzzles you’ve finished.',
+      ],
+      tips: [
+        'Stuck? Tap <b>Hint</b>: it outlines the first letter of a word you haven’t found.',
+        'Look for a word’s unusual letters first, like a K, V or Z: there are fewer of them to check.',
+      ],
+    },
+    load: () => import('./wordsearch'),
+  },
+  {
+    id: 'wordgrid',
+    title: 'Word Grid',
+    description: 'Spell words with touching letters in a grid',
+    icon: wordGridIcon,
+    category: 'words',
+    howToPlay: {
+      goal: 'Find as many words as you can in a grid of 16 letters.',
+      steps: [
+        'Spell a word by tapping letters that touch: across, up and down, or diagonally. Each letter can be used once per word. Then tap <b>Enter</b>.',
+        'Tap the last letter again to take it back, or <b>Clear</b> to start over. Tapping a letter that doesn’t touch starts a new word there.',
+        'Words need at least 3 letters. Points by length: 3 or 4 letters score 1, 5 letters 2, 6 letters 3, 7 letters 5, and 8 letters 11.',
+        'There’s no clock. Tap <b>Done</b> when you’ve found all you can: the line under the grid then shows some words you missed. Tap <b>New grid</b> to play again.',
+        '<b>Best</b> is your highest score for one grid.',
+      ],
+      tips: [
+        'Stuck? Tap <b>Hint</b>: it outlines the letter a word you haven’t found starts on, and says how long it is.',
+        'Look for endings like -S, -ED and -ER near a word you’ve found: they often make another.',
+      ],
+    },
+    load: () => import('./wordgrid'),
+  },
+  {
+    id: 'ladder',
+    title: 'Word Ladder',
+    description: 'Change one letter at a time to reach the word',
+    icon: ladderIcon,
+    category: 'words',
+    howToPlay: {
+      goal: 'Turn the top word into the bottom word, one letter at a time.',
+      steps: [
+        'Tap the letter you want to change in the big word, then tap the new letter on the keyboard.',
+        'Each step must change exactly one letter and make a real word: COLD, CORD, CARD, WARD, WARM.',
+        'Your ladder so far is shown above the word you’re changing. Tap <b>Undo</b> to take a step back.',
+        '<b>Par</b> is the fewest steps it takes using everyday words. Any real word is allowed as a step, so you can sometimes beat it.',
+        '<b>Solved</b> counts the puzzles you’ve finished.',
+      ],
+      tips: [
+        'Stuck? Tap <b>Hint</b>: it says the next word on a shortest ladder, and outlines the letter to change.',
+        'Look at which letters the two words share. Those can usually stay put while you work on the others.',
+        'Vowels are the easiest letters to swap: lots of words differ by just a vowel.',
+      ],
+    },
+    load: () => import('./ladder'),
+  },
+  {
     id: 'hangman',
     title: 'Hangman',
     description: 'Guess the word one letter at a time',
     icon: hangmanIcon,
-    category: 'puzzles',
+    category: 'words',
     howToPlay: {
       goal: 'Find the hidden word before the figure is finished.',
       steps: [

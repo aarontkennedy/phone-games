@@ -65,6 +65,9 @@ const html = `
 
   <h2>Third-party software</h2>
   <p>Offline support uses Workbox by Google, under the MIT License.</p>
+  <p>The word games check words against the ENABLE word list by Alan Beale and M. Cooper,
+  which they released into the public domain. That list isn’t ours: it stays free for
+  anyone to use and share.</p>
   <details>
     <summary>Show the license notices</summary>
     <pre data-notices></pre>

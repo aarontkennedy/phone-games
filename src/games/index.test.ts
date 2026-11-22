@@ -27,6 +27,7 @@ const PROTECTED_NAMES = [
   'yatzy',
   'yatz',
   'kalah',
+  'kakuro', // Nikoli's name for cross sums
   // Proprietary casino table games: don't build them under these names.
   'three card poker',
   'let it ride',
@@ -66,6 +67,8 @@ describe('game registry', () => {
         'linearGradient, radialGradient, pattern, filter, image, foreignObject, [filter], [opacity]',
       );
       expect(banned, `${g.id} icon is not flat`).toHaveLength(0);
+      // Icons are small: text in one would be far under 18px (docs/DESIGN.md, "Readable text").
+      expect(doc.querySelectorAll('text'), `${g.id} icon has text`).toHaveLength(0);
     }
   });
 

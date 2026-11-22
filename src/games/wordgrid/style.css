@@ -1,0 +1,83 @@
+/* The word you're spelling, the 4 by 4 grid of letters, then the words found so far
+   (newest first, scrolling when there are many). Letters in your word are filled; the
+   last one you tapped is outlined too. */
+.wg-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  touch-action: manipulation;
+}
+
+.wg-word {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.wg-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-2);
+  width: min(100%, 228px);
+}
+
+.wg-cell {
+  aspect-ratio: 1;
+  min-height: var(--tap);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-xl);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.wg-cell:disabled {
+  cursor: default;
+}
+
+.wg-cell.picked {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.wg-cell.last {
+  outline: 3px solid var(--highlight);
+  outline-offset: 2px;
+}
+
+/* Where Hint's word starts: dashed, so it's not mistaken for your pick. */
+.wg-cell.hint {
+  outline: 3px dashed var(--highlight);
+  outline-offset: 2px;
+}
+
+.wg-found {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-1) var(--space-3);
+  width: 100%;
+  max-height: calc(2 * 1.4em + var(--space-1));
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  line-height: 1.4;
+}
+
+.wg-found .wg-none {
+  color: var(--muted);
+}
+
+/* Clear and Enter on one row; Hint and Done on the next. */
+.wg-break {
+  flex-basis: 100%;
+  height: 0;
+}

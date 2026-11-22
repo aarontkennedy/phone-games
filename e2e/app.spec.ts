@@ -36,6 +36,12 @@ const GAMES = [
   { id: 'pyramid', title: 'Pyramid' },
   { id: 'baccarat', title: 'Baccarat' },
   { id: 'shutbox', title: 'Shut the Box' },
+  { id: 'anagrams', title: 'Anagrams' },
+  { id: 'wordsearch', title: 'Word Search' },
+  { id: 'ladder', title: 'Word Ladder' },
+  { id: 'wordgrid', title: 'Word Grid' },
+  { id: 'pegs', title: 'Peg Solitaire' },
+  { id: 'crosssums', title: 'Cross Sums' },
   { id: 'craps', title: 'Craps' },
   { id: 'paigow', title: 'Pai Gow Poker' },
 ];
@@ -45,7 +51,7 @@ test.beforeEach(({ page }) => failOnErrors(page));
 test('home groups the games, and shows the most played once you’ve played', async ({ page }) => {
   await page.goto('./');
   const groups = page.locator('.home-group h2');
-  await expect(groups).toHaveText(['Card games', 'Casino', 'Puzzles', 'Board games', 'Dice and tiles']);
+  await expect(groups).toHaveText(['Card games', 'Casino', 'Puzzles', 'Words', 'Board games', 'Dice and tiles']);
   await expectNoHorizontalOverflow(page);
   await expectReadableText(page);
 

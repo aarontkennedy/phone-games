@@ -1,0 +1,89 @@
+/* Your ladder so far on one line, the word you're changing as big letter tiles, then the
+   target. Below, the keyboard (seven keys a row), then Hint and Undo. */
+.ld-board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  touch-action: manipulation;
+}
+
+.ld-path {
+  margin: 0;
+  color: var(--muted);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.ld-to {
+  margin: 0;
+  color: var(--muted);
+}
+
+.ld-word {
+  display: grid;
+  grid-template-columns: repeat(4, 52px);
+  gap: var(--space-2);
+}
+
+.ld-tile {
+  display: grid;
+  place-items: center;
+  height: 52px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-xl);
+  font-weight: 800;
+}
+
+button.ld-tile {
+  cursor: pointer;
+}
+
+.ld-tile.picked {
+  border-color: var(--highlight);
+  outline: 3px solid var(--highlight);
+  outline-offset: 1px;
+}
+
+/* The letter Hint says to change: dashed, so it's not mistaken for your pick. */
+.ld-tile.hint:not(.picked) {
+  outline: 3px dashed var(--highlight);
+  outline-offset: 1px;
+}
+
+.ld-target .ld-tile {
+  border-style: dashed;
+  background: transparent;
+}
+
+.controls > .ld-keys {
+  flex-basis: 100%;
+}
+
+.ld-keys {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+/* Keys, like a phone keyboard's: rounded squares, not the usual pill buttons. */
+.ld-keys .btn {
+  padding: 0;
+  border-radius: var(--radius-sm);
+}
+
+.ld-keys .ld-next {
+  grid-column: 1 / -1;
+}
+
+/* Sideways, nine keys a row keeps the side bar short enough to fit. */
+@media (orientation: landscape) and (max-height: 560px) {
+  .ld-keys {
+    grid-template-columns: repeat(9, minmax(0, 1fr));
+  }
+}
