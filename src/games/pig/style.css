@@ -1,0 +1,75 @@
+/* Whose turn, one big die, this turn's points, and a bar for each player's score toward
+   100 (yours in the accent color, the computer's muted). A rolled 1 turns red. */
+.pi {
+  --pi-bust: #b3141b;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pi {
+    --pi-bust: #ff8a80;
+  }
+}
+
+.pi-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.pi-turn,
+.pi-total {
+  margin: 0;
+}
+
+.pi-die {
+  display: block;
+  width: 96px;
+  height: 96px;
+  padding: 10px;
+  border: 3px solid var(--text);
+  border-radius: var(--radius);
+  background: var(--surface);
+  fill: var(--text);
+}
+
+.pi-die svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pi-die.blank {
+  border-style: dashed;
+  border-color: var(--border);
+}
+
+.pi-die.bust {
+  border-color: var(--pi-bust);
+  fill: var(--pi-bust);
+}
+
+.pi-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.pi-bar {
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-2);
+}
+
+.pi-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.pi-bar.p1 span {
+  background: var(--muted);
+}

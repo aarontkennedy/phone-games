@@ -1,7 +1,7 @@
 import type { GameMeta } from '../core/game';
 import { BULB_ICON, ERASE_ICON, NEW_GAME, SETTINGS, inlineIcon } from '../core/icons';
 import { chartHtml as blackjackChart } from './blackjack/strategy';
-import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon, rouletteIcon, crapsIcon, paiGowIcon, shutBoxIcon, baccaratIcon, pyramidIcon, ladderIcon, anagramsIcon, wordSearchIcon, wordGridIcon, pegsIcon, crossSumsIcon } from './icons';
+import { cardsIcon, checkersIcon, chipIcon, diceIcon, discsIcon, dominoIcon, eightIcon, fanIcon, freeCellsIcon, gridIcon, heartIcon, mineIcon, numberGridIcon, pairIcon, pegboardIcon, reversiIcon, spadeIcon, tilesIcon, yachtIcon, mancalaIcon, hangmanIcon, spiderIcon, backgammonIcon, dotsIcon, fishIcon, runIcon, knightIcon, videoPokerIcon, holdemIcon, drawPokerIcon, rouletteIcon, crapsIcon, paiGowIcon, shutBoxIcon, baccaratIcon, pyramidIcon, ladderIcon, anagramsIcon, wordSearchIcon, wordGridIcon, pegsIcon, crossSumsIcon, pigIcon, liarsDiceIcon } from './icons';
 
 // Add new games here. Each one is code-split and only loaded when opened.
 // Titles must pass the naming rules in docs/LEGAL.md; icons must be flat SVG (docs/DESIGN.md).
@@ -706,6 +706,53 @@ export const games: GameMeta[] = [
       ],
     },
     load: () => import('./dominoes'),
+  },
+  {
+    id: 'liarsdice',
+    title: 'Liar’s Dice',
+    description: 'Bid on everyone’s hidden dice, or call a bluff',
+    icon: liarsDiceIcon,
+    category: 'dice',
+    howToPlay: {
+      goal: 'Be the last player with dice, against two computer players, West and East.',
+      steps: [
+        'Everyone starts with five dice. You see only your own, at the bottom.',
+        'Players take turns bidding on how many dice on the whole table (everyone’s together) show a face: say, “four 5s”. Count your own, and guess the rest.',
+        'Each bid must be higher than the last: more dice, or the same number of a higher face. Set the number with − and +, pick a face, and tap <b>Bid</b>.',
+        'Think the last bid is too high? Tap <b>Liar!</b> Everyone’s dice are shown. If there are at least as many as bid, you lose a die. If not, the bidder does.',
+        'Whoever loses a die starts the next round, with everyone rolling again. Lose your last die and you’re out.',
+      ],
+      tips: [
+        `Not sure? Tap ${HINT} above the buttons. It works out the chances from your own dice: how likely the last bid is to be true, and the safest raise. With no wild faces, each die you can’t see shows any face 1 time in 6.`,
+        'A bid on a face you hold several of is safer: you know those dice are there.',
+        `<b>Easy</b> players call and raise loosely. <b>Strong</b> players follow the odds and bluff now and then. Change it any time with ${SETTINGS} at the top.`,
+      ],
+    },
+    load: () => import('./liarsdice'),
+  },
+  {
+    id: 'pig',
+    title: 'Pig',
+    description: 'Roll as long as you dare, but a 1 loses it all',
+    icon: pigIcon,
+    category: 'dice',
+    howToPlay: {
+      goal: 'Be the first to 100 points, playing against the computer.',
+      steps: [
+        'On your turn, tap <b>Roll</b> to roll one die. Each roll adds to your points for this turn.',
+        'Keep rolling as long as you like, then tap <b>Hold</b> to add this turn’s points to your score.',
+        'Roll a 1 and you lose this turn’s points, and the die passes to the computer.',
+        'The first to reach 100 wins. The bars under the die show how close each of you is.',
+        '<b>Right</b> is how often your choice to roll or hold matched the best one. After one that wasn’t, the line under the die says what was. Choices you make after tapping <b>Hint</b> don’t count.',
+      ],
+      tips: [
+        `Not sure? Tap ${HINT} above the buttons. It says whether to roll or hold for the best chance to win the game, worked out exactly for every score.`,
+        'Early on, holding at about 20 is a good rule: below that, rolling again gains more than it risks.',
+        'Behind? Roll longer. Ahead, or close to 100? Hold sooner.',
+        `<b>Easy</b> holds at a loose total. <b>Strong</b> plays the best roll or hold every time. Change it any time with ${SETTINGS} at the top.`,
+      ],
+    },
+    load: () => import('./pig'),
   },
   {
     id: 'shutbox',

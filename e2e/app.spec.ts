@@ -42,6 +42,8 @@ const GAMES = [
   { id: 'wordgrid', title: 'Word Grid' },
   { id: 'pegs', title: 'Peg Solitaire' },
   { id: 'crosssums', title: 'Cross Sums' },
+  { id: 'pig', title: 'Pig' },
+  { id: 'liarsdice', title: 'Liar’s Dice' },
   { id: 'craps', title: 'Craps' },
   { id: 'paigow', title: 'Pai Gow Poker' },
 ];

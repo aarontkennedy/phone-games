@@ -1,0 +1,118 @@
+/* West and East at the top with their dice hidden (shown after a call), the bid in the
+   middle, your dice at the bottom: each seat's name beside its dice. Whoever's turn it is
+   gets an outline. After a call, the dice showing the bid's face are filled. Below: a bid
+   row (fewer, number, more, Bid, Liar!); the six faces to bid on sit on the board, under
+   your dice. */
+.li-table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+}
+
+.li-seat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+}
+
+.li-seat.turn {
+  border-color: var(--highlight);
+}
+
+.li-name {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.li-said {
+  color: var(--muted);
+}
+
+.li-dice {
+  display: flex;
+  flex: none;
+  gap: 3px;
+  min-height: 40px;
+}
+
+.li-die {
+  display: block;
+  width: 40px;
+  height: 40px;
+  padding: 4px;
+  border: 2px solid var(--text);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  fill: var(--text);
+}
+
+.li-die svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.li-die.hidden {
+  border-color: var(--border);
+  background: var(--surface-2);
+}
+
+.li-die.match {
+  background: var(--accent);
+  border-color: var(--accent);
+  fill: var(--on-accent);
+}
+
+.li-out {
+  color: var(--muted);
+}
+
+.li-bid {
+  margin: 0;
+  text-align: center;
+}
+
+/* The steppers stay square; Bid and Liar! share the rest of the row. */
+.li-bidrow {
+  align-items: center;
+}
+
+.li-bidrow > .li-step {
+  flex: none;
+  min-width: var(--tap);
+  padding: 0;
+}
+
+.li-qty {
+  flex: none;
+  min-width: 2ch;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.li-faces {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: var(--space-1);
+}
+
+.li-face {
+  padding: 6px;
+  border-radius: var(--radius-sm);
+  fill: currentColor;
+}
+
+.li-face svg {
+  display: block;
+  width: 28px;
+  height: 28px;
+  margin: auto;
+}

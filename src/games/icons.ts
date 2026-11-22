@@ -368,3 +368,16 @@ export const crossSumsIcon = svg(
     }))
     .join('') + '<rect x="23" y="23" width="8" height="8" rx="1" fill="#ffd08a"/>',
 );
+
+/** A die showing 1 beside a stack of chips: roll on, or bank. */
+export const pigIcon = svg(
+  '<rect x="4" y="10" width="24" height="24" rx="5" fill="#ffffff" stroke="#23202e" stroke-width="2"/><circle cx="16" cy="22" r="3" fill="#ef5f58"/>' +
+    [0, 1, 2].map((i) => `<rect x="31" y="${30 - i * 7}" width="14" height="6" rx="2" fill="${['#2a8a6c', '#4fbcac', '#ffd08a'][i]}"/>`).join(''),
+);
+
+/** A cup tipped over a hidden die, beside one die shown. */
+export const liarsDiceIcon = svg(
+  '<path d="M6 10h20l-3 26H9z" fill="#8a5a2b"/><rect x="4" y="34" width="24" height="5" rx="2" fill="#5a3a1a"/>' +
+    '<rect x="29" y="22" width="16" height="16" rx="3" fill="#ffffff" stroke="#23202e" stroke-width="2"/>' +
+    '<circle cx="33.5" cy="26.5" r="1.6" fill="#23202e"/><circle cx="37" cy="30" r="1.6" fill="#23202e"/><circle cx="40.5" cy="33.5" r="1.6" fill="#23202e"/>',
+);

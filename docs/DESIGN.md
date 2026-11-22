@@ -254,9 +254,10 @@ line, which mostly points at the board), then what just happened, then the butto
 ### Coaching
 
 Games with a best play to learn (Blackjack, Video Poker, Cribbage discards, Hot Dice,
-Texas Hold'em, Five-Card Draw, Euchre bids, Yacht, Shut the Box) teach it, so the player
-gets better rather than just getting told. Craps, Baccarat and Mines have Hint without a
-Right score: Craps and Baccarat have better and worse bets rather than one right one, and
+Texas Hold'em, Five-Card Draw, Euchre bids, Yacht, Shut the Box, Pig) teach it, so the
+player gets better rather than just getting told. Craps, Baccarat, Liar's Dice and Mines have
+Hint without a Right score: Craps and Baccarat have better and worse bets rather than one
+right one, Liar's Dice is a bluffing game (Hint gives the odds from your own dice), and
 Mines teaches reasoning (Hint outlines a square the numbers prove, and the number that
 proves it). The solitaires (Solitaire, Spider, Free Cells, Pyramid), the word games,
 Peg Solitaire and Cross Sums keep plain Hint buttons, which suggest a move (or a word, or
@@ -281,7 +282,8 @@ a square) rather than teach a strategy.
   Five-Card Draw, which draws by the book). Some are rules of thumb, said so in the rules:
   Euchre counts the hand for trump (Strong's count), Yacht weighs each box against what it
   usually scores, looking ahead over the rolls left. Shut the Box is exact, from a table
-  of every set of open tiles. Craps and Baccarat rank bets by the house's share (Baccarat's
+  of every set of open tiles. Pig is exact too: the best play to win for every score,
+  worked out by scripts/make-pig.mjs (Neller and Presser's method) into policy.ts. Craps and Baccarat rank bets by the house's share (Baccarat's
   worked out exactly from a six-deck shoe in its tests); Mines finds squares the numbers
   prove. Each game's rules say how its Hint decides.
 - **Shown on the board too:** cards or dice to keep get the dashed `hint` outline.

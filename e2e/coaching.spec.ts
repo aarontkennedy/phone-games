@@ -113,10 +113,31 @@ test('Baccarat: Hint outlines the Banker bet', async ({ page }) => {
   await expectTouchTargets(page);
 });
 
+test('Pig: Hint says whether to roll or hold', async ({ page }) => {
+  await page.goto('./#/pig');
+  // A 1 on the first roll passes the turn; roll until there are points to decide about.
+  for (let i = 0; i < 10 && !(await page.locator('[data-hint]').count()); i++) {
+    const roll = page.locator('[data-roll]');
+    await expect(roll.or(page.locator('[data-hint]'))).toBeVisible({ timeout: 15_000 });
+    if (await roll.count()) await roll.click();
+  }
+  await expectHint(page, /^Best: (hold \d+|roll again)\.$/);
+});
+
+test('Liar’s Dice: Hint gives the odds', async ({ page }) => {
+  await page.goto('./#/liarsdice');
+  await expect(page.locator('[data-hint]')).toBeVisible({ timeout: 15_000 });
+  await page.locator('[data-hint]').click();
+  await expect(page.locator('[data-tip]')).toHaveText(/^Best: (bid|call)/);
+  await expectNoHorizontalOverflow(page);
+  await expectReadableText(page);
+  await expectTouchTargets(page);
+});
+
 test('three stats fit the side bar on a small phone held sideways', async ({ page }) => {
   await page.setViewportSize({ width: 667, height: 375 });
   // Each game's screen class, so the check waits for that game, not the one before it.
-  const games = { videopoker: 'vp', cribbage: 'cb', hotdice: 'hd', holdem: 'he', blackjack: 'bj', drawpoker: 'dp', euchre: 'eu', yacht: 'ya', shutbox: 'sb' };
+  const games = { videopoker: 'vp', cribbage: 'cb', hotdice: 'hd', holdem: 'he', blackjack: 'bj', drawpoker: 'dp', euchre: 'eu', yacht: 'ya', shutbox: 'sb', pig: 'pi' };
   for (const [id, screen] of Object.entries(games)) {
     await page.goto(`./#/${id}`);
     await expect(page.locator(`.screen.${screen} [data-accuracy]`)).toBeVisible();

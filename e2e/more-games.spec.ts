@@ -388,6 +388,26 @@ test('Cross Sums: fill a square, and hint another', async ({ page }) => {
   await expectGoodLayout(page);
 });
 
+test('Pig: roll, hold, and the computer takes its turn', async ({ page }) => {
+  await page.goto('./#/pig');
+  await expectGoodLayout(page);
+  await page.locator('[data-roll]').click();
+  await expect(status(page)).toHaveText(/^You have \d+ this turn|^A 1!/);
+  if (await page.locator('[data-hold]:enabled').count()) await page.locator('[data-hold]').click();
+  await expect(status(page)).toHaveText(/computer|Computer|A 1!/, { timeout: 5000 });
+  await expectGoodLayout(page);
+});
+
+test('Liar’s Dice: bid, and the others answer', async ({ page }) => {
+  await page.goto('./#/liarsdice');
+  await expectGoodLayout(page);
+  await page.locator('[data-face="6"]').click();
+  await page.locator('[data-bid]').click();
+  await expect(page.locator('[data-recent] li').first()).toHaveText(/^(You bid|West|East)/);
+  await expect(page.locator('[data-recent] li')).not.toHaveCount(0);
+  await expectGoodLayout(page);
+});
+
 test('Pai Gow Poker: deal, set the hand with the hint, and play', async ({ page }) => {
   await page.goto('./#/paigow');
   await expectGoodLayout(page);

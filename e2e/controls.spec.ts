@@ -7,7 +7,7 @@ const GAMES = [
   '2048', 'backgammon', 'blackjack', 'checkers', 'chess', 'craps', 'crazyeights', 'cribbage', 'dominoes', 'dots', 'drawpoker',
   'euchre', 'fourinarow', 'freecells', 'gin', 'gofish', 'hangman', 'hearts', 'holdem', 'hotdice', 'mancala', 'minesweeper',
   'numberplace', 'paigow', 'reversi', 'roulette', 'rummy', 'solitaire', 'spades', 'spider', 'tictactoe', 'videopoker', 'yacht',
-  'pyramid', 'baccarat', 'shutbox', 'anagrams', 'wordsearch', 'ladder', 'wordgrid', 'pegs', 'crosssums',
+  'pyramid', 'baccarat', 'shutbox', 'anagrams', 'wordsearch', 'ladder', 'wordgrid', 'pegs', 'crosssums', 'pig', 'liarsdice',
 ];
 
 test.beforeEach(async ({ page }) => {
